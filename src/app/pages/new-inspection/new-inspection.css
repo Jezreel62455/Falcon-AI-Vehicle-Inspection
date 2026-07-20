@@ -1,0 +1,16 @@
+h1{
+    margin-bottom:30px;
+}
+
+mat-card{
+    padding:25px;
+}
+
+mat-form-field{
+    width:100%;
+    margin-bottom:15px;
+}
+
+button{
+    margin-right:10px;
+}

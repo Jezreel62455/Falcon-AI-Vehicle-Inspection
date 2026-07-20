@@ -1,0 +1,40 @@
+import { Routes } from '@angular/router';
+
+export const routes: Routes = [
+  {
+    path: '',
+    loadComponent: () =>
+      import('./layout/main-layout/main-layout').then(
+        (m) => m.MainLayoutComponent
+      ),
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./pages/dashboard/dashboard').then((m) => m.Dashboard),
+      },
+      {
+        path: 'new-inspection',
+        loadComponent: () =>
+          import('./pages/new-inspection/new-inspection').then(
+            (m) => m.NewInspection
+          ),
+      },
+      {
+        path: 'history',
+        loadComponent: () =>
+          import('./pages/history/history').then((m) => m.History),
+      },
+      {
+        path: 'reports',
+        loadComponent: () =>
+          import('./pages/reports/reports').then((m) => m.Reports),
+      },
+      {
+        path: 'settings',
+        loadComponent: () =>
+          import('./pages/settings/settings').then((m) => m.Settings),
+      },
+    ],
+  },
+];

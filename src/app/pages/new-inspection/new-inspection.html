@@ -1,0 +1,86 @@
+<h1>New Vehicle Inspection</h1>
+
+<mat-stepper linear>
+
+  <mat-step [stepControl]="customerForm">
+
+    <form [formGroup]="customerForm">
+
+      <ng-template matStepLabel>Customer</ng-template>
+
+      <mat-form-field appearance="outline">
+        <mat-label>First Name</mat-label>
+        <input matInput formControlName="firstName">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Surname</mat-label>
+        <input matInput formControlName="surname">
+      </mat-form-field>
+
+      <br>
+
+      <button mat-raised-button color="primary" matStepperNext>
+        Next
+      </button>
+
+    </form>
+
+  </mat-step>
+
+  <mat-step [stepControl]="policyForm">
+
+    <form [formGroup]="policyForm">
+
+      <ng-template matStepLabel>Policy</ng-template>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Policy Number</mat-label>
+        <input matInput formControlName="policy">
+      </mat-form-field>
+
+      <br>
+
+      <button mat-button matStepperPrevious>
+        Back
+      </button>
+
+      <button mat-raised-button matStepperNext>
+        Next
+      </button>
+
+    </form>
+
+  </mat-step>
+
+  <mat-step [stepControl]="vehicleForm">
+
+    <form [formGroup]="vehicleForm">
+
+      <ng-template matStepLabel>Vehicle</ng-template>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Registration</mat-label>
+        <input matInput formControlName="registration">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>VIN</mat-label>
+        <input matInput formControlName="vin">
+      </mat-form-field>
+
+      <br>
+
+      <button mat-button matStepperPrevious>
+        Back
+      </button>
+
+      <button mat-raised-button color="primary">
+        Save
+      </button>
+
+    </form>
+
+  </mat-step>
+
+</mat-stepper>
