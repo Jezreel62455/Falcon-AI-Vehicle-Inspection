@@ -1,86 +1,1101 @@
-<h1>New Vehicle Inspection</h1>
+<div class="inspection-page">
 
-<mat-stepper linear>
+  <!-- HEADER -->
 
-  <mat-step [stepControl]="customerForm">
+  <div class="inspection-header">
 
-    <form [formGroup]="customerForm">
+    <div>
 
-      <ng-template matStepLabel>Customer</ng-template>
+      <div class="inspection-badge">
 
-      <mat-form-field appearance="outline">
-        <mat-label>First Name</mat-label>
-        <input matInput formControlName="firstName">
-      </mat-form-field>
+        <span *ngIf="inspectionType === 'pre-cover'">
+          🛡️ Pre-Cover Inspection
+        </span>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Surname</mat-label>
-        <input matInput formControlName="surname">
-      </mat-form-field>
+        <span *ngIf="inspectionType === 'accident'">
+          🚨 Accident Claim Inspection
+        </span>
 
-      <br>
+      </div>
 
-      <button mat-raised-button color="primary" matStepperNext>
-        Next
-      </button>
+      <h1>
+        {{ inspectionTitle }}
+      </h1>
 
-    </form>
+      <p>
+        {{ inspectionDescription }}
+      </p>
 
-  </mat-step>
+    </div>
 
-  <mat-step [stepControl]="policyForm">
+  </div>
 
-    <form [formGroup]="policyForm">
 
-      <ng-template matStepLabel>Policy</ng-template>
+  <!-- SUCCESS MESSAGE -->
 
-      <mat-form-field appearance="outline">
-        <mat-label>Policy Number</mat-label>
-        <input matInput formControlName="policy">
-      </mat-form-field>
+  <div
+    class="ai-processing-card"
+    *ngIf="inspectionSubmitted">
 
-      <br>
+    <div class="ai-icon">
+      ✅
+    </div>
 
-      <button mat-button matStepperPrevious>
-        Back
-      </button>
+    <div>
 
-      <button mat-raised-button matStepperNext>
-        Next
-      </button>
+      <h2>
+        Inspection Submitted Successfully
+      </h2>
 
-    </form>
+      <p>
+        Your inspection has been submitted for review.
+      </p>
 
-  </mat-step>
+      <p>
 
-  <mat-step [stepControl]="vehicleForm">
+        Inspection type:
 
-    <form [formGroup]="vehicleForm">
+        <strong>
 
-      <ng-template matStepLabel>Vehicle</ng-template>
+          {{ inspectionType === 'pre-cover'
+            ? 'Pre-Cover Inspection'
+            : 'Accident Claim Inspection'
+          }}
 
-      <mat-form-field appearance="outline">
-        <mat-label>Registration</mat-label>
-        <input matInput formControlName="registration">
-      </mat-form-field>
+        </strong>
 
-      <mat-form-field appearance="outline">
-        <mat-label>VIN</mat-label>
-        <input matInput formControlName="vin">
-      </mat-form-field>
+      </p>
 
-      <br>
+    </div>
 
-      <button mat-button matStepperPrevious>
-        Back
-      </button>
+  </div>
 
-      <button mat-raised-button color="primary">
-        Save
-      </button>
 
-    </form>
+  <!-- STEPPER -->
 
-  </mat-step>
+  <mat-stepper
+    linear
+    #stepper
+    *ngIf="!inspectionSubmitted">
 
-</mat-stepper>
+
+    <!-- CUSTOMER -->
+
+    <mat-step
+      [stepControl]="customerForm">
+
+      <form
+        [formGroup]="customerForm">
+
+        <ng-template
+          matStepLabel>
+
+          Customer
+
+        </ng-template>
+
+
+        <h2>
+          Customer Information
+        </h2>
+
+
+        <p class="step-description">
+
+          Tell us who is completing this inspection.
+
+        </p>
+
+
+        <div class="form-grid">
+
+
+          <mat-form-field
+            appearance="outline">
+
+            <mat-label>
+              First Name
+            </mat-label>
+
+            <input
+              matInput
+              formControlName="firstName">
+
+          </mat-form-field>
+
+
+          <mat-form-field
+            appearance="outline">
+
+            <mat-label>
+              Surname
+            </mat-label>
+
+            <input
+              matInput
+              formControlName="surname">
+
+          </mat-form-field>
+
+
+          <mat-form-field
+            appearance="outline">
+
+            <mat-label>
+              Phone Number
+            </mat-label>
+
+            <input
+              matInput
+              formControlName="phone">
+
+          </mat-form-field>
+
+
+          <mat-form-field
+            appearance="outline">
+
+            <mat-label>
+              Email Address
+            </mat-label>
+
+            <input
+              matInput
+              type="email"
+              formControlName="email">
+
+          </mat-form-field>
+
+
+        </div>
+
+
+        <div class="step-actions">
+
+          <button
+            mat-raised-button
+            color="primary"
+            matStepperNext>
+
+            Next
+
+          </button>
+
+        </div>
+
+
+      </form>
+
+    </mat-step>
+
+
+    <!-- POLICY -->
+
+    <mat-step
+      [stepControl]="policyForm">
+
+      <form
+        [formGroup]="policyForm">
+
+        <ng-template
+          matStepLabel>
+
+          Policy
+
+        </ng-template>
+
+
+        <h2>
+          Insurance Information
+        </h2>
+
+
+        <p class="step-description">
+
+          Enter the insurance policy information associated with this vehicle.
+
+        </p>
+
+
+        <div class="form-grid">
+
+
+          <mat-form-field
+            appearance="outline">
+
+            <mat-label>
+              Policy Number
+            </mat-label>
+
+            <input
+              matInput
+              formControlName="policy">
+
+          </mat-form-field>
+
+
+          <mat-form-field
+            appearance="outline">
+
+            <mat-label>
+              Insurance Company
+            </mat-label>
+
+            <input
+              matInput
+              formControlName="company">
+
+          </mat-form-field>
+
+
+        </div>
+
+
+        <div class="step-actions">
+
+
+          <button
+            mat-button
+            matStepperPrevious>
+
+            Back
+
+          </button>
+
+
+          <button
+            mat-raised-button
+            color="primary"
+            matStepperNext>
+
+            Next
+
+          </button>
+
+
+        </div>
+
+
+      </form>
+
+    </mat-step>
+
+
+    <!-- VEHICLE -->
+
+    <mat-step
+      [stepControl]="vehicleForm">
+
+      <form
+        [formGroup]="vehicleForm">
+
+        <ng-template
+          matStepLabel>
+
+          Vehicle
+
+        </ng-template>
+
+
+        <h2>
+          Vehicle Information
+        </h2>
+
+
+        <p class="step-description">
+
+          Provide the details of the vehicle being inspected.
+
+        </p>
+
+
+        <div class="form-grid">
+
+
+          <mat-form-field
+            appearance="outline">
+
+            <mat-label>
+              Registration
+            </mat-label>
+
+            <input
+              matInput
+              formControlName="registration">
+
+          </mat-form-field>
+
+
+          <mat-form-field
+            appearance="outline">
+
+            <mat-label>
+              VIN
+            </mat-label>
+
+            <input
+              matInput
+              formControlName="vin">
+
+          </mat-form-field>
+
+
+          <mat-form-field
+            appearance="outline">
+
+            <mat-label>
+              Make
+            </mat-label>
+
+            <input
+              matInput
+              formControlName="make">
+
+          </mat-form-field>
+
+
+          <mat-form-field
+            appearance="outline">
+
+            <mat-label>
+              Model
+            </mat-label>
+
+            <input
+              matInput
+              formControlName="model">
+
+          </mat-form-field>
+
+
+          <mat-form-field
+            appearance="outline">
+
+            <mat-label>
+              Year
+            </mat-label>
+
+            <input
+              matInput
+              formControlName="year">
+
+          </mat-form-field>
+
+
+          <mat-form-field
+            appearance="outline">
+
+            <mat-label>
+              Colour
+            </mat-label>
+
+            <input
+              matInput
+              formControlName="colour">
+
+          </mat-form-field>
+
+
+          <mat-form-field
+            appearance="outline">
+
+            <mat-label>
+              Mileage
+            </mat-label>
+
+            <input
+              matInput
+              formControlName="mileage">
+
+          </mat-form-field>
+
+
+        </div>
+
+
+        <div class="step-actions">
+
+
+          <button
+            mat-button
+            matStepperPrevious>
+
+            Back
+
+          </button>
+
+
+          <button
+            mat-raised-button
+            color="primary"
+            matStepperNext>
+
+            Next
+
+          </button>
+
+
+        </div>
+
+
+      </form>
+
+    </mat-step>
+
+
+    <!-- GUIDED VEHICLE PHOTOS -->
+
+    <mat-step>
+
+      <ng-template
+        matStepLabel>
+
+        Vehicle Photos
+
+      </ng-template>
+
+
+      <div class="photo-inspection">
+
+
+        <h2>
+          Guided Vehicle Photo Inspection
+        </h2>
+
+
+        <p class="step-description">
+
+          Please capture each required view of the vehicle.
+
+          This helps us perform a complete inspection.
+
+        </p>
+
+
+        <!-- PROGRESS -->
+
+        <div class="photo-progress">
+
+
+          <strong>
+
+            {{ completedPhotoCount }}
+
+            of
+
+            {{ photos.length }}
+
+            photos completed
+
+          </strong>
+
+
+          <div class="progress-bar">
+
+
+            <div
+              class="progress-fill"
+              [style.width.%]="
+                (completedPhotoCount / photos.length) * 100
+              ">
+
+            </div>
+
+
+          </div>
+
+
+        </div>
+
+
+        <!-- CURRENT PHOTO -->
+
+        <div class="current-photo-card">
+
+
+          <div class="photo-number">
+
+            Photo
+
+            {{ currentPhotoIndex + 1 }}
+
+            of
+
+            {{ photos.length }}
+
+          </div>
+
+
+          <h2>
+
+            📸
+
+            {{ currentPhoto.title }}
+
+          </h2>
+
+
+          <p>
+
+            {{ currentPhoto.description }}
+
+          </p>
+
+
+          <!-- PHOTO PREVIEW -->
+
+          <div
+            class="photo-preview"
+            *ngIf="currentPhoto.preview">
+
+
+            <img
+              [src]="currentPhoto.preview"
+              alt="Vehicle inspection photo">
+
+
+          </div>
+
+
+          <!-- PHOTO INPUT -->
+
+          <input
+            type="file"
+            accept="image/*"
+            capture="environment"
+            [id]="currentPhoto.id"
+            hidden
+            (change)="
+              onPhotoSelected($event, currentPhoto)
+            ">
+
+
+          <label
+            class="upload-button"
+            [for]="currentPhoto.id">
+
+
+            📸
+
+            {{ currentPhoto.preview
+              ? 'Replace Photo'
+              : 'Take / Choose Photo'
+            }}
+
+
+          </label>
+
+
+          <div
+            class="photo-status"
+            *ngIf="currentPhoto.preview">
+
+
+            ✓ Photo captured
+
+          </div>
+
+
+        </div>
+
+
+        <!-- PHOTO NAVIGATION -->
+
+        <div class="photo-navigation">
+
+
+          <button
+            mat-button
+            (click)="previousPhoto()"
+            [disabled]="currentPhotoIndex === 0">
+
+
+            ← Previous
+
+          </button>
+
+
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="nextPhoto()"
+            [disabled]="
+              currentPhotoIndex === photos.length - 1
+            ">
+
+
+            Next →
+
+          </button>
+
+
+        </div>
+
+
+        <!-- PHOTO CHECKLIST -->
+
+        <div class="photo-checklist">
+
+
+          <h3>
+            Inspection Photo Checklist
+          </h3>
+
+
+          <div
+            class="checklist-item"
+            *ngFor="
+              let photo of photos;
+              let i = index
+            "
+            (click)="goToPhoto(i)">
+
+
+            <span>
+
+              {{ photo.file ? '✓' : '○' }}
+
+            </span>
+
+
+            <span>
+
+              {{ photo.title }}
+
+            </span>
+
+
+          </div>
+
+
+        </div>
+
+
+        <!-- ACCIDENT DAMAGE PHOTOS -->
+
+        <div
+          class="accident-damage-section"
+          *ngIf="inspectionType === 'accident'">
+
+
+          <h2>
+            🚨 Accident Damage Photos
+          </h2>
+
+
+          <p>
+
+            Add additional photos showing the damage caused by the accident.
+
+          </p>
+
+
+          <input
+            type="file"
+            multiple
+            accept="image/*"
+            (change)="onDamagePhotosSelected($event)">
+
+
+          <div
+            class="damage-preview">
+
+
+            <img
+              *ngFor="
+                let image of damagePhotoPreviews
+              "
+              [src]="image">
+
+
+          </div>
+
+
+        </div>
+
+
+      </div>
+
+
+      <!-- PHOTO STEP BUTTONS -->
+
+      <div class="step-actions">
+
+
+        <button
+          mat-button
+          matStepperPrevious>
+
+          Back
+
+        </button>
+
+
+        <button
+          mat-raised-button
+          color="primary"
+          matStepperNext
+          [disabled]="!allRequiredPhotosComplete">
+
+
+          Continue to Review
+
+        </button>
+
+
+      </div>
+
+
+    </mat-step>
+
+
+    <!-- REVIEW -->
+
+    <mat-step>
+
+      <ng-template
+        matStepLabel>
+
+        Review & Submit
+
+      </ng-template>
+
+
+      <h2>
+        Review Your Inspection
+      </h2>
+
+
+      <p class="step-description">
+
+        Please review all information before submitting your inspection.
+
+      </p>
+
+
+      <!-- INSPECTION TYPE -->
+
+      <div class="review-card">
+
+
+        <h3>
+          Inspection Type
+        </h3>
+
+
+        <p>
+
+          <strong>
+
+            {{ inspectionType === 'pre-cover'
+              ? '🛡️ Pre-Cover Inspection'
+              : '🚨 Accident Claim Inspection'
+            }}
+
+          </strong>
+
+        </p>
+
+
+      </div>
+
+
+      <!-- CUSTOMER -->
+
+      <div class="review-card">
+
+
+        <h3>
+          Customer Information
+        </h3>
+
+
+        <p>
+
+          <strong>
+            Name:
+          </strong>
+
+          {{ customerForm.value.firstName }}
+
+          {{ customerForm.value.surname }}
+
+        </p>
+
+
+        <p>
+
+          <strong>
+            Phone:
+          </strong>
+
+          {{ customerForm.value.phone || 'Not provided' }}
+
+        </p>
+
+
+        <p>
+
+          <strong>
+            Email:
+          </strong>
+
+          {{ customerForm.value.email || 'Not provided' }}
+
+        </p>
+
+
+      </div>
+
+
+      <!-- INSURANCE -->
+
+      <div class="review-card">
+
+
+        <h3>
+          Insurance Information
+        </h3>
+
+
+        <p>
+
+          <strong>
+            Policy Number:
+          </strong>
+
+          {{ policyForm.value.policy }}
+
+        </p>
+
+
+        <p>
+
+          <strong>
+            Insurance Company:
+          </strong>
+
+          {{ policyForm.value.company || 'Not provided' }}
+
+        </p>
+
+
+      </div>
+
+
+      <!-- VEHICLE -->
+
+      <div class="review-card">
+
+
+        <h3>
+          Vehicle Information
+        </h3>
+
+
+        <div class="review-grid">
+
+
+          <p>
+
+            <strong>
+              Registration:
+            </strong>
+
+            {{ vehicleForm.value.registration }}
+
+          </p>
+
+
+          <p>
+
+            <strong>
+              VIN:
+            </strong>
+
+            {{ vehicleForm.value.vin || 'Not provided' }}
+
+          </p>
+
+
+          <p>
+
+            <strong>
+              Make:
+            </strong>
+
+            {{ vehicleForm.value.make || 'Not provided' }}
+
+          </p>
+
+
+          <p>
+
+            <strong>
+              Model:
+            </strong>
+
+            {{ vehicleForm.value.model || 'Not provided' }}
+
+          </p>
+
+
+          <p>
+
+            <strong>
+              Year:
+            </strong>
+
+            {{ vehicleForm.value.year || 'Not provided' }}
+
+          </p>
+
+
+          <p>
+
+            <strong>
+              Colour:
+            </strong>
+
+            {{ vehicleForm.value.colour || 'Not provided' }}
+
+          </p>
+
+
+          <p>
+
+            <strong>
+              Mileage:
+            </strong>
+
+            {{ vehicleForm.value.mileage || 'Not provided' }}
+
+          </p>
+
+
+        </div>
+
+
+      </div>
+
+
+      <!-- VEHICLE PHOTO REVIEW -->
+
+      <div class="review-card">
+
+
+        <h3>
+          Vehicle Inspection Photos
+        </h3>
+
+
+        <p>
+
+          {{ completedPhotoCount }}
+
+          required vehicle photos captured.
+
+        </p>
+
+
+        <div class="review-images">
+
+
+          <div
+            *ngFor="let photo of photos">
+
+
+            <img
+              *ngIf="photo.preview"
+              [src]="photo.preview"
+              [alt]="photo.title">
+
+
+            <p>
+
+              {{ photo.title }}
+
+            </p>
+
+
+          </div>
+
+
+        </div>
+
+
+      </div>
+
+
+      <!-- ACCIDENT DAMAGE PHOTO REVIEW -->
+
+      <div
+        class="review-card"
+        *ngIf="inspectionType === 'accident'">
+
+
+        <h3>
+          Accident Damage Photos
+        </h3>
+
+
+        <p>
+
+          {{ damagePhotos.length }}
+
+          additional damage photo(s) selected.
+
+        </p>
+
+
+        <div class="review-images">
+
+
+          <img
+            *ngFor="
+              let image of damagePhotoPreviews
+            "
+            [src]="image">
+
+
+        </div>
+
+
+      </div>
+
+
+      <!-- SUBMIT -->
+
+      <div class="step-actions">
+
+
+        <button
+          mat-button
+          matStepperPrevious>
+
+          Back
+
+        </button>
+
+
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="submitInspection()">
+
+
+          ✅ Submit Inspection
+
+        </button>
+
+
+      </div>
+
+
+    </mat-step>
+
+
+  </mat-stepper>
+
+
+</div>

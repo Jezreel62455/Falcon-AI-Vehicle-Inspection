@@ -14,3 +14,26 @@ mat-form-field{
 button{
     margin-right:10px;
 }
+.preview-container {
+
+  display:flex;
+  gap:20px;
+  flex-wrap:wrap;
+
+  margin-top:20px;
+
+}
+
+
+.preview-container img {
+
+  width:180px;
+  height:130px;
+
+  object-fit:cover;
+
+  border-radius:10px;
+
+  box-shadow:0 3px 10px rgba(0,0,0,.2);
+
+}

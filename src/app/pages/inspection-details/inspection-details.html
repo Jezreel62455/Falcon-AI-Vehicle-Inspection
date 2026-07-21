@@ -1,0 +1,453 @@
+<div class="details-page">
+
+  @if (isLoading) {
+
+    <div class="loading">
+
+      Loading inspection details...
+
+    </div>
+
+  }
+
+
+  @if (errorMessage) {
+
+    <div class="error">
+
+      {{ errorMessage }}
+
+    </div>
+
+  }
+
+
+  @if (!isLoading && !errorMessage && inspection) {
+
+    <div class="page-header">
+
+      <div>
+
+        <h1>
+          Inspection Details
+        </h1>
+
+        <p>
+          View the complete vehicle inspection.
+        </p>
+
+      </div>
+
+
+      <button
+        type="button"
+        (click)="goBack()">
+
+        ← Back to History
+
+      </button>
+
+    </div>
+
+
+    <div class="details-grid">
+
+
+      <section class="details-card">
+
+        <h2>
+          Inspection Information
+        </h2>
+
+
+        <div class="detail-row">
+
+          <strong>
+            Inspection ID
+          </strong>
+
+          <span>
+            {{ inspection.id }}
+          </span>
+
+        </div>
+
+
+        <div class="detail-row">
+
+          <strong>
+            Status
+          </strong>
+
+          <span class="status">
+
+            {{ inspection.status }}
+
+          </span>
+
+        </div>
+
+
+        <div class="detail-row">
+
+          <strong>
+            Inspection Type
+          </strong>
+
+          <span>
+
+            {{ inspection.inspectionType || 'Pre-Cover Inspection' }}
+
+          </span>
+
+        </div>
+
+
+        <div class="detail-row">
+
+          <strong>
+            Submitted
+          </strong>
+
+          <span>
+
+            {{ inspection.createdAt | date:'medium' }}
+
+          </span>
+
+        </div>
+
+      </section>
+
+
+      <section class="details-card">
+
+        <h2>
+          Customer Information
+        </h2>
+
+
+        <div class="detail-row">
+
+          <strong>
+            Name
+          </strong>
+
+          <span>
+
+            {{ inspection.customer?.firstName }}
+
+            {{ inspection.customer?.surname }}
+
+          </span>
+
+        </div>
+
+
+        <div class="detail-row">
+
+          <strong>
+            Phone
+          </strong>
+
+          <span>
+
+            {{ inspection.customer?.phone || 'Not provided' }}
+
+          </span>
+
+        </div>
+
+
+        <div class="detail-row">
+
+          <strong>
+            Email
+          </strong>
+
+          <span>
+
+            {{ inspection.customer?.email || 'Not provided' }}
+
+          </span>
+
+        </div>
+
+      </section>
+
+
+      <section class="details-card">
+
+        <h2>
+          Policy Information
+        </h2>
+
+
+        <div class="detail-row">
+
+          <strong>
+            Policy
+          </strong>
+
+          <span>
+
+            {{ inspection.policy?.policy }}
+
+          </span>
+
+        </div>
+
+
+        <div class="detail-row">
+
+          <strong>
+            Insurance Company
+          </strong>
+
+          <span>
+
+            {{ inspection.policy?.company || 'Not provided' }}
+
+          </span>
+
+        </div>
+
+      </section>
+
+
+      <section class="details-card">
+
+        <h2>
+          Vehicle Information
+        </h2>
+
+
+        <div class="detail-row">
+
+          <strong>
+            Registration
+          </strong>
+
+          <span>
+
+            {{ inspection.vehicle?.registration }}
+
+          </span>
+
+        </div>
+
+
+        <div class="detail-row">
+
+          <strong>
+            VIN
+          </strong>
+
+          <span>
+
+            {{ inspection.vehicle?.vin || 'Not provided' }}
+
+          </span>
+
+        </div>
+
+
+        <div class="detail-row">
+
+          <strong>
+            Make
+          </strong>
+
+          <span>
+
+            {{ inspection.vehicle?.make || 'Not provided' }}
+
+          </span>
+
+        </div>
+
+
+        <div class="detail-row">
+
+          <strong>
+            Model
+          </strong>
+
+          <span>
+
+            {{ inspection.vehicle?.model || 'Not provided' }}
+
+          </span>
+
+        </div>
+
+
+        <div class="detail-row">
+
+          <strong>
+            Year
+          </strong>
+
+          <span>
+
+            {{ inspection.vehicle?.year || 'Not provided' }}
+
+          </span>
+
+        </div>
+
+
+        <div class="detail-row">
+
+          <strong>
+            Colour
+          </strong>
+
+          <span>
+
+            {{ inspection.vehicle?.colour || 'Not provided' }}
+
+          </span>
+
+        </div>
+
+
+        <div class="detail-row">
+
+          <strong>
+            Mileage
+          </strong>
+
+          <span>
+
+            {{ inspection.vehicle?.mileage || 'Not provided' }}
+
+          </span>
+
+        </div>
+
+      </section>
+
+
+      <section class="details-card photo-section">
+
+        <h2>
+          Vehicle Photos
+        </h2>
+
+
+        @if (
+          inspection.vehiclePhotos?.length
+        ) {
+
+          <div class="photo-grid">
+
+            @for (
+              photo of inspection.vehiclePhotos;
+              track photo.id
+            ) {
+
+              <div class="photo-card">
+
+                <div class="photo-placeholder">
+
+                  📷
+
+                </div>
+
+
+                <strong>
+
+                  {{ photo.title }}
+
+                </strong>
+
+
+                <small>
+
+                  {{ photo.fileName }}
+
+                </small>
+
+              </div>
+
+            }
+
+          </div>
+
+        }
+
+        @else {
+
+          <p>
+            No vehicle photos available.
+          </p>
+
+        }
+
+      </section>
+
+
+      <section class="details-card photo-section">
+
+        <h2>
+          Accident Damage Photos
+        </h2>
+
+
+        @if (
+          inspection.damagePhotos?.length
+        ) {
+
+          <div class="photo-grid">
+
+            @for (
+              photo of inspection.damagePhotos;
+              track photo.fileName
+            ) {
+
+              <div class="photo-card">
+
+                <div class="photo-placeholder">
+
+                  📷
+
+                </div>
+
+
+                <strong>
+
+                  Damage Photo
+
+                </strong>
+
+
+                <small>
+
+                  {{ photo.fileName }}
+
+                </small>
+
+              </div>
+
+            }
+
+          </div>
+
+        }
+
+        @else {
+
+          <p>
+            No accident damage photos available.
+          </p>
+
+        }
+
+      </section>
+
+    </div>
+
+  }
+
+</div>

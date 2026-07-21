@@ -1,31 +1,395 @@
 <div class="dashboard">
 
-  <h1>Falcon AI Vehicle Inspection Platform</h1>
+  <!-- HERO SECTION -->
+  <section class="hero">
 
-  <p>Welcome back!</p>
+    <div class="hero-content">
 
-  <div class="cards">
+      <div class="badge">
+        🚗 Falcon AI Vehicle Inspection
+      </div>
 
-    <div class="card">
-      <h2>Today's Inspections</h2>
-      <h1>18</h1>
+      <h1>
+        Smarter vehicle inspections.
+        <span>Powered by AI.</span>
+      </h1>
+
+      <p>
+        Complete your vehicle inspection remotely, securely and conveniently.
+        Whether you are applying for insurance or submitting an accident claim,
+        Falcon AI guides you through the entire process.
+      </p>
+
+      <div class="hero-actions">
+
+        <button
+          class="primary-button"
+          routerLink="/new-inspection"
+          [queryParams]="{ type: 'pre-cover' }">
+
+          Start Vehicle Inspection
+
+          <span>→</span>
+
+        </button>
+
+        <button
+          class="secondary-button"
+          routerLink="/history">
+
+          View My Inspections
+
+        </button>
+
+      </div>
+
     </div>
 
-    <div class="card">
-      <h2>Pending Reviews</h2>
-      <h1>5</h1>
+    <div class="hero-visual">
+
+      <div class="vehicle-card">
+
+        <div class="vehicle-icon">
+          🚘
+        </div>
+
+        <h3>Digital Vehicle Inspection</h3>
+
+        <p>
+          Secure. Guided. AI-assisted.
+        </p>
+
+        <div class="inspection-status">
+
+          <div class="status-dot"></div>
+
+          Inspection Platform Online
+
+        </div>
+
+      </div>
+
     </div>
 
-    <div class="card">
-      <h2>Completed</h2>
-      <h1>13</h1>
+  </section>
+
+
+  <!-- INSPECTION OPTIONS -->
+  <section class="inspection-options">
+
+    <div class="section-heading">
+
+      <h2>What do you need to do?</h2>
+
+      <p>
+        Select the type of vehicle inspection you would like to complete.
+      </p>
+
     </div>
 
-    <div class="card">
-      <h2>AI Alerts</h2>
-      <h1>2</h1>
+
+    <div class="option-grid">
+
+
+      <!-- PRE-COVER INSPECTION -->
+      <div class="option-card">
+
+        <div class="option-icon">
+          🛡️
+        </div>
+
+        <div class="option-content">
+
+          <h3>Pre-Cover Inspection</h3>
+
+          <p>
+            Complete a vehicle inspection before your insurance policy
+            receives full comprehensive cover.
+          </p>
+
+          <ul>
+
+            <li>✓ Verify your vehicle condition</li>
+
+            <li>✓ Capture guided vehicle photos</li>
+
+            <li>✓ AI-assisted inspection analysis</li>
+
+          </ul>
+
+          <button
+            class="card-button"
+            routerLink="/new-inspection"
+            [queryParams]="{ type: 'pre-cover' }">
+
+            Start Pre-Cover Inspection
+
+            <span>→</span>
+
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!-- ACCIDENT CLAIM -->
+      <div class="option-card accident">
+
+        <div class="option-icon">
+          🚨
+        </div>
+
+        <div class="option-content">
+
+          <h3>Accident Claim Inspection</h3>
+
+          <p>
+            Submit photos of your vehicle after an accident to help your
+            insurer assess the damage and process your claim.
+          </p>
+
+          <ul>
+
+            <li>✓ Document accident damage</li>
+
+            <li>✓ Upload vehicle images</li>
+
+            <li>✓ Track your claim inspection</li>
+
+          </ul>
+
+          <button
+            class="card-button"
+            routerLink="/new-inspection"
+            [queryParams]="{ type: 'accident' }">
+
+            Start Accident Inspection
+
+            <span>→</span>
+
+          </button>
+
+        </div>
+
+      </div>
+
     </div>
 
-  </div>
+  </section>
+
+
+  <!-- HOW IT WORKS -->
+  <section class="how-it-works">
+
+    <div class="section-heading">
+
+      <h2>How Falcon AI works</h2>
+
+      <p>
+        A simple guided process from inspection to decision.
+      </p>
+
+    </div>
+
+
+    <div class="steps">
+
+      <div class="step">
+
+        <div class="step-number">
+          1
+        </div>
+
+        <h3>Start</h3>
+
+        <p>
+          Select the type of vehicle inspection you need.
+        </p>
+
+      </div>
+
+
+      <div class="step">
+
+        <div class="step-number">
+          2
+        </div>
+
+        <h3>Capture</h3>
+
+        <p>
+          Follow the guided process to capture vehicle information and photos.
+        </p>
+
+      </div>
+
+
+      <div class="step">
+
+        <div class="step-number">
+          3
+        </div>
+
+        <h3>Analyse</h3>
+
+        <p>
+          AI-assisted technology helps identify and analyse vehicle damage.
+        </p>
+
+      </div>
+
+
+      <div class="step">
+
+        <div class="step-number">
+          4
+        </div>
+
+        <h3>Review</h3>
+
+        <p>
+          Your insurer reviews the inspection and makes a decision.
+        </p>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- RECENT INSPECTIONS -->
+  <section class="recent-section">
+
+    <div class="section-heading">
+
+      <h2>Recent Inspections</h2>
+
+      <p>
+        View the latest vehicle inspection activity.
+      </p>
+
+    </div>
+
+
+    <div class="inspection-table-wrapper">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>Vehicle</th>
+
+            <th>Status</th>
+
+            <th>AI Result</th>
+
+            <th>Confidence</th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          <tr>
+
+            <td>
+
+              <strong>VW Golf 1.4</strong>
+
+              <small>Pre-Cover Inspection</small>
+
+            </td>
+
+            <td>
+
+              <span class="status complete">
+                Complete
+              </span>
+
+            </td>
+
+            <td>
+              No Damage
+            </td>
+
+            <td>
+              <strong>98%</strong>
+            </td>
+
+          </tr>
+
+
+          <tr>
+
+            <td>
+
+              <strong>BMW 320i</strong>
+
+              <small>Accident Claim</small>
+
+            </td>
+
+            <td>
+
+              <span class="status review">
+                Under Review
+              </span>
+
+            </td>
+
+            <td>
+              Front Bumper Damage
+            </td>
+
+            <td>
+              <strong>91%</strong>
+
+            </td>
+
+          </tr>
+
+
+          <tr>
+
+            <td>
+
+              <strong>Toyota Hilux</strong>
+
+              <small>Pre-Cover Inspection</small>
+
+            </td>
+
+            <td>
+
+              <span class="status complete">
+                Complete
+              </span>
+
+            </td>
+
+            <td>
+              Good Condition
+            </td>
+
+            <td>
+              <strong>96%</strong>
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </section>
 
 </div>

@@ -1,13 +1,31 @@
-.container{
-    height:calc(100vh - 64px);
+.toolbar-spacer {
+  flex: 1 1 auto;
 }
 
-mat-sidenav{
-    width:260px;
-    padding:20px;
+
+.container {
+  height: calc(100vh - 64px);
 }
 
-mat-sidenav-content{
-    padding:30px;
-    background:#f5f7fa;
+
+mat-sidenav {
+  width: 240px;
+}
+
+
+mat-sidenav-content {
+  background: #f5f7fb;
+}
+
+
+.active-link {
+  background: rgba(63, 81, 181, 0.12);
+  border-radius: 8px;
+}
+mat-nav-list button {
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  cursor: pointer;
 }
