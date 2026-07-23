@@ -1,1 +1,355 @@
-<p>reports works!</p>
+<div class="reports-page">
+
+  <div class="page-header">
+
+    <div>
+
+      <h1>
+        Reports
+      </h1>
+
+      <p>
+        Review and analyse all vehicle inspections.
+      </p>
+
+    </div>
+
+  </div>
+
+
+  @if (isLoading) {
+
+    <div class="loading">
+
+      Loading reports...
+
+    </div>
+
+  }
+
+
+  @if (errorMessage) {
+
+    <div class="error">
+
+      {{ errorMessage }}
+
+    </div>
+
+  }
+
+
+  @if (!isLoading && !errorMessage) {
+
+    <div class="statistics-grid">
+
+      <div class="stat-card">
+
+        <span class="stat-label">
+          Total Inspections
+        </span>
+
+        <strong class="stat-value">
+          {{ totalInspections }}
+        </strong>
+
+      </div>
+
+
+      <div class="stat-card">
+
+        <span class="stat-label">
+          Submitted
+        </span>
+
+        <strong class="stat-value">
+          {{ submittedInspections }}
+        </strong>
+
+      </div>
+
+
+      <div class="stat-card">
+
+        <span class="stat-label">
+          Pre-Cover
+        </span>
+
+        <strong class="stat-value">
+          {{ preCoverInspections }}
+        </strong>
+
+      </div>
+
+
+      <div class="stat-card">
+
+        <span class="stat-label">
+          Accident Claims
+        </span>
+
+        <strong class="stat-value">
+          {{ accidentInspections }}
+        </strong>
+
+      </div>
+
+    </div>
+
+
+    <div class="filters-card">
+
+      <div class="search-box">
+
+        <label>
+          Search
+        </label>
+
+        <input
+          type="text"
+          placeholder="Search customer or registration"
+          [(ngModel)]="searchTerm"
+          (input)="applyFilters()"
+        />
+
+      </div>
+
+
+      <div class="filter-box">
+
+        <label>
+          Status
+        </label>
+
+        <select
+          [(ngModel)]="selectedStatus"
+          (change)="applyFilters()"
+        >
+
+          <option value="all">
+            All Statuses
+          </option>
+
+          <option value="submitted">
+            Submitted
+          </option>
+
+          <option value="under-review">
+            Under Review
+          </option>
+
+          <option value="approved">
+            Approved
+          </option>
+
+          <option value="rejected">
+            Rejected
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="filter-box">
+
+        <label>
+          Inspection Type
+        </label>
+
+        <select
+          [(ngModel)]="selectedType"
+          (change)="applyFilters()"
+        >
+
+          <option value="all">
+            All Types
+          </option>
+
+          <option value="pre-cover">
+            Pre-Cover
+          </option>
+
+          <option value="accident">
+            Accident Claim
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+
+    <div class="reports-card">
+
+      <div class="reports-header">
+
+        <h2>
+          Inspection Reports
+        </h2>
+
+        <span>
+
+          {{ filteredInspections.length }}
+
+          result(s)
+
+        </span>
+
+      </div>
+
+
+      @if (filteredInspections.length > 0) {
+
+        <div class="table-wrapper">
+
+          <table>
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  Customer
+                </th>
+
+                <th>
+                  Registration
+                </th>
+
+                <th>
+                  Type
+                </th>
+
+                <th>
+                  Status
+                </th>
+
+                <th>
+                  Date
+                </th>
+
+                <th>
+                  Action
+                </th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody>
+
+              @for (
+                inspection of filteredInspections;
+                track trackByInspection($index, inspection)
+              ) {
+
+                <tr>
+
+                  <td>
+
+                    <strong>
+
+                      {{ getCustomerName(inspection) }}
+
+                    </strong>
+
+                  </td>
+
+
+                  <td>
+
+                    {{ getVehicleRegistration(inspection) }}
+
+                  </td>
+
+
+                  <td>
+
+                    {{ getInspectionType(inspection) }}
+
+                  </td>
+
+
+                  <td>
+
+                    <span
+                      class="status"
+                      [ngClass]="
+                        getStatusClass(inspection)
+                      "
+                    >
+
+                      {{ getStatus(inspection) }}
+
+                    </span>
+
+                  </td>
+
+
+                  <td>
+
+                    {{
+                      inspection.createdAt
+                      | date:'mediumDate'
+                    }}
+
+                  </td>
+
+
+                  <td>
+
+                    <button
+                      type="button"
+                      class="view-button"
+                      (click)="
+                        viewInspection(inspection)
+                      "
+                    >
+
+                      View Details
+
+                    </button>
+
+                  </td>
+
+                </tr>
+
+              }
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      }
+
+
+      @else {
+
+        <div class="empty-state">
+
+          <div class="empty-icon">
+            📊
+          </div>
+
+          <h3>
+            No reports found
+          </h3>
+
+          <p>
+            Try changing your search or filters.
+          </p>
+
+        </div>
+
+      }
+
+    </div>
+
+  }
+
+</div>

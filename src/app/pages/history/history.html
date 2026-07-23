@@ -1,10 +1,8 @@
 <div class="history-page">
 
-
   <!-- HEADER -->
 
   <div class="history-header">
-
 
     <div>
 
@@ -12,26 +10,19 @@
         Inspection History
       </h1>
 
-
       <p class="subtitle">
-
         View all vehicle inspections submitted through Falcon AI.
-
       </p>
 
     </div>
 
-
     <a
-
       class="new-inspection-button"
-
       routerLink="/new-inspection">
 
       + New Inspection
 
     </a>
-
 
   </div>
 
@@ -40,13 +31,9 @@
 
   @if (isLoading) {
 
-
     <div class="loading">
-
       Loading inspection history...
-
     </div>
-
 
   }
 
@@ -55,13 +42,9 @@
 
   @if (errorMessage) {
 
-
     <div class="error">
-
       {{ errorMessage }}
-
     </div>
-
 
   }
 
@@ -69,46 +52,30 @@
   <!-- EMPTY -->
 
   @if (
-
     !isLoading &&
-
     !errorMessage &&
-
     inspections.length === 0
-
   ) {
-
 
     <div class="empty-state">
 
-
       <h2>
-
         No inspections yet
-
       </h2>
 
-
       <p>
-
         Start your first vehicle inspection to see it here.
-
       </p>
 
-
       <a
-
         class="new-inspection-button"
-
         routerLink="/new-inspection">
 
         Start Inspection
 
       </a>
 
-
     </div>
-
 
   }
 
@@ -116,27 +83,17 @@
   <!-- INSPECTIONS -->
 
   @if (
-
     !isLoading &&
-
     !errorMessage &&
-
     inspections.length > 0
-
   ) {
-
 
     <div class="inspection-list">
 
-
       @for (
-
         inspection of inspections;
-
         track inspection.id
-
       ) {
-
 
         <div class="inspection-card">
 
@@ -145,47 +102,32 @@
 
           <div class="inspection-card-header">
 
-
             <div>
-
 
               <h2>
 
-
                 {{
-
                   inspection.vehicle?.registration
-
                   || 'Vehicle Inspection'
-
                 }}
-
 
               </h2>
 
-
               <p class="inspection-id">
-
 
                 Inspection ID:
 
                 {{ inspection.id }}
 
-
               </p>
-
 
             </div>
 
-
             <span class="status">
-
 
               {{ inspection.status }}
 
-
             </span>
-
 
           </div>
 
@@ -194,187 +136,122 @@
 
           <div class="vehicle-section">
 
-
             <h3>
-
               Vehicle Information
-
             </h3>
-
 
             <div class="vehicle-grid">
 
 
               <div class="detail-item">
 
-
                 <strong>
-
                   Registration
-
                 </strong>
-
 
                 <span>
 
-
                   {{
-
                     inspection.vehicle?.registration
-
                     || 'Not provided'
-
                   }}
 
-
                 </span>
-
 
               </div>
 
 
               <div class="detail-item">
 
-
                 <strong>
-
                   Make
-
                 </strong>
-
 
                 <span>
 
-
                   {{
-
                     inspection.vehicle?.make
-
                     || 'Not provided'
-
                   }}
 
-
                 </span>
-
 
               </div>
 
 
               <div class="detail-item">
 
-
                 <strong>
-
                   Model
-
                 </strong>
-
 
                 <span>
 
-
                   {{
-
                     inspection.vehicle?.model
-
                     || 'Not provided'
-
                   }}
 
-
                 </span>
-
 
               </div>
 
 
               <div class="detail-item">
 
-
                 <strong>
-
                   Year
-
                 </strong>
-
 
                 <span>
 
-
                   {{
-
                     inspection.vehicle?.year
-
                     || 'Not provided'
-
                   }}
 
-
                 </span>
-
 
               </div>
 
 
               <div class="detail-item">
 
-
                 <strong>
-
                   Colour
-
                 </strong>
-
 
                 <span>
 
-
                   {{
-
                     inspection.vehicle?.colour
-
                     || 'Not provided'
-
                   }}
 
-
                 </span>
-
 
               </div>
 
 
               <div class="detail-item">
 
-
                 <strong>
-
                   Mileage
-
                 </strong>
-
 
                 <span>
 
-
                   {{
-
                     inspection.vehicle?.mileage
-
                     || 'Not provided'
-
                   }}
 
-
                 </span>
-
 
               </div>
 
 
             </div>
-
 
           </div>
 
@@ -386,56 +263,36 @@
 
             <div class="detail-item">
 
-
               <strong>
-
                 Inspection Type
-
               </strong>
-
 
               <span>
 
-
                 {{
-
                   inspection.type
-
                   || 'Pre-Cover Inspection'
-
                 }}
 
-
               </span>
-
 
             </div>
 
 
             <div class="detail-item">
 
-
               <strong>
-
                 Submitted
-
               </strong>
-
 
               <span>
 
-
                 {{
-
                   inspection.createdAt
-
                   | date:'medium'
-
                 }}
 
-
               </span>
-
 
             </div>
 
@@ -446,6 +303,15 @@
           <!-- ACTIONS -->
 
           <div class="inspection-actions">
+
+            <!-- TEMPORARY DEBUG -->
+
+            <p style="color: red;">
+
+              DEBUG ID:
+              {{ inspection.id }}
+
+            </p>
 
 
             <a
@@ -460,24 +326,18 @@
 
               ]">
 
-
               View Details
 
-
             </a>
-
 
           </div>
 
 
         </div>
 
-
       }
 
-
     </div>
-
 
   }
 

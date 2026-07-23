@@ -1,7 +1,5 @@
 <div class="inspection-page">
 
-  <!-- HEADER -->
-
   <div class="inspection-header">
 
     <div>
@@ -30,8 +28,6 @@
 
   </div>
 
-
-  <!-- SUCCESS MESSAGE -->
 
   <div
     class="ai-processing-card"
@@ -71,15 +67,11 @@
   </div>
 
 
-  <!-- STEPPER -->
-
   <mat-stepper
     linear
     #stepper
     *ngIf="!inspectionSubmitted">
 
-
-    <!-- CUSTOMER -->
 
     <mat-step
       [stepControl]="customerForm">
@@ -108,7 +100,6 @@
 
 
         <div class="form-grid">
-
 
           <mat-form-field
             appearance="outline">
@@ -166,7 +157,6 @@
 
           </mat-form-field>
 
-
         </div>
 
 
@@ -183,13 +173,10 @@
 
         </div>
 
-
       </form>
 
     </mat-step>
 
-
-    <!-- POLICY -->
 
     <mat-step
       [stepControl]="policyForm">
@@ -219,7 +206,6 @@
 
         <div class="form-grid">
 
-
           <mat-form-field
             appearance="outline">
 
@@ -247,12 +233,10 @@
 
           </mat-form-field>
 
-
         </div>
 
 
         <div class="step-actions">
-
 
           <button
             mat-button
@@ -272,16 +256,12 @@
 
           </button>
 
-
         </div>
-
 
       </form>
 
     </mat-step>
 
-
-    <!-- VEHICLE -->
 
     <mat-step
       [stepControl]="vehicleForm">
@@ -310,7 +290,6 @@
 
 
         <div class="form-grid">
-
 
           <mat-form-field
             appearance="outline">
@@ -409,12 +388,10 @@
 
           </mat-form-field>
 
-
         </div>
 
 
         <div class="step-actions">
-
 
           <button
             mat-button
@@ -434,16 +411,12 @@
 
           </button>
 
-
         </div>
-
 
       </form>
 
     </mat-step>
 
-
-    <!-- GUIDED VEHICLE PHOTOS -->
 
     <mat-step>
 
@@ -456,7 +429,6 @@
 
 
       <div class="photo-inspection">
-
 
         <h2>
           Guided Vehicle Photo Inspection
@@ -472,10 +444,7 @@
         </p>
 
 
-        <!-- PROGRESS -->
-
         <div class="photo-progress">
-
 
           <strong>
 
@@ -492,7 +461,6 @@
 
           <div class="progress-bar">
 
-
             <div
               class="progress-fill"
               [style.width.%]="
@@ -501,17 +469,12 @@
 
             </div>
 
-
           </div>
-
 
         </div>
 
 
-        <!-- CURRENT PHOTO -->
-
         <div class="current-photo-card">
-
 
           <div class="photo-number">
 
@@ -542,22 +505,16 @@
           </p>
 
 
-          <!-- PHOTO PREVIEW -->
-
           <div
             class="photo-preview"
             *ngIf="currentPhoto.preview">
-
 
             <img
               [src]="currentPhoto.preview"
               alt="Vehicle inspection photo">
 
-
           </div>
 
-
-          <!-- PHOTO INPUT -->
 
           <input
             type="file"
@@ -565,15 +522,12 @@
             capture="environment"
             [id]="currentPhoto.id"
             hidden
-            (change)="
-              onPhotoSelected($event, currentPhoto)
-            ">
+            (change)="onPhotoSelected($event, currentPhoto)">
 
 
           <label
             class="upload-button"
             [for]="currentPhoto.id">
-
 
             📸
 
@@ -582,7 +536,6 @@
               : 'Take / Choose Photo'
             }}
 
-
           </label>
 
 
@@ -590,25 +543,19 @@
             class="photo-status"
             *ngIf="currentPhoto.preview">
 
-
             ✓ Photo captured
 
           </div>
 
-
         </div>
 
 
-        <!-- PHOTO NAVIGATION -->
-
         <div class="photo-navigation">
-
 
           <button
             mat-button
             (click)="previousPhoto()"
             [disabled]="currentPhotoIndex === 0">
-
 
             ← Previous
 
@@ -619,23 +566,16 @@
             mat-raised-button
             color="primary"
             (click)="nextPhoto()"
-            [disabled]="
-              currentPhotoIndex === photos.length - 1
-            ">
-
+            [disabled]="currentPhotoIndex === photos.length - 1">
 
             Next →
 
           </button>
 
-
         </div>
 
 
-        <!-- PHOTO CHECKLIST -->
-
         <div class="photo-checklist">
-
 
           <h3>
             Inspection Photo Checklist
@@ -650,7 +590,6 @@
             "
             (click)="goToPhoto(i)">
 
-
             <span>
 
               {{ photo.file ? '✓' : '○' }}
@@ -664,19 +603,14 @@
 
             </span>
 
-
           </div>
-
 
         </div>
 
 
-        <!-- ACCIDENT DAMAGE PHOTOS -->
-
         <div
           class="accident-damage-section"
           *ngIf="inspectionType === 'accident'">
-
 
           <h2>
             🚨 Accident Damage Photos
@@ -700,27 +634,20 @@
           <div
             class="damage-preview">
 
-
             <img
               *ngFor="
                 let image of damagePhotoPreviews
               "
               [src]="image">
 
-
           </div>
 
-
         </div>
-
 
       </div>
 
 
-      <!-- PHOTO STEP BUTTONS -->
-
       <div class="step-actions">
-
 
         <button
           mat-button
@@ -737,19 +664,14 @@
           matStepperNext
           [disabled]="!allRequiredPhotosComplete">
 
-
           Continue to Review
 
         </button>
 
-
       </div>
-
 
     </mat-step>
 
-
-    <!-- REVIEW -->
 
     <mat-step>
 
@@ -773,10 +695,7 @@
       </p>
 
 
-      <!-- INSPECTION TYPE -->
-
       <div class="review-card">
-
 
         <h3>
           Inspection Type
@@ -796,14 +715,10 @@
 
         </p>
 
-
       </div>
 
 
-      <!-- CUSTOMER -->
-
       <div class="review-card">
-
 
         <h3>
           Customer Information
@@ -844,14 +759,10 @@
 
         </p>
 
-
       </div>
 
 
-      <!-- INSURANCE -->
-
       <div class="review-card">
-
 
         <h3>
           Insurance Information
@@ -879,14 +790,10 @@
 
         </p>
 
-
       </div>
 
 
-      <!-- VEHICLE -->
-
       <div class="review-card">
-
 
         <h3>
           Vehicle Information
@@ -894,7 +801,6 @@
 
 
         <div class="review-grid">
-
 
           <p>
 
@@ -972,17 +878,12 @@
 
           </p>
 
-
         </div>
-
 
       </div>
 
 
-      <!-- VEHICLE PHOTO REVIEW -->
-
       <div class="review-card">
-
 
         <h3>
           Vehicle Inspection Photos
@@ -1000,10 +901,8 @@
 
         <div class="review-images">
 
-
           <div
             *ngFor="let photo of photos">
-
 
             <img
               *ngIf="photo.preview"
@@ -1017,22 +916,16 @@
 
             </p>
 
-
           </div>
 
-
         </div>
-
 
       </div>
 
 
-      <!-- ACCIDENT DAMAGE PHOTO REVIEW -->
-
       <div
         class="review-card"
         *ngIf="inspectionType === 'accident'">
-
 
         <h3>
           Accident Damage Photos
@@ -1050,24 +943,18 @@
 
         <div class="review-images">
 
-
           <img
             *ngFor="
               let image of damagePhotoPreviews
             "
             [src]="image">
 
-
         </div>
-
 
       </div>
 
 
-      <!-- SUBMIT -->
-
       <div class="step-actions">
-
 
         <button
           mat-button
@@ -1081,21 +968,20 @@
         <button
           mat-raised-button
           color="primary"
+          [disabled]="isSubmitting"
           (click)="submitInspection()">
 
-
-          ✅ Submit Inspection
+          {{ isSubmitting
+            ? 'Submitting...'
+            : '✅ Submit Inspection'
+          }}
 
         </button>
 
-
       </div>
-
 
     </mat-step>
 
-
   </mat-stepper>
-
 
 </div>

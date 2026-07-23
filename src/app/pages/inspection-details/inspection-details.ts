@@ -1,168 +1,130 @@
+import { CommonModule } from '@angular/common';
 import {
   Component,
   OnInit,
-  ChangeDetectorRef,
   inject
 } from '@angular/core';
-
-import { CommonModule } from '@angular/common';
-
 import {
   ActivatedRoute,
   Router
 } from '@angular/router';
 
-import {
-  InspectionService
-} from '../../services/inspection.service';
-
+import { InspectionService } from '../../services/inspection.service';
 
 @Component({
   selector: 'app-inspection-details',
-
   standalone: true,
-
   imports: [
     CommonModule
   ],
-
-  templateUrl:
-    './inspection-details.html',
-
-  styleUrl:
-    './inspection-details.css'
+  templateUrl: './inspection-details.html',
+  styleUrl: './inspection-details.css'
 })
+export class InspectionDetails implements OnInit {
 
-
-export class InspectionDetails
-  implements OnInit {
-
-
-  private route =
+  private readonly route =
     inject(ActivatedRoute);
 
-
-  private router =
+  private readonly router =
     inject(Router);
 
-
-  private inspectionService =
+  private readonly inspectionService =
     inject(InspectionService);
 
+  inspection: any = null;
 
-  private changeDetectorRef =
-    inject(ChangeDetectorRef);
+  isLoading = true;
 
+  errorMessage = '';
 
-  inspection: any =
-    null;
+  ngOnInit(): void {
 
+    this.route.paramMap.subscribe({
 
-  isLoading =
-    true;
+      next: (params) => {
 
+        const id =
+          params.get('id');
 
-  errorMessage =
-    '';
+        if (!id) {
 
+          this.inspection = null;
 
-  ngOnInit():
-    void {
+          this.errorMessage =
+            'Inspection ID not found.';
 
+          this.isLoading = false;
 
-    const id =
-      this.route.snapshot.paramMap.get(
-        'id'
-      );
+          return;
+        }
 
+        this.loadInspection(id);
 
-    console.log(
-      'DETAILS PAGE ID:',
-      id
-    );
+      },
 
+      error: (error) => {
 
-    if (!id) {
+        console.error(
+          'Failed to read inspection route:',
+          error
+        );
 
+        this.inspection = null;
 
-      this.errorMessage =
-        'Inspection ID was not provided.';
+        this.errorMessage =
+          'Unable to open inspection.';
 
+        this.isLoading = false;
 
-      this.isLoading =
-        false;
+      }
 
+    });
 
-      return;
+  }
 
-    }
+  private loadInspection(
+    id: string
+  ): void {
 
+    this.isLoading = true;
+
+    this.errorMessage = '';
+
+    this.inspection = null;
 
     this.inspectionService
-
-      .getInspectionById(
-        id
-      )
-
+      .getInspectionById(id)
       .subscribe({
 
-        next:
-          (data) => {
+        next: (inspection) => {
 
+          this.inspection = inspection;
 
-            console.log(
-              'INSPECTION DETAILS RECEIVED:',
-              data
-            );
+          this.isLoading = false;
 
+        },
 
-            this.inspection =
-              data;
+        error: (error) => {
 
+          console.error(
+            'Failed to load inspection details:',
+            error
+          );
 
-            this.isLoading =
-              false;
+          this.inspection = null;
 
+          this.errorMessage =
+            'Failed to load inspection details.';
 
-            this.changeDetectorRef
-              .detectChanges();
+          this.isLoading = false;
 
-
-          },
-
-
-        error:
-          (error) => {
-
-
-            console.error(
-              'FAILED TO LOAD INSPECTION:',
-              error
-            );
-
-
-            this.errorMessage =
-              'Unable to load this inspection.';
-
-
-            this.isLoading =
-              false;
-
-
-            this.changeDetectorRef
-              .detectChanges();
-
-
-          }
+        }
 
       });
 
   }
 
-
-  goBack():
-    void {
-
+  goBack(): void {
 
     this.router.navigate([
       '/history'
