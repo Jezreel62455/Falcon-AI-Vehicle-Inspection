@@ -1,274 +1,167 @@
 <div class="inspection-details-page">
 
+  <!-- LOADING -->
   @if (isLoading) {
 
-    <div class="loading">
+    <div class="state-card loading-state">
 
-      Loading inspection...
+      <div class="loading-spinner"></div>
 
-    </div>
+      <h2>Loading inspection report...</h2>
 
-  }
-
-
-  @if (!isLoading && errorMessage) {
-
-    <div class="error">
-
-      {{ errorMessage }}
+      <p>
+        Please wait while the inspection details are retrieved.
+      </p>
 
     </div>
 
   }
 
+  <!-- ERROR -->
+  @else if (!inspection) {
 
-  @if (
-    !isLoading &&
-    !errorMessage &&
-    inspection
-  ) {
+    <div class="state-card error-state">
 
-    <div class="details-header">
+      <div class="error-icon">
+        !
+      </div>
 
-      <div>
+      <h2>Inspection not found</h2>
+
+      <p>
+        We could not load the requested inspection.
+      </p>
+
+      <button
+        type="button"
+        class="back-button"
+        routerLink="/history">
+
+        Back to Inspection History
+
+      </button>
+
+    </div>
+
+  }
+
+  <!-- INSPECTION REPORT -->
+  @else {
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+
+      <div class="header-left">
 
         <button
           type="button"
-          class="back-button"
-          (click)="goBack()"
-        >
+          class="back-link"
+          routerLink="/history">
 
-          ← Back to Reports
+          <span class="back-arrow">←</span>
+
+          Back to Inspection History
 
         </button>
 
+        <div class="title-row">
 
-        <h1>
+          <div>
 
-          Inspection Report
+            <div class="eyebrow">
+              INSPECTION REPORT
+            </div>
 
-        </h1>
+            <h1>
+              Vehicle Inspection Details
+            </h1>
 
+            <p class="subtitle">
 
-        <p class="subtitle">
+              Review the complete inspection record and vehicle information.
 
-          {{
-            inspection.customer?.firstName
-            || 'Unknown'
-          }}
+            </p>
 
-          {{
-            inspection.customer?.surname
-            || ''
-          }}
+          </div>
 
-        </p>
+        </div>
 
       </div>
 
+      <div class="header-actions">
 
-      <span class="status">
+        <span
+          class="status-badge"
+          [class.status-submitted]="inspection.status === 'SUBMITTED'"
+          [class.status-completed]="inspection.status === 'COMPLETED'"
+          [class.status-pending]="inspection.status === 'PENDING'"
+          [class.status-failed]="inspection.status === 'FAILED'">
 
-        {{
-          inspection.status
-          || 'Submitted'
-        }}
+          {{ inspection.status || 'SUBMITTED' }}
 
-      </span>
+        </span>
+
+      </div>
 
     </div>
 
 
-    <div class="details-grid">
+    <!-- SUMMARY CARD -->
+    <div class="summary-card">
 
+      <div class="summary-main">
 
-      <!-- CUSTOMER DETAILS -->
-
-      <div class="details-card">
-
-        <h2>
-          Customer Details
-        </h2>
-
-
-        <div class="detail-row">
-
-          <span>
-            First Name
-          </span>
-
-          <strong>
-
-            {{
-              inspection.customer?.firstName
-              || 'Not provided'
-            }}
-
-          </strong>
-
+        <div class="summary-icon">
+          🚗
         </div>
 
+        <div class="summary-content">
 
-        <div class="detail-row">
-
-          <span>
-            Surname
-          </span>
-
-          <strong>
+          <h2>
 
             {{
-              inspection.customer?.surname
-              || 'Not provided'
+              inspection.customer.firstName
+              || inspection['customerFirstName']
+              || 'Customer'
             }}
 
-          </strong>
+            {{
+              inspection.customer.surname
+              || inspection['customerSurname']
+              || ''
+            }}
+
+          </h2>
+
+          <p class="registration">
+
+            {{
+              inspection.vehicle.registration
+              || inspection['registration']
+              || 'Registration unavailable'
+            }}
+
+          </p>
 
         </div>
 
       </div>
 
 
-      <!-- VEHICLE DETAILS -->
+      <div class="summary-meta">
 
-      <div class="details-card">
+        <div class="summary-meta-item">
 
-        <h2>
-          Vehicle Details
-        </h2>
-
-
-        <div class="detail-row">
-
-          <span>
-            Registration
+          <span class="meta-label">
+            Inspection Type
           </span>
 
           <strong>
 
             {{
-              inspection.vehicle?.registration
-              || 'Not provided'
-            }}
-
-          </strong>
-
-        </div>
-
-
-        <div class="detail-row">
-
-          <span>
-            Make
-          </span>
-
-          <strong>
-
-            {{
-              inspection.vehicle?.make
-              || 'Not provided'
-            }}
-
-          </strong>
-
-        </div>
-
-
-        <div class="detail-row">
-
-          <span>
-            Model
-          </span>
-
-          <strong>
-
-            {{
-              inspection.vehicle?.model
-              || 'Not provided'
-            }}
-
-          </strong>
-
-        </div>
-
-
-        <div class="detail-row">
-
-          <span>
-            Year
-          </span>
-
-          <strong>
-
-            {{
-              inspection.vehicle?.year
-              || 'Not provided'
-            }}
-
-          </strong>
-
-        </div>
-
-
-        <div class="detail-row">
-
-          <span>
-            Colour
-          </span>
-
-          <strong>
-
-            {{
-              inspection.vehicle?.colour
-              || 'Not provided'
-            }}
-
-          </strong>
-
-        </div>
-
-
-        <div class="detail-row">
-
-          <span>
-            Mileage
-          </span>
-
-          <strong>
-
-            {{
-              inspection.vehicle?.mileage
-              || 'Not provided'
-            }}
-
-          </strong>
-
-        </div>
-
-      </div>
-
-
-      <!-- INSPECTION DETAILS -->
-
-      <div class="details-card">
-
-        <h2>
-          Inspection Details
-        </h2>
-
-
-        <div class="detail-row">
-
-          <span>
-            Type
-          </span>
-
-          <strong>
-
-            {{
-              inspection.type
+              inspection.inspectionType
               || inspection.inspectionType
-              || 'Pre-Cover'
+              || 'Vehicle Inspection'
             }}
 
           </strong>
@@ -276,35 +169,17 @@
         </div>
 
 
-        <div class="detail-row">
+        <div class="summary-meta-item">
 
-          <span>
-            Status
-          </span>
-
-          <strong>
-
-            {{
-              inspection.status
-              || 'Submitted'
-            }}
-
-          </strong>
-
-        </div>
-
-
-        <div class="detail-row">
-
-          <span>
-            Created
+          <span class="meta-label">
+            Date Created
           </span>
 
           <strong>
 
             {{
               inspection.createdAt
-              | date:'medium'
+              | date: 'dd MMM yyyy'
             }}
 
           </strong>
@@ -313,37 +188,705 @@
 
       </div>
 
-
     </div>
 
-  }
+
+    <!-- REPORT CONTENT -->
+    <div class="report-grid">
 
 
-  @if (
-    !isLoading &&
-    !errorMessage &&
-    !inspection
-  ) {
+      <!-- LEFT COLUMN -->
+      <div class="report-main">
 
-    <div class="empty-state">
 
-      <h2>
-        Inspection not found
-      </h2>
+        <!-- CUSTOMER INFORMATION -->
+        <section class="report-card">
 
-      <p>
-        The requested inspection could not be loaded.
-      </p>
+          <div class="card-header">
 
-      <button
-        type="button"
-        class="back-button"
-        (click)="goBack()"
-      >
+            <div>
 
-        ← Back to Reports
+              <span class="section-kicker">
+                CUSTOMER
+              </span>
 
-      </button>
+              <h2>
+                Customer Information
+              </h2>
+
+            </div>
+
+            <div class="section-icon">
+              👤
+            </div>
+
+          </div>
+
+
+          <div class="details-grid">
+
+            <div class="detail-item">
+
+              <span class="detail-label">
+                First Name
+              </span>
+
+              <span class="detail-value">
+
+                {{
+                  inspection.customer.firstName
+                  || inspection['customerFirstName']
+                  || 'Not provided'
+                }}
+
+              </span>
+
+            </div>
+
+
+            <div class="detail-item">
+
+              <span class="detail-label">
+                Surname
+              </span>
+
+              <span class="detail-value">
+
+                {{
+                  inspection.customer.surname
+                  || inspection['customerSurname']
+                  || 'Not provided'
+                }}
+
+              </span>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- POLICY INFORMATION -->
+        <section class="report-card">
+
+          <div class="card-header">
+
+            <div>
+
+              <span class="section-kicker">
+                POLICY
+              </span>
+
+              <h2>
+                Policy Information
+              </h2>
+
+            </div>
+
+            <div class="section-icon">
+              🛡️
+            </div>
+
+          </div>
+
+
+          <div class="details-grid">
+
+            <div class="detail-item">
+
+              <span class="detail-label">
+                Policy Number
+              </span>
+
+              <span class="detail-value">
+
+                {{
+                  inspection.policy.policyNumber
+                  || inspection['policyNumber']
+                  || 'Not provided'
+                }}
+
+              </span>
+
+            </div>
+
+
+            <div class="detail-item">
+
+              <span class="detail-label">
+                Insurance Company
+              </span>
+
+              <span class="detail-value">
+
+                {{
+                  inspection.policy.insuranceCompany
+                  || inspection['insuranceCompany']
+                  || 'Not provided'
+                }}
+
+              </span>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- VEHICLE INFORMATION -->
+        <section class="report-card">
+
+          <div class="card-header">
+
+            <div>
+
+              <span class="section-kicker">
+                VEHICLE
+              </span>
+
+              <h2>
+                Vehicle Information
+              </h2>
+
+            </div>
+
+            <div class="section-icon">
+              🚘
+            </div>
+
+          </div>
+
+
+          <div class="details-grid vehicle-details">
+
+
+            <div class="detail-item">
+
+              <span class="detail-label">
+                Registration
+              </span>
+
+              <span class="detail-value highlight-value">
+
+                {{
+                  inspection.vehicle.registration
+                  || inspection['registration']
+                  || 'Not provided'
+                }}
+
+              </span>
+
+            </div>
+
+
+            <div class="detail-item">
+
+              <span class="detail-label">
+                Make
+              </span>
+
+              <span class="detail-value">
+
+                {{
+                  inspection.vehicle.make
+                  || inspection['make']
+                  || 'Not provided'
+                }}
+
+              </span>
+
+            </div>
+
+
+            <div class="detail-item">
+
+              <span class="detail-label">
+                Model
+              </span>
+
+              <span class="detail-value">
+
+                {{
+                  inspection.vehicle.model
+                  || inspection['model']
+                  || 'Not provided'
+                }}
+
+              </span>
+
+            </div>
+
+
+            <div class="detail-item">
+
+              <span class="detail-label">
+                Year
+              </span>
+
+              <span class="detail-value">
+
+                {{
+                  inspection.vehicle.year
+                  || inspection['year']
+                  || 'Not provided'
+                }}
+
+              </span>
+
+            </div>
+
+
+            <div class="detail-item">
+
+              <span class="detail-label">
+                Colour
+              </span>
+
+              <span class="detail-value">
+
+                {{
+                  inspection.vehicle.colour
+                  || inspection['colour']
+                  || 'Not provided'
+                }}
+
+              </span>
+
+            </div>
+
+
+            <div class="detail-item">
+
+              <span class="detail-label">
+                Mileage
+              </span>
+
+              <span class="detail-value">
+
+                @if (
+                  inspection.vehicle.mileage
+                  || inspection['mileage']
+                ) {
+
+                  {{
+                    inspection.vehicle.mileage
+                    || inspection['mileage']
+                  }}
+
+                  km
+
+                }
+
+                @else {
+
+                  Not provided
+
+                }
+
+              </span>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- INSPECTION INFORMATION -->
+        <section class="report-card">
+
+          <div class="card-header">
+
+            <div>
+
+              <span class="section-kicker">
+                INSPECTION
+              </span>
+
+              <h2>
+                Inspection Information
+              </h2>
+
+            </div>
+
+            <div class="section-icon">
+              🔍
+            </div>
+
+          </div>
+
+
+          <div class="details-grid">
+
+
+            <div class="detail-item">
+
+              <span class="detail-label">
+                Inspection ID
+              </span>
+
+              <span class="detail-value id-value">
+
+                {{ inspection.id }}
+
+              </span>
+
+            </div>
+
+
+            <div class="detail-item">
+
+              <span class="detail-label">
+                Inspection Type
+              </span>
+
+              <span class="detail-value">
+
+                {{
+                  inspection.inspectionType
+                  || inspection.inspectionType
+                  || 'Not provided'
+                }}
+
+              </span>
+
+            </div>
+
+
+            <div class="detail-item">
+
+              <span class="detail-label">
+                Status
+              </span>
+
+              <span class="detail-value">
+
+                {{ inspection.status || 'SUBMITTED' }}
+
+              </span>
+
+            </div>
+
+
+            <div class="detail-item">
+
+              <span class="detail-label">
+                Created
+              </span>
+
+              <span class="detail-value">
+
+                {{
+                  inspection.createdAt
+                  | date: 'dd MMM yyyy, HH:mm'
+                }}
+
+              </span>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- PHOTO INSPECTION -->
+        <section class="report-card">
+
+          <div class="card-header">
+
+            <div>
+
+              <span class="section-kicker">
+                EVIDENCE
+              </span>
+
+              <h2>
+                Inspection Photos
+              </h2>
+
+            </div>
+
+            <div class="section-icon">
+              📷
+            </div>
+
+          </div>
+
+
+          @if (
+            inspection.photos
+            && inspection.photos.length > 0
+          ) {
+
+            <div class="photo-grid">
+
+              @for (
+                photo of inspection.photos;
+                track $index
+              ) {
+
+                <div class="photo-card">
+
+                  <img
+                    [src]="getPhotoUrl(photo.path)"
+                    alt="Inspection vehicle photo"
+                  />
+
+                  <div class="photo-label">
+
+                    {{ photo.title }}
+
+                  </div>
+
+                </div>
+
+              }
+
+            </div>
+
+          }
+
+          @else {
+
+            <div class="empty-state">
+
+              <div class="empty-icon">
+                📷
+              </div>
+
+              <h3>
+                No photos available
+              </h3>
+
+              <p>
+                No inspection photos have been uploaded for this inspection.
+              </p>
+
+            </div>
+
+          }
+
+        </section>
+
+
+      </div>
+
+
+      <!-- RIGHT COLUMN -->
+      <aside class="report-sidebar">
+
+
+        <!-- STATUS CARD -->
+        <div class="side-card">
+
+          <div class="side-card-header">
+
+            <span class="section-kicker">
+              INSPECTION STATUS
+            </span>
+
+            <span
+              class="status-dot"
+              [class.dot-completed]="inspection.status === 'COMPLETED'"
+              [class.dot-submitted]="inspection.status === 'SUBMITTED'"
+              [class.dot-pending]="inspection.status === 'PENDING'">
+
+            </span>
+
+          </div>
+
+
+          <div class="status-large">
+
+            {{ inspection.status || 'SUBMITTED' }}
+
+          </div>
+
+
+          <p class="side-description">
+
+            This inspection has been successfully recorded in the inspection system.
+
+          </p>
+
+        </div>
+
+
+        <!-- INSPECTION TYPE CARD -->
+        <div class="side-card">
+
+          <div class="side-card-header">
+
+            <span class="section-kicker">
+              INSPECTION TYPE
+            </span>
+
+          </div>
+
+
+          <div class="inspection-type">
+
+            <div class="type-icon">
+
+              @if (
+                inspection.inspectionType === 'accident'
+                || inspection.inspectionType === 'accident'
+              ) {
+
+                ⚠️
+
+              }
+
+              @else {
+
+                🛡️
+
+              }
+
+            </div>
+
+
+            <div>
+
+              <strong>
+
+                {{
+                  inspection.inspectionType
+                  || inspection.inspectionType
+                  || 'Vehicle Inspection'
+                }}
+
+              </strong>
+
+              <span>
+
+                @if (
+                  inspection.inspectionType === 'accident'
+                  || inspection.inspectionType === 'accident'
+                ) {
+
+                  Accident Claim Inspection
+
+                }
+
+                @else {
+
+                  Pre-Cover Inspection
+
+                }
+
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- QUICK SUMMARY -->
+        <div class="side-card">
+
+          <div class="side-card-header">
+
+            <span class="section-kicker">
+              QUICK SUMMARY
+            </span>
+
+          </div>
+
+
+          <div class="quick-summary">
+
+
+            <div class="quick-item">
+
+              <span>
+                Customer
+              </span>
+
+              <strong>
+
+                {{
+                  inspection.customer.firstName
+                  || inspection['customerFirstName']
+                  || 'N/A'
+                }}
+
+                {{
+                  inspection.customer.surname
+                  || inspection['customerSurname']
+                  || ''
+                }}
+
+              </strong>
+
+            </div>
+
+
+            <div class="quick-item">
+
+              <span>
+                Vehicle
+              </span>
+
+              <strong>
+
+                {{
+                  inspection.vehicle.registration
+                  || inspection['registration']
+                  || 'N/A'
+                }}
+
+              </strong>
+
+            </div>
+
+
+            <div class="quick-item">
+
+              <span>
+                Photos
+              </span>
+
+              <strong>
+
+                {{
+                  inspection.photos.length || 0
+                }}
+
+              </strong>
+
+            </div>
+
+
+            <div class="quick-item">
+
+              <span>
+                Created
+              </span>
+
+              <strong>
+
+                {{
+                  inspection.createdAt
+                  | date: 'dd MMM yyyy'
+                }}
+
+              </strong>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+      </aside>
+
 
     </div>
 

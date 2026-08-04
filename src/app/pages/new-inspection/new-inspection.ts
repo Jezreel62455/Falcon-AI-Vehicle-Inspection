@@ -80,15 +80,15 @@ interface InspectionPhoto {
 export class NewInspection implements OnInit {
 
 
-  private fb =
+  private readonly fb =
     inject(FormBuilder);
 
 
-  private route =
+  private readonly route =
     inject(ActivatedRoute);
 
 
-  private inspectionService =
+  private readonly inspectionService =
     inject(InspectionService);
 
 
@@ -742,6 +742,9 @@ export class NewInspection implements OnInit {
 
     ) {
 
+      this.customerForm.markAllAsTouched();
+
+
       alert(
 
         'Please complete the customer information.'
@@ -760,6 +763,9 @@ export class NewInspection implements OnInit {
 
     ) {
 
+      this.policyForm.markAllAsTouched();
+
+
       alert(
 
         'Please complete the policy information.'
@@ -777,6 +783,9 @@ export class NewInspection implements OnInit {
       !this.vehicleForm.valid
 
     ) {
+
+      this.vehicleForm.markAllAsTouched();
+
 
       alert(
 
@@ -931,27 +940,102 @@ export class NewInspection implements OnInit {
                 );
 
 
+            const customer =
+              this.customerForm.getRawValue();
+
+
+            const policy =
+              this.policyForm.getRawValue();
+
+
+            const vehicle =
+              this.vehicleForm.getRawValue();
+
+
             const inspectionData = {
 
               inspectionType:
+
                 this.inspectionType,
 
-              customer:
-                this.customerForm.value,
 
-              policy:
-                this.policyForm.value,
+              customerFirstName:
 
-              vehicle:
-                this.vehicleForm.value,
+                customer.firstName || null,
 
-              vehiclePhotos:
+
+              customerSurname:
+
+                customer.surname || null,
+
+
+              policyNumber:
+
+                policy.policy || null,
+
+
+              insuranceCompany:
+
+                policy.company || null,
+
+
+              registration:
+
+                vehicle.registration || null,
+
+
+              make:
+
+                vehicle.make || null,
+
+
+              model:
+
+                vehicle.model || null,
+
+
+              year:
+
+                vehicle.year
+
+                  ? String(vehicle.year)
+
+                  : null,
+
+
+              colour:
+
+                vehicle.colour || null,
+
+
+              mileage:
+
+                vehicle.mileage
+
+                  ? String(vehicle.mileage)
+
+                  : null,
+
+
+              photos:
+
                 uploadedVehiclePhotos,
 
+
               damagePhotos:
+
                 uploadedDamagePhotos
 
             };
+
+
+            console.log(
+
+              'FINAL INSPECTION DATA SENT TO BACKEND:',
+
+              inspectionData
+
+            );
 
 
             this.inspectionService
@@ -967,6 +1051,7 @@ export class NewInspection implements OnInit {
                 next:
 
                   () => {
+
 
                     this.isSubmitting =
                       false;
@@ -988,6 +1073,7 @@ export class NewInspection implements OnInit {
                 error:
 
                   (error: any) => {
+
 
                     console.error(
 
@@ -1018,6 +1104,7 @@ export class NewInspection implements OnInit {
         error:
 
           (error: any) => {
+
 
             console.error(
 

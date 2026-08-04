@@ -1,206 +1,314 @@
 <div class="reports-page">
 
-  <div class="page-header">
+  <!-- ==========================================
+       PAGE HEADER
+  =========================================== -->
+
+  <section class="page-header">
 
     <div>
 
+      <span class="page-eyebrow">
+
+        EXECUTIVE REPORTING
+
+      </span>
+
       <h1>
-        Reports
+
+        Falcon AI Reports
+
       </h1>
 
       <p>
-        Review and analyse all vehicle inspections.
+
+        View inspection performance, fleet statistics and AI insights from one dashboard.
+
       </p>
 
     </div>
 
-  </div>
+  </section>
 
 
   @if (isLoading) {
 
-    <div class="loading">
+    <div class="state-card">
 
-      Loading reports...
+      <div class="loading-spinner"></div>
 
-    </div>
+      <p>
 
-  }
+        Loading inspection reports...
 
-
-  @if (errorMessage) {
-
-    <div class="error">
-
-      {{ errorMessage }}
+      </p>
 
     </div>
 
   }
 
+  @else if (errorMessage) {
 
-  @if (!isLoading && !errorMessage) {
+    <div class="state-card error-state">
 
-    <div class="statistics-grid">
+      <h3>
 
-      <div class="stat-card">
+        Unable to load reports
 
-        <span class="stat-label">
-          Total Inspections
-        </span>
+      </h3>
 
-        <strong class="stat-value">
-          {{ totalInspections }}
-        </strong>
+      <p>
 
-      </div>
+        {{ errorMessage }}
 
-
-      <div class="stat-card">
-
-        <span class="stat-label">
-          Submitted
-        </span>
-
-        <strong class="stat-value">
-          {{ submittedInspections }}
-        </strong>
-
-      </div>
-
-
-      <div class="stat-card">
-
-        <span class="stat-label">
-          Pre-Cover
-        </span>
-
-        <strong class="stat-value">
-          {{ preCoverInspections }}
-        </strong>
-
-      </div>
-
-
-      <div class="stat-card">
-
-        <span class="stat-label">
-          Accident Claims
-        </span>
-
-        <strong class="stat-value">
-          {{ accidentInspections }}
-        </strong>
-
-      </div>
+      </p>
 
     </div>
 
+  }
 
-    <div class="filters-card">
+  @else {
 
-      <div class="search-box">
+    <!-- ==========================================
+         TOP STATISTICS
+    =========================================== -->
 
-        <label>
-          Search
-        </label>
+    <section class="statistics-grid">
 
-        <input
-          type="text"
-          placeholder="Search customer or registration"
-          [(ngModel)]="searchTerm"
-          (input)="applyFilters()"
-        />
+      <article class="stat-card">
 
-      </div>
+        <div>
+
+          <span class="stat-label">
+
+            TOTAL INSPECTIONS
+
+          </span>
+
+          <strong class="stat-value">
+
+            {{ totalInspections }}
+
+          </strong>
+
+        </div>
+
+      </article>
+
+      <article class="stat-card">
+
+        <div>
+
+          <span class="stat-label">
+
+            COMPLETED
+
+          </span>
+
+          <strong class="stat-value">
+
+            {{ completedInspections }}
+
+          </strong>
+
+        </div>
+
+      </article>
+
+      <article class="stat-card">
+
+        <div>
+
+          <span class="stat-label">
+
+            ACCIDENT CLAIMS
+
+          </span>
+
+          <strong class="stat-value">
+
+            {{ accidentInspections }}
+
+          </strong>
+
+        </div>
+
+      </article>
+
+      <article class="stat-card">
+
+        <div>
+
+          <span class="stat-label">
+
+            AI CONFIDENCE
+
+          </span>
+
+          <strong class="stat-value">
+
+            {{ averageAiConfidence }}%
+
+          </strong>
+
+        </div>
+
+      </article>
+
+    </section>
 
 
-      <div class="filter-box">
+    <!-- ==========================================
+         EXECUTIVE SUMMARY
+    =========================================== -->
 
-        <label>
-          Status
-        </label>
+    <section class="reports-overview">
 
-        <select
-          [(ngModel)]="selectedStatus"
-          (change)="applyFilters()"
-        >
-
-          <option value="all">
-            All Statuses
-          </option>
-
-          <option value="submitted">
-            Submitted
-          </option>
-
-          <option value="under-review">
-            Under Review
-          </option>
-
-          <option value="approved">
-            Approved
-          </option>
-
-          <option value="rejected">
-            Rejected
-          </option>
-
-        </select>
-
-      </div>
-
-
-      <div class="filter-box">
-
-        <label>
-          Inspection Type
-        </label>
-
-        <select
-          [(ngModel)]="selectedType"
-          (change)="applyFilters()"
-        >
-
-          <option value="all">
-            All Types
-          </option>
-
-          <option value="pre-cover">
-            Pre-Cover
-          </option>
-
-          <option value="accident">
-            Accident Claim
-          </option>
-
-        </select>
-
-      </div>
-
-    </div>
-
-
-    <div class="reports-card">
-
-      <div class="reports-header">
+      <article class="summary-card">
 
         <h2>
-          Inspection Reports
+
+          Inspection Types
+
         </h2>
 
-        <span>
+        <div class="progress-row">
 
-          {{ filteredInspections.length }}
+          <span>
 
-          result(s)
+            Pre-Cover
 
-        </span>
+          </span>
+
+          <strong>
+
+            {{ getPreCoverPercentage() }}%
+
+          </strong>
+
+        </div>
+
+        <div class="progress-bar">
+
+          <div
+            class="progress-fill blue"
+            [style.width.%]="getPreCoverPercentage()"
+          ></div>
+
+        </div>
+
+        <div class="progress-row">
+
+          <span>
+
+            Accident
+
+          </span>
+
+          <strong>
+
+            {{ getAccidentPercentage() }}%
+
+          </strong>
+
+        </div>
+
+        <div class="progress-bar">
+
+          <div
+            class="progress-fill orange"
+            [style.width.%]="getAccidentPercentage()"
+          ></div>
+
+        </div>
+
+      </article>
+            
+
+      <div class="reports-toolbar">
+
+        <div class="search-box">
+
+          <span class="search-icon">🔍</span>
+
+          <input
+            type="text"
+            placeholder="Search customer, registration or status..."
+            [(ngModel)]="searchTerm"
+            (input)="applyFilters()"
+          />
+
+        </div>
+
+        <div class="toolbar-filters">
+
+          <select
+            [(ngModel)]="selectedType"
+            (change)="applyFilters()"
+          >
+
+            <option value="all">
+              All Types
+            </option>
+
+            <option value="pre">
+              Pre-Cover
+            </option>
+
+            <option value="accident">
+              Accident
+            </option>
+
+          </select>
+
+          <select
+            [(ngModel)]="selectedStatus"
+            (change)="applyFilters()"
+          >
+
+            <option value="all">
+              All Statuses
+            </option>
+
+            <option value="submitted">
+              Submitted
+            </option>
+
+            <option value="processing">
+              Processing
+            </option>
+
+            <option value="completed">
+              Completed
+            </option>
+
+          </select>
+
+        </div>
 
       </div>
 
+      @if (filteredInspections.length === 0) {
 
-      @if (filteredInspections.length > 0) {
+        <div class="empty-state">
+
+          <div class="empty-icon">
+            📄
+          </div>
+
+          <h3>
+            No inspection reports found
+          </h3>
+
+          <p>
+            Try changing the search filters or create a new inspection request.
+          </p>
+
+        </div>
+
+      }
+
+      @else {
 
         <div class="table-wrapper">
 
@@ -210,34 +318,21 @@
 
               <tr>
 
-                <th>
-                  Customer
-                </th>
+                <th>Customer</th>
 
-                <th>
-                  Registration
-                </th>
+                <th>Registration</th>
 
-                <th>
-                  Type
-                </th>
+                <th>Type</th>
 
-                <th>
-                  Status
-                </th>
+                <th>Status</th>
 
-                <th>
-                  Date
-                </th>
+                <th>Date</th>
 
-                <th>
-                  Action
-                </th>
+                <th></th>
 
               </tr>
 
             </thead>
-
 
             <tbody>
 
@@ -250,21 +345,43 @@
 
                   <td>
 
-                    <strong>
+                    <div class="customer-cell">
 
-                      {{ getCustomerName(inspection) }}
+                      <div class="customer-avatar">
+
+                        {{ getCustomerName(inspection).charAt(0) }}
+
+                      </div>
+
+                      <div>
+
+                        <strong>
+
+                          {{ getCustomerName(inspection) }}
+
+                        </strong>
+
+                        <span>
+
+                          {{ getVehicleRegistration(inspection) }}
+
+                        </span>
+
+                      </div>
+
+                    </div>
+
+                  </td>
+
+                  <td>
+
+                    <strong class="registration">
+
+                      {{ getVehicleRegistration(inspection) }}
 
                     </strong>
 
                   </td>
-
-
-                  <td>
-
-                    {{ getVehicleRegistration(inspection) }}
-
-                  </td>
-
 
                   <td>
 
@@ -272,14 +389,11 @@
 
                   </td>
 
-
                   <td>
 
                     <span
                       class="status"
-                      [ngClass]="
-                        getStatusClass(inspection)
-                      "
+                      [ngClass]="getStatusClass(inspection)"
                     >
 
                       {{ getStatus(inspection) }}
@@ -288,25 +402,18 @@
 
                   </td>
 
-
                   <td>
 
-                    {{
-                      inspection.createdAt
-                      | date:'mediumDate'
-                    }}
+                    {{ inspection.createdAt | date:'dd MMM yyyy' }}
 
                   </td>
-
 
                   <td>
 
                     <button
                       type="button"
                       class="view-button"
-                      (click)="
-                        viewInspection(inspection)
-                      "
+                      (click)="viewInspection(inspection)"
                     >
 
                       View Details
@@ -327,28 +434,7 @@
 
       }
 
-
-      @else {
-
-        <div class="empty-state">
-
-          <div class="empty-icon">
-            📊
-          </div>
-
-          <h3>
-            No reports found
-          </h3>
-
-          <p>
-            Try changing your search or filters.
-          </p>
-
-        </div>
-
-      }
-
-    </div>
+    </section>
 
   }
 

@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Inspection {
+  id                String   @id @default(uuid())
+
+  // Inspection Information
+  status            String
+  inspectionType    String?
+
+  // Customer
+  customerFirstName String?
+  customerSurname   String?
+  policyNumber      String?
+  insuranceCompany  String?
+
+  // Vehicle
+  registration      String?
+  make              String?
+  model             String?
+  year              String?
+  colour            String?
+  mileage           String?
+
+  // Photos
+  photos            Json?
+  damagePhotos      Json?
+
+  // ==========================
+  // AI Processing
+  // ==========================
+
+  aiStatus          String   @default("PENDING")
+
+  aiScore           Float?
+
+  damageDetected    Boolean  @default(false)
+
+  damageSummary     String?
+
+  vinExtracted      String?
+
+  odometerReading   String?
+
+  aiProvider        String?
+
+  processedAt       DateTime?
+
+  // ==========================
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}

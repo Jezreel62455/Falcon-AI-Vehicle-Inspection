@@ -1,64 +1,87 @@
-import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+import {
+  Component,
+  inject
+} from '@angular/core';
 
 import {
   Router,
   RouterLink,
+  RouterLinkActive,
   RouterOutlet
 } from '@angular/router';
-
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatListModule } from '@angular/material/list';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
 
 
 @Component({
   selector: 'app-main-layout',
-
   standalone: true,
-
   imports: [
-
-    RouterLink,
-
+    CommonModule,
     RouterOutlet,
-
-    MatToolbarModule,
-
-    MatSidenavModule,
-
-    MatListModule,
-
-    MatIconModule,
-
-    MatButtonModule
-
+    RouterLink,
+    RouterLinkActive
   ],
-
   templateUrl: './main-layout.html',
-
   styleUrl: './main-layout.css'
-
 })
-
-
 export class MainLayoutComponent {
 
 
-  private router =
+  private readonly router =
     inject(Router);
 
 
-  navigate(
-    path: string
-  ): void {
+  isSidebarCollapsed = false;
 
+  isMobileSidebarOpen = false;
+
+
+
+  toggleSidebar(): void {
+
+    this.isSidebarCollapsed =
+      !this.isSidebarCollapsed;
+
+  }
+
+
+
+  toggleMobileSidebar(): void {
+
+    this.isMobileSidebarOpen =
+      !this.isMobileSidebarOpen;
+
+  }
+
+
+
+  closeMobileSidebar(): void {
+
+    this.isMobileSidebarOpen =
+      false;
+
+  }
+
+
+
+  navigateToNewInspection(): void {
+
+    this.closeMobileSidebar();
 
     this.router.navigate([
-      path
+      '/create-inspection-request'
     ]);
 
+  }
+
+
+
+  goToDashboard(): void {
+
+    this.closeMobileSidebar();
+
+    this.router.navigateByUrl('/');
 
   }
 

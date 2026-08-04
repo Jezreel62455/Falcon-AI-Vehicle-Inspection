@@ -1,395 +1,1114 @@
-<div class="dashboard">
+<div class="dashboard-page">
 
-  <!-- HERO SECTION -->
-  <section class="hero">
 
-    <div class="hero-content">
+  <!-- =========================================
+       PAGE HEADER
+  ========================================== -->
 
-      <div class="badge">
-        🚗 Falcon AI Vehicle Inspection
-      </div>
+  <section class="page-header">
+
+    <div>
+
+      <span class="eyebrow">
+        FALCON AI PLATFORM
+      </span>
 
       <h1>
-        Smarter vehicle inspections.
-        <span>Powered by AI.</span>
+        Vehicle Inspection Dashboard
       </h1>
 
       <p>
-        Complete your vehicle inspection remotely, securely and conveniently.
-        Whether you are applying for insurance or submitting an accident claim,
-        Falcon AI guides you through the entire process.
+        Monitor customer inspection requests, review submissions and manage
+        vehicle assessments from a single workspace.
       </p>
 
-      <div class="hero-actions">
+    </div>
+
+
+    <button
+      type="button"
+      class="header-action"
+      routerLink="/create-inspection-request">
+
+      <span class="plus-icon">
+        +
+      </span>
+
+      Create Inspection Request
+
+    </button>
+
+
+  </section>
+
+
+
+  <!-- =========================================
+       ERROR MESSAGE
+  ========================================== -->
+
+  @if (errorMessage) {
+
+    <div class="dashboard-alert">
+
+      <strong>
+        Unable to load dashboard.
+      </strong>
+
+      <span>
+
+        {{ errorMessage }}
+
+      </span>
+
+    </div>
+
+  }
+
+
+
+  <!-- =========================================
+       STATISTICS
+  ========================================== -->
+
+
+  <section class="statistics-grid">
+
+
+    <article class="stat-card">
+
+
+      <div class="stat-card-top">
+
+
+        <span class="stat-label">
+
+          TOTAL REQUESTS
+
+        </span>
+
+
+        <div class="stat-icon blue">
+
+          <span class="icon-document"></span>
+
+        </div>
+
+
+      </div>
+
+
+
+      <strong class="stat-value">
+
+
+        @if (isLoading) {
+
+          —
+
+        }
+
+        @else {
+
+          {{ totalInspections }}
+
+        }
+
+
+      </strong>
+
+
+
+      <span class="stat-description">
+
+        Customer inspection requests
+
+      </span>
+
+
+    </article>
+
+
+
+
+
+    <article class="stat-card">
+
+
+      <div class="stat-card-top">
+
+
+        <span class="stat-label">
+
+          SUBMITTED
+
+        </span>
+
+
+        <div class="stat-icon purple">
+
+          <span class="icon-send"></span>
+
+        </div>
+
+
+      </div>
+
+
+
+      <strong class="stat-value">
+
+
+        @if (isLoading) {
+
+          —
+
+        }
+
+        @else {
+
+          {{ submittedInspections }}
+
+        }
+
+
+      </strong>
+
+
+
+      <span class="stat-description">
+
+        Awaiting admin review
+
+      </span>
+
+
+    </article>
+
+
+
+
+
+    <article class="stat-card">
+
+
+      <div class="stat-card-top">
+
+
+        <span class="stat-label">
+
+          COMPLETED
+
+        </span>
+
+
+        <div class="stat-icon green">
+
+          <span class="icon-check"></span>
+
+        </div>
+
+
+      </div>
+
+
+
+      <strong class="stat-value">
+
+
+        @if (isLoading) {
+
+          —
+
+        }
+
+        @else {
+
+          {{ completedInspections }}
+
+        }
+
+
+      </strong>
+
+
+
+      <span class="stat-description">
+
+        Completed assessments
+
+      </span>
+
+
+    </article>
+
+
+
+
+
+    <article class="stat-card">
+
+
+      <div class="stat-card-top">
+
+
+        <span class="stat-label">
+
+          UNDER REVIEW
+
+        </span>
+
+
+        <div class="stat-icon orange">
+
+          <span class="icon-clock"></span>
+
+        </div>
+
+
+      </div>
+
+
+
+      <strong class="stat-value">
+
+
+        @if (isLoading) {
+
+          —
+
+        }
+
+        @else {
+
+          {{ underReviewInspections }}
+
+        }
+
+
+      </strong>
+
+
+
+      <span class="stat-description">
+
+        Requiring attention
+
+      </span>
+
+
+    </article>
+
+
+  </section>
+
+    <!-- =========================================
+       MAIN GRID
+  ========================================== -->
+
+
+  <section class="dashboard-grid">
+
+    <!-- CREATE REQUEST HERO CARD --> 
+    
+<article class="start-card">
+
+  <div class="start-card-content">
+
+    <span class="eyebrow light">
+      QUICK ACTION
+    </span>
+
+    <h2>
+      Create a customer inspection request
+    </h2>
+
+    <p>
+      Send a secure inspection link to the customer. The customer completes
+      the vehicle assessment from their phone, and the results return to this
+      dashboard for review.
+    </p>
+
+    <div class="start-actions">
+
+      <button
+        type="button"
+        class="start-primary"
+        routerLink="/create-inspection-request">
+
+        Create Inspection Request
+
+        <span>
+          →
+        </span>
+
+      </button>
+
+    </div>
+
+  </div>
+
+  <div class="start-visual">
+
+    <div class="visual-ring ring-one"></div>
+
+    <div class="visual-ring ring-two"></div>
+
+    <div class="vehicle-illustration">
+
+      <div class="vehicle-roof"></div>
+
+      <div class="vehicle-window"></div>
+
+      <div class="vehicle-body"></div>
+
+      <div class="vehicle-wheel wheel-left"></div>
+
+      <div class="vehicle-wheel wheel-right"></div>
+
+      <div class="vehicle-light light-left"></div>
+
+      <div class="vehicle-light light-right"></div>
+
+    </div>
+
+  </div>
+
+</article>
+
+    <!-- ACTIVITY CARD -->
+
+
+    <article class="activity-card">
+
+
+      <div class="card-heading">
+
+
+        <div>
+
+
+          <span class="eyebrow">
+
+            LIVE ACTIVITY
+
+          </span>
+
+
+
+          <h2>
+
+            Inspection Overview
+
+          </h2>
+
+
+        </div>
+
+
+
+        <span class="live-indicator">
+
+
+          <span></span>
+
+
+          Online
+
+
+        </span>
+
+
+      </div>
+
+
+
+
+
+      <div class="activity-list">
+
+
+
+        <div class="activity-row">
+
+
+          <div class="activity-row-icon blue">
+
+            <span class="icon-document"></span>
+
+          </div>
+
+
+
+          <div class="activity-row-content">
+
+
+            <strong>
+
+              Total Requests
+
+            </strong>
+
+
+
+            <span>
+
+              Customer inspection requests created
+
+            </span>
+
+
+          </div>
+
+
+
+          <strong class="activity-number">
+
+            {{ totalInspections }}
+
+          </strong>
+
+
+        </div>
+
+
+
+
+
+        <div class="activity-row">
+
+
+          <div class="activity-row-icon purple">
+
+            <span class="icon-send"></span>
+
+          </div>
+
+
+
+          <div class="activity-row-content">
+
+
+            <strong>
+
+              Submitted
+
+            </strong>
+
+
+
+            <span>
+
+              Customer completed inspection
+
+            </span>
+
+
+          </div>
+
+
+
+          <strong class="activity-number">
+
+            {{ submittedInspections }}
+
+          </strong>
+
+
+        </div>
+
+
+
+
+
+        <div class="activity-row">
+
+
+          <div class="activity-row-icon green">
+
+            <span class="icon-check"></span>
+
+          </div>
+
+
+
+          <div class="activity-row-content">
+
+
+            <strong>
+
+              Completed
+
+            </strong>
+
+
+
+            <span>
+
+              Successfully processed
+
+            </span>
+
+
+          </div>
+
+
+
+          <strong class="activity-number">
+
+            {{ completedInspections }}
+
+          </strong>
+
+
+        </div>
+
+
+
+
+
+        <div class="activity-row">
+
+
+          <div class="activity-row-icon orange">
+
+            <span class="icon-clock"></span>
+
+          </div>
+
+
+
+          <div class="activity-row-content">
+
+
+            <strong>
+
+              Under Review
+
+            </strong>
+
+
+
+            <span>
+
+              Awaiting assessment
+
+            </span>
+
+
+          </div>
+
+
+
+          <strong class="activity-number">
+
+            {{ underReviewInspections }}
+
+          </strong>
+
+
+        </div>
+
+
+
+      </div>
+
+
+    </article>
+
+
+  </section>
+
+    <!-- =========================================
+       RECENT INSPECTIONS
+  ========================================== -->
+
+
+  <section class="recent-card">
+
+
+    <div class="card-heading">
+
+
+      <div>
+
+
+        <span class="eyebrow">
+
+          INSPECTION REQUESTS
+
+        </span>
+
+
+
+        <h2>
+
+          Latest Customer Activity
+
+        </h2>
+
+
+      </div>
+
+
+
+      <a
+        routerLink="/history"
+        class="view-all-link">
+
+
+        View All
+
+
+        <span>
+
+          →
+
+        </span>
+
+
+      </a>
+
+
+    </div>
+
+
+
+
+
+    @if (isLoading) {
+
+
+      <div class="table-loading">
+
+
+        Loading inspections...
+
+
+      </div>
+
+
+    }
+
+
+    @else if (getRecentInspections().length === 0) {
+
+
+      <div class="empty-state">
+
+
+        <div class="empty-state-icon">
+
+          🚗
+
+        </div>
+
+
+
+        <h3>
+
+          No inspection requests available
+
+        </h3>
+
+
+
+        <p>
+
+          Create your first customer inspection request to begin.
+
+        </p>
+
+
+
 
         <button
-          class="primary-button"
-          routerLink="/new-inspection"
-          [queryParams]="{ type: 'pre-cover' }">
+          type="button"
+          class="empty-state-button"
+          routerLink="/create-inspection-request">
 
-          Start Vehicle Inspection
 
-          <span>→</span>
+          Create Request
+
 
         </button>
 
-        <button
-          class="secondary-button"
-          routerLink="/history">
-
-          View My Inspections
-
-        </button>
 
       </div>
 
-    </div>
 
-    <div class="hero-visual">
+    }
 
-      <div class="vehicle-card">
 
-        <div class="vehicle-icon">
-          🚘
-        </div>
+    @else {
 
-        <h3>Digital Vehicle Inspection</h3>
 
-        <p>
-          Secure. Guided. AI-assisted.
-        </p>
 
-        <div class="inspection-status">
+      <div class="inspection-table-wrapper">
 
-          <div class="status-dot"></div>
 
-          Inspection Platform Online
+        <table>
 
-        </div>
+
+          <thead>
+
+
+            <tr>
+
+
+              <th>
+                Customer
+              </th>
+
+
+              <th>
+                Registration
+              </th>
+
+
+              <th>
+                Inspection Type
+              </th>
+
+
+              <th>
+                Status
+              </th>
+
+
+              <th>
+                Date
+              </th>
+
+
+              <th>
+              </th>
+
+
+            </tr>
+
+
+          </thead>
+
+
+
+
+          <tbody>
+
+
+            @for (
+              inspection of getRecentInspections();
+              track inspection.id
+            ) {
+
+
+              <tr>
+
+
+                <td>
+
+
+                  <div class="customer-cell">
+
+
+                    <div class="customer-avatar">
+
+
+                      {{
+                        getCustomerName(inspection).charAt(0)
+                      }}
+
+
+                    </div>
+
+
+
+                    <div>
+
+
+                      <strong>
+
+
+                        {{ getCustomerName(inspection) }}
+
+
+                      </strong>
+
+
+
+                      <span>
+
+
+                        {{ getVehicleRegistration(inspection) }}
+
+
+                      </span>
+
+
+                    </div>
+
+
+                  </div>
+
+
+                </td>
+
+
+
+
+                <td>
+
+
+                  <strong class="registration">
+
+
+                    {{ getVehicleRegistration(inspection) }}
+
+
+                  </strong>
+
+
+                </td>
+
+
+
+
+                <td>
+
+
+                  <span class="type-text">
+
+
+                    {{ getInspectionType(inspection) }}
+
+
+                  </span>
+
+
+                </td>
+
+
+
+
+                <td>
+
+
+                  <span
+                    class="status-badge"
+                    [ngClass]="getStatusClass(inspection)">
+
+
+                    <span class="status-dot"></span>
+
+
+                    {{ getStatus(inspection) }}
+
+
+                  </span>
+
+
+                </td>
+
+
+
+
+                <td>
+
+
+                  <span class="date-text">
+
+
+                    @if (getDate(inspection)) {
+
+
+                      {{ getDate(inspection) | date:'dd MMM yyyy' }}
+
+
+                    }
+
+
+                    @else {
+
+
+                      —
+
+
+                    }
+
+
+                  </span>
+
+
+                </td>
+
+
+
+
+                <td>
+
+
+                  <button
+                    type="button"
+                    class="table-action"
+                    (click)="openInspection(inspection)">
+
+
+                    View Details
+
+
+                  </button>
+
+
+                </td>
+
+
+
+              </tr>
+
+
+            }
+
+
+          </tbody>
+
+
+        </table>
+
 
       </div>
 
-    </div>
+
+    }
+
 
   </section>
 
 
-  <!-- INSPECTION OPTIONS -->
-  <section class="inspection-options">
-
-    <div class="section-heading">
-
-      <h2>What do you need to do?</h2>
-
-      <p>
-        Select the type of vehicle inspection you would like to complete.
-      </p>
-
-    </div>
 
 
-    <div class="option-grid">
+
+  <!-- =========================================
+       QUICK ACTIONS
+  ========================================== -->
 
 
-      <!-- PRE-COVER INSPECTION -->
-      <div class="option-card">
+  <section class="quick-actions-card">
 
-        <div class="option-icon">
-          🛡️
-        </div>
 
-        <div class="option-content">
+    <div class="section-header">
 
-          <h3>Pre-Cover Inspection</h3>
 
-          <p>
-            Complete a vehicle inspection before your insurance policy
-            receives full comprehensive cover.
-          </p>
+      <div>
 
-          <ul>
 
-            <li>✓ Verify your vehicle condition</li>
+        <h2>
 
-            <li>✓ Capture guided vehicle photos</li>
+          Quick Actions
 
-            <li>✓ AI-assisted inspection analysis</li>
+        </h2>
 
-          </ul>
 
-          <button
-            class="card-button"
-            routerLink="/new-inspection"
-            [queryParams]="{ type: 'pre-cover' }">
 
-            Start Pre-Cover Inspection
+        <p>
 
-            <span>→</span>
+          Common administrator tasks
 
-          </button>
+        </p>
 
-        </div>
 
       </div>
 
 
-      <!-- ACCIDENT CLAIM -->
-      <div class="option-card accident">
+    </div>
 
-        <div class="option-icon">
-          🚨
-        </div>
 
-        <div class="option-content">
+    <div class="quick-actions-grid">
 
-          <h3>Accident Claim Inspection</h3>
+      <button
+        class="quick-action"
+        routerLink="/history">
 
-          <p>
-            Submit photos of your vehicle after an accident to help your
-            insurer assess the damage and process your claim.
-          </p>
 
-          <ul>
+        <span class="action-icon">
 
-            <li>✓ Document accident damage</li>
+          📋
 
-            <li>✓ Upload vehicle images</li>
+        </span>
 
-            <li>✓ Track your claim inspection</li>
 
-          </ul>
 
-          <button
-            class="card-button"
-            routerLink="/new-inspection"
-            [queryParams]="{ type: 'accident' }">
+        <span>
 
-            Start Accident Inspection
 
-            <span>→</span>
+          <strong>
 
-          </button>
+            Inspection History
 
-        </div>
+          </strong>
 
-      </div>
+
+
+          <small>
+
+            Review previous inspections
+
+          </small>
+
+
+        </span>
+
+
+      </button>
+
+
+
+
+
+      <button
+        class="quick-action"
+       (click)="router.navigate(['/reports'])">
+
+
+        <span class="action-icon">
+
+          📊
+
+        </span>
+
+
+
+        <span>
+
+
+          <strong>
+
+            Reports
+
+          </strong>
+
+
+
+          <small>
+
+            View analytics and trends
+
+          </small>
+
+
+        </span>
+
+
+      </button>
+
+
+
 
     </div>
+
 
   </section>
 
-
-  <!-- HOW IT WORKS -->
-  <section class="how-it-works">
-
-    <div class="section-heading">
-
-      <h2>How Falcon AI works</h2>
-
-      <p>
-        A simple guided process from inspection to decision.
-      </p>
-
-    </div>
-
-
-    <div class="steps">
-
-      <div class="step">
-
-        <div class="step-number">
-          1
-        </div>
-
-        <h3>Start</h3>
-
-        <p>
-          Select the type of vehicle inspection you need.
-        </p>
-
-      </div>
-
-
-      <div class="step">
-
-        <div class="step-number">
-          2
-        </div>
-
-        <h3>Capture</h3>
-
-        <p>
-          Follow the guided process to capture vehicle information and photos.
-        </p>
-
-      </div>
-
-
-      <div class="step">
-
-        <div class="step-number">
-          3
-        </div>
-
-        <h3>Analyse</h3>
-
-        <p>
-          AI-assisted technology helps identify and analyse vehicle damage.
-        </p>
-
-      </div>
-
-
-      <div class="step">
-
-        <div class="step-number">
-          4
-        </div>
-
-        <h3>Review</h3>
-
-        <p>
-          Your insurer reviews the inspection and makes a decision.
-        </p>
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <!-- RECENT INSPECTIONS -->
-  <section class="recent-section">
-
-    <div class="section-heading">
-
-      <h2>Recent Inspections</h2>
-
-      <p>
-        View the latest vehicle inspection activity.
-      </p>
-
-    </div>
-
-
-    <div class="inspection-table-wrapper">
-
-      <table>
-
-        <thead>
-
-          <tr>
-
-            <th>Vehicle</th>
-
-            <th>Status</th>
-
-            <th>AI Result</th>
-
-            <th>Confidence</th>
-
-          </tr>
-
-        </thead>
-
-
-        <tbody>
-
-          <tr>
-
-            <td>
-
-              <strong>VW Golf 1.4</strong>
-
-              <small>Pre-Cover Inspection</small>
-
-            </td>
-
-            <td>
-
-              <span class="status complete">
-                Complete
-              </span>
-
-            </td>
-
-            <td>
-              No Damage
-            </td>
-
-            <td>
-              <strong>98%</strong>
-            </td>
-
-          </tr>
-
-
-          <tr>
-
-            <td>
-
-              <strong>BMW 320i</strong>
-
-              <small>Accident Claim</small>
-
-            </td>
-
-            <td>
-
-              <span class="status review">
-                Under Review
-              </span>
-
-            </td>
-
-            <td>
-              Front Bumper Damage
-            </td>
-
-            <td>
-              <strong>91%</strong>
-
-            </td>
-
-          </tr>
-
-
-          <tr>
-
-            <td>
-
-              <strong>Toyota Hilux</strong>
-
-              <small>Pre-Cover Inspection</small>
-
-            </td>
-
-            <td>
-
-              <span class="status complete">
-                Complete
-              </span>
-
-            </td>
-
-            <td>
-              Good Condition
-            </td>
-
-            <td>
-              <strong>96%</strong>
-
-            </td>
-
-          </tr>
-
-        </tbody>
-
-      </table>
-
-    </div>
-
-  </section>
 
 </div>
+
+ 

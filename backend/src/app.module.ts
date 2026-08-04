@@ -1,33 +1,47 @@
-import { Module } from '@nestjs/common';
+import {
+  Module,
+} from '@nestjs/common';
 
-import { AppController } from './app.controller';
+import {
+  ServeStaticModule,
+} from '@nestjs/serve-static';
 
-import { AppService } from './app.service';
+import {
+  join,
+} from 'path';
 
-import { InspectionsModule } from './inspections/inspections.module';
+import {
+  InspectionsModule,
+} from './inspections/inspections.module';
+
+// NOTE:
+// Prisma lives in backend/prisma, not backend/src/prisma
+import {
+  PrismaModule,
+} from '../prisma/prisma.module';
 
 
 @Module({
 
   imports: [
 
-    InspectionsModule
+    ServeStaticModule.forRoot({
+
+      rootPath: join(
+        process.cwd(),
+        'uploads',
+      ),
+
+      serveRoot: '/uploads/',
+
+    }),
+
+    PrismaModule,
+
+    InspectionsModule,
 
   ],
-
-  controllers: [
-
-    AppController
-
-  ],
-
-  providers: [
-
-    AppService
-
-  ]
 
 })
-
 
 export class AppModule {}

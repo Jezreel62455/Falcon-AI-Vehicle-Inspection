@@ -14,6 +14,13 @@ export const routes: Routes = [
           import('./pages/dashboard/dashboard').then((m) => m.Dashboard),
       },
       {
+        path: 'create-inspection-request',
+        loadComponent: () =>
+        import('./pages/create-inspection-request/create-inspection-request').then(
+        (m) => m.CreateInspectionRequest
+   ),
+      },
+      {
         path: 'new-inspection',
         loadComponent: () =>
           import('./pages/new-inspection/new-inspection').then(
@@ -32,10 +39,12 @@ export const routes: Routes = [
         (m) => m.InspectionDetails
        ),
       },
-      {
+            {
         path: 'reports',
         loadComponent: () =>
-          import('./pages/reports/reports').then((m) => m.Reports),
+        import('./pages/reports/reports').then(
+        (m) => m.Reports
+       ),
       },
       {
         path: 'settings',

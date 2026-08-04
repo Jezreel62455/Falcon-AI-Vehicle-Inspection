@@ -4,10 +4,19 @@ import {
   OnInit,
   inject
 } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 
-import { InspectionService } from '../../services/inspection.service';
+import {
+  FormsModule
+} from '@angular/forms';
+
+import {
+  Router
+} from '@angular/router';
+
+import {
+  Inspection,
+  InspectionService
+} from '../../services/inspection.service';
 
 @Component({
   selector: 'app-reports',
@@ -27,9 +36,13 @@ export class Reports implements OnInit {
   private readonly router =
     inject(Router);
 
-  inspections: any[] = [];
+  inspections: Inspection[] = [];
 
-  filteredInspections: any[] = [];
+  filteredInspections: Inspection[] = [];
+
+  isLoading = true;
+
+  errorMessage = '';
 
   searchTerm = '';
 
@@ -37,17 +50,35 @@ export class Reports implements OnInit {
 
   selectedType = 'all';
 
-  isLoading = true;
-
-  errorMessage = '';
+  /* ===================================================
+     DASHBOARD STATISTICS
+  =================================================== */
 
   totalInspections = 0;
 
   submittedInspections = 0;
 
+  completedInspections = 0;
+
+  underReviewInspections = 0;
+
   preCoverInspections = 0;
 
   accidentInspections = 0;
+
+  averageMileage = 0;
+
+  averageVehicleAge = 0;
+
+  mostCommonColour = '-';
+
+  averageAiConfidence = 96;
+
+  averageDamageSeverity = 0;
+
+  estimatedRepairExposure = 0;
+
+  highestRiskVehicle = '-';
 
   ngOnInit(): void {
 
@@ -65,11 +96,9 @@ export class Reports implements OnInit {
       .getInspections()
       .subscribe({
 
-        next: (data: any[] | null | undefined) => {
+        next: inspections => {
 
-          this.inspections = Array.isArray(data)
-            ? data
-            : [];
+          this.inspections = inspections;
 
           this.calculateStatistics();
 
@@ -79,10 +108,10 @@ export class Reports implements OnInit {
 
         },
 
-        error: (error: unknown) => {
+        error: error => {
 
           console.error(
-            'Failed to load reports:',
+            'Failed to load reports',
             error
           );
 
@@ -91,7 +120,7 @@ export class Reports implements OnInit {
           this.filteredInspections = [];
 
           this.errorMessage =
-            'Failed to load reports.';
+            'Unable to load inspection reports.';
 
           this.isLoading = false;
 
@@ -107,35 +136,144 @@ export class Reports implements OnInit {
       this.inspections.length;
 
     this.submittedInspections =
-      this.inspections.filter(
-        inspection =>
-          this.getStatus(inspection)
-            .toLowerCase() === 'submitted'
+      this.inspections.filter(x =>
+        this.getStatus(x)
+          .toUpperCase() === 'SUBMITTED'
+      ).length;
+
+    this.completedInspections =
+      this.inspections.filter(x =>
+        this.getStatus(x)
+          .toUpperCase() === 'COMPLETED'
+      ).length;
+
+    this.underReviewInspections =
+      this.inspections.filter(x =>
+        this.getStatus(x)
+          .toUpperCase().includes('REVIEW')
       ).length;
 
     this.preCoverInspections =
-      this.inspections.filter(
-        inspection =>
-          this.getInspectionType(inspection)
-            .toLowerCase()
-            .includes('pre')
+      this.inspections.filter(x =>
+        this.getInspectionType(x)
+          .toLowerCase()
+          .includes('pre')
       ).length;
 
     this.accidentInspections =
-      this.inspections.filter(
-        inspection => {
-
-          const type =
-            this.getInspectionType(inspection)
-              .toLowerCase();
-
-          return (
-            type.includes('accident') ||
-            type.includes('claim')
-          );
-
-        }
+      this.inspections.filter(x =>
+        this.getInspectionType(x)
+          .toLowerCase()
+          .includes('accident')
       ).length;
+          /* ==============================================
+       Average Mileage
+    ============================================== */
+
+    const mileageValues =
+      this.inspections
+        .map(x => Number(x.vehicle?.mileage) || 0)
+        .filter(x => x > 0);
+
+    this.averageMileage =
+      mileageValues.length > 0
+        ? Math.round(
+            mileageValues.reduce(
+              (a, b) => a + b,
+              0
+            ) / mileageValues.length
+          )
+        : 0;
+
+
+    /* ==============================================
+       Average Vehicle Age
+    ============================================== */
+
+    const currentYear =
+      new Date().getFullYear();
+
+    const ages =
+      this.inspections
+        .map(x => {
+
+          const year =
+            Number(x.vehicle?.year);
+
+          return year > 1900
+            ? currentYear - year
+            : 0;
+
+        })
+        .filter(x => x > 0);
+
+    this.averageVehicleAge =
+      ages.length > 0
+        ? Math.round(
+            ages.reduce(
+              (a, b) => a + b,
+              0
+            ) / ages.length
+          )
+        : 0;
+
+
+    /* ==============================================
+       Most Common Vehicle Colour
+    ============================================== */
+
+    const colourCount:
+      Record<string, number> = {};
+
+    this.inspections.forEach(x => {
+
+      const colour =
+        (x.vehicle?.colour || '')
+          .trim();
+
+      if (!colour) {
+
+        return;
+
+      }
+
+      colourCount[colour] =
+        (colourCount[colour] || 0) + 1;
+
+    });
+
+    const colours =
+      Object.entries(colourCount);
+
+    this.mostCommonColour =
+      colours.length
+        ? colours.sort(
+            (a, b) => b[1] - a[1]
+          )[0][0]
+        : '-';
+
+
+    /* ==============================================
+       Demo AI Statistics
+       (Will come from AWS later)
+    ============================================== */
+
+    this.averageAiConfidence = 96;
+
+    this.averageDamageSeverity =
+      this.accidentInspections > 0
+        ? 18
+        : 0;
+
+    this.estimatedRepairExposure =
+      this.accidentInspections * 14500;
+
+    this.highestRiskVehicle =
+      this.inspections.length
+        ? this.getVehicleRegistration(
+            this.inspections[0]
+          )
+        : '-';
 
   }
 
@@ -143,52 +281,80 @@ export class Reports implements OnInit {
 
     const search =
       this.searchTerm
-        .toLowerCase()
-        .trim();
+        .trim()
+        .toLowerCase();
 
     this.filteredInspections =
       this.inspections.filter(
-
         inspection => {
 
-          const customerName =
-            this.getCustomerName(inspection)
-              .toLowerCase();
+          const customer =
+            this.getCustomerName(
+              inspection
+            ).toLowerCase();
 
           const registration =
-            this.getVehicleRegistration(inspection)
-              .toLowerCase();
+            this.getVehicleRegistration(
+              inspection
+            ).toLowerCase();
 
           const type =
-            this.getInspectionType(inspection)
-              .toLowerCase();
+            this.getInspectionType(
+              inspection
+            ).toLowerCase();
 
           const status =
-            this.getStatus(inspection)
-              .toLowerCase();
+            this.getStatus(
+              inspection
+            ).toLowerCase();
 
           const matchesSearch =
-            !search ||
-            customerName.includes(search) ||
-            registration.includes(search) ||
-            type.includes(search) ||
+
+            search === ''
+
+            ||
+
+            customer.includes(search)
+
+            ||
+
+            registration.includes(search)
+
+            ||
+
+            type.includes(search)
+
+            ||
+
             status.includes(search);
 
           const matchesStatus =
-            this.selectedStatus === 'all' ||
+
+            this.selectedStatus === 'all'
+
+            ||
+
             status ===
-              this.selectedStatus.toLowerCase();
+            this.selectedStatus.toLowerCase();
 
           const matchesType =
-            this.selectedType === 'all' ||
+
+            this.selectedType === 'all'
+
+            ||
+
             type.includes(
               this.selectedType.toLowerCase()
             );
 
           return (
+
             matchesSearch &&
+
             matchesStatus &&
+
             matchesType
+
           );
 
         }
@@ -196,22 +362,14 @@ export class Reports implements OnInit {
       );
 
   }
-
-  viewInspection(
-    inspection: any
+    viewInspection(
+    inspection: Inspection
   ): void {
 
-    const id =
-      inspection?.id;
-
-    if (
-      id === undefined ||
-      id === null ||
-      id === ''
-    ) {
+    if (!inspection.id) {
 
       console.error(
-        'Cannot open inspection because the inspection ID is missing.',
+        'Inspection ID missing.',
         inspection
       );
 
@@ -219,89 +377,133 @@ export class Reports implements OnInit {
 
     }
 
-    this.router.navigate([
+    void this.router.navigate([
       '/inspection-details',
-      id
+      inspection.id
     ]);
 
   }
 
   getCustomerName(
-    inspection: any
+    inspection: Inspection
   ): string {
 
-    const customer =
-      inspection?.customer;
+    const first =
+      inspection.customer.firstName ?? '';
 
-    if (!customer) {
+    const surname =
+      inspection.customer.surname ?? '';
 
-      return 'Unknown Customer';
+    const fullName =
+      `${first} ${surname}`.trim();
 
-    }
-
-    return (
-
-      `${customer.firstName || ''} ` +
-      `${customer.surname || ''}`
-
-    ).trim() || 'Unknown Customer';
+    return fullName || 'Unknown Customer';
 
   }
 
   getVehicleRegistration(
-    inspection: any
+    inspection: Inspection
   ): string {
 
     return (
-      inspection?.vehicle?.registration
-      || 'N/A'
+      inspection.vehicle.registration ||
+      '-'
     );
 
   }
 
   getInspectionType(
-    inspection: any
+    inspection: Inspection
   ): string {
 
     return (
-      inspection?.inspectionType
-      || inspection?.type
-      || 'N/A'
+      inspection.inspectionType ||
+      'Pre-Cover Inspection'
     );
 
   }
 
   getStatus(
-    inspection: any
+    inspection: Inspection
   ): string {
 
     return (
-      inspection?.status
-      || 'Unknown'
+      inspection.status ||
+      'Unknown'
     );
 
   }
 
   getStatusClass(
-    inspection: any
+    inspection: Inspection
   ): string {
 
-    return this
-      .getStatus(inspection)
-      .toLowerCase()
-      .replace(/\s+/g, '-');
+    switch (
+      this.getStatus(inspection)
+        .toUpperCase()
+    ) {
+
+      case 'COMPLETED':
+        return 'status-approved';
+
+      case 'PROCESSING':
+        return 'status-processing';
+
+      case 'UNDER REVIEW':
+        return 'status-under-review';
+
+      case 'PENDING':
+        return 'status-pending';
+
+      case 'SUBMITTED':
+        return 'status-submitted';
+
+      case 'FAILED':
+        return 'status-rejected';
+
+      default:
+        return 'status-submitted';
+
+    }
+
+  }
+
+  getPreCoverPercentage(): number {
+
+    if (this.totalInspections === 0) {
+
+      return 0;
+
+    }
+
+    return Math.round(
+      (this.preCoverInspections /
+        this.totalInspections) * 100
+    );
+
+  }
+
+  getAccidentPercentage(): number {
+
+    if (this.totalInspections === 0) {
+
+      return 0;
+
+    }
+
+    return Math.round(
+      (this.accidentInspections /
+        this.totalInspections) * 100
+    );
 
   }
 
   trackByInspection(
     index: number,
-    inspection: any
+    inspection: Inspection
   ): string | number {
 
-    return (
-      inspection?.id
-      || index
-    );
+    return inspection.id;
 
   }
 

@@ -1,1 +1,267 @@
-<p>settings works!</p>
+<div class="settings-page">
+
+
+  <section class="settings-header">
+
+    <span class="eyebrow">
+      PLATFORM SETTINGS
+    </span>
+
+
+    <h1>
+      Settings
+    </h1>
+
+
+    <p>
+      Manage Falcon AI inspection preferences and platform configuration.
+    </p>
+
+  </section>
+
+
+
+  <section class="settings-grid">
+
+
+
+    <!-- COMPANY PROFILE -->
+
+    <article class="settings-card">
+
+
+      <h2>
+        Company Profile
+      </h2>
+
+
+
+      <div class="form-group">
+
+        <label>
+          Company Name
+        </label>
+
+
+        <input
+          type="text"
+          [(ngModel)]="companyName"
+        />
+
+      </div>
+
+
+
+
+      <div class="form-group">
+
+        <label>
+          Industry
+        </label>
+
+
+        <input
+          type="text"
+          [(ngModel)]="industry"
+        />
+
+      </div>
+
+
+
+    </article>
+
+
+
+
+
+    <!-- INSPECTION SETTINGS -->
+
+    <article class="settings-card">
+
+
+      <h2>
+        Inspection Preferences
+      </h2>
+
+
+
+      <label class="toggle-row">
+
+        <span>
+          Require VIN Photo
+        </span>
+
+
+        <input
+          type="checkbox"
+          [(ngModel)]="requireVinPhoto"
+        />
+
+      </label>
+
+
+
+
+      <label class="toggle-row">
+
+        <span>
+          Require Odometer Photo
+        </span>
+
+
+        <input
+          type="checkbox"
+          [(ngModel)]="requireOdometerPhoto"
+        />
+
+      </label>
+
+
+
+
+      <label class="toggle-row">
+
+        <span>
+          Enable AI Review
+        </span>
+
+
+        <input
+          type="checkbox"
+          [(ngModel)]="aiReviewEnabled"
+        />
+
+      </label>
+
+
+
+    </article>
+
+
+
+
+
+    <!-- NOTIFICATIONS -->
+
+    <article class="settings-card">
+
+
+      <h2>
+        Notifications
+      </h2>
+
+
+
+      <label class="toggle-row">
+
+        <span>
+          Email Notifications
+        </span>
+
+
+        <input
+          type="checkbox"
+          [(ngModel)]="emailNotifications"
+        />
+
+      </label>
+
+
+
+
+      <label class="toggle-row">
+
+        <span>
+          Inspection Alerts
+        </span>
+
+
+        <input
+          type="checkbox"
+          [(ngModel)]="inspectionAlerts"
+        />
+
+      </label>
+
+
+
+    </article>
+
+
+
+
+
+    <!-- PLATFORM -->
+
+    <article class="settings-card">
+
+
+      <h2>
+        Platform Information
+      </h2>
+
+
+
+
+      <div class="info-row">
+
+        <span>
+          Version
+        </span>
+
+
+        <strong>
+          Falcon AI v1.0
+        </strong>
+
+      </div>
+
+
+
+
+
+      <div class="info-row">
+
+        <span>
+          AI Engine
+        </span>
+
+
+        <strong>
+          Ready for AWS Integration
+        </strong>
+
+      </div>
+
+
+
+    </article>
+
+
+
+  </section>
+
+
+
+
+
+  <div class="settings-actions">
+
+
+    <button
+      type="button"
+      class="save-button"
+      (click)="saveSettings()"
+    >
+
+      Save Changes
+
+    </button>
+
+
+  </div>
+
+
+
+</div>

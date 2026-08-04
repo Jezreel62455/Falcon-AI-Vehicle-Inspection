@@ -1,0 +1,299 @@
+<div class="request-page">
+
+
+  <!-- HEADER -->
+
+  <section class="page-header">
+
+    <div>
+
+      <span class="eyebrow">
+        FALCON AI PLATFORM
+      </span>
+
+      <h1>
+        Create Inspection Request
+      </h1>
+
+      <p>
+        Send a customer a secure vehicle inspection request
+        and monitor the completed assessment.
+      </p>
+
+    </div>
+
+
+    <button
+      type="button"
+      class="back-button"
+      (click)="cancel()">
+
+      ← Back
+
+    </button>
+
+
+  </section>
+
+
+
+  <!-- FORM CARD -->
+
+  <section class="request-card">
+
+
+    <form
+      [formGroup]="requestForm"
+      (ngSubmit)="submitRequest()">
+
+
+
+      <div class="section-title">
+
+        <h2>
+          Customer Information
+        </h2>
+
+        <p>
+          Enter the customer details that will receive the inspection link.
+        </p>
+
+      </div>
+
+
+
+
+      <div class="form-grid">
+
+
+        <div class="form-field">
+
+          <label>
+            First Name
+          </label>
+
+          <input
+            type="text"
+            formControlName="firstName"
+            placeholder="Enter first name">
+
+        </div>
+
+
+
+
+        <div class="form-field">
+
+          <label>
+            Surname
+          </label>
+
+          <input
+            type="text"
+            formControlName="surname"
+            placeholder="Enter surname">
+
+        </div>
+
+
+
+
+        <div class="form-field">
+
+          <label>
+            Email Address
+          </label>
+
+          <input
+            type="email"
+            formControlName="email"
+            placeholder="customer@email.com">
+
+        </div>
+
+
+
+
+        <div class="form-field">
+
+          <label>
+            Phone Number
+          </label>
+
+          <input
+            type="tel"
+            formControlName="phone"
+            placeholder="+27">
+
+        </div>
+
+
+      </div>
+
+
+
+
+
+      <div class="section-title">
+
+        <h2>
+          Insurance Details
+        </h2>
+
+        <p>
+          Link the inspection request to the customer's policy.
+        </p>
+
+      </div>
+
+
+
+
+      <div class="form-grid">
+
+
+        <div class="form-field">
+
+          <label>
+            Policy Number
+          </label>
+
+          <input
+            type="text"
+            formControlName="policyNumber"
+            placeholder="Policy reference">
+
+        </div>
+
+
+
+
+        <div class="form-field">
+
+          <label>
+            Insurance Company
+          </label>
+
+          <input
+            type="text"
+            formControlName="insuranceCompany"
+            placeholder="Insurance provider">
+
+        </div>
+
+
+      </div>
+
+
+
+
+
+      <div class="section-title">
+
+        <h2>
+          Inspection Type
+        </h2>
+
+      </div>
+
+
+
+
+      <div class="inspection-options">
+
+
+        <label class="option-card">
+
+
+          <input
+            type="radio"
+            value="pre-cover"
+            formControlName="inspectionType">
+
+
+          <div>
+
+            <strong>
+              🛡️ Pre-Cover Inspection
+            </strong>
+
+            <span>
+              Verify vehicle condition before insurance cover.
+            </span>
+
+          </div>
+
+
+        </label>
+
+
+
+
+
+        <label class="option-card">
+
+
+          <input
+            type="radio"
+            value="accident"
+            formControlName="inspectionType">
+
+
+          <div>
+
+            <strong>
+              🚨 Accident Claim
+            </strong>
+
+            <span>
+              Capture vehicle damage after an incident.
+            </span>
+
+          </div>
+
+
+        </label>
+
+
+
+      </div>
+
+
+
+
+
+      <div class="form-actions">
+
+
+        <button
+          type="button"
+          class="secondary-button"
+          (click)="cancel()">
+
+          Cancel
+
+        </button>
+
+
+
+
+        <button
+          type="submit"
+          class="primary-button">
+
+          Create Inspection Request
+
+        </button>
+
+
+      </div>
+
+
+
+    </form>
+
+
+  </section>
+
+
+</div>

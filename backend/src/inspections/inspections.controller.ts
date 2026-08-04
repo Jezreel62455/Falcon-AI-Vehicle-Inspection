@@ -9,24 +9,38 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 
-
 import {
   FilesInterceptor,
 } from '@nestjs/platform-express';
 
-
 import {
   diskStorage,
 } from 'multer';
-
 
 import {
   extname,
   join,
 } from 'path';
 
+import {
+  existsSync,
+  mkdirSync,
+} from 'fs';
 
-import { InspectionsService } from './inspections.service';
+import {
+  InspectionsService,
+} from './inspections.service';
+
+
+const uploadPath = join(
+  process.cwd(),
+  'uploads',
+);
+
+
+if (!existsSync(uploadPath)) {
+  mkdirSync(uploadPath);
+}
 
 
 @Controller('inspections')
@@ -34,32 +48,26 @@ export class InspectionsController {
 
 
   constructor(
-
     private readonly inspectionsService:
-
       InspectionsService,
-
   ) {}
 
 
+
   @Post()
-
-  createInspection(
-
-    @Body() inspectionData: any,
-
+  async createInspection(
+    @Body()
+    inspectionData: any,
   ) {
 
-
     return this.inspectionsService
-
       .createInspection(
-
         inspectionData,
-
       );
 
   }
+
+
 
 
   @Post('upload')
@@ -79,50 +87,35 @@ export class InspectionsController {
           diskStorage({
 
             destination:
-
-              join(
-
-                process.cwd(),
-
-                'uploads',
-
-              ),
+              uploadPath,
 
 
-            filename: (
+            filename:
 
-              req,
-
-              file,
-
-              callback,
-
-            ) => {
+              (
+                req,
+                file,
+                callback,
+              ) => {
 
 
-              const uniqueName =
+                const uniqueName =
+
+                  `${Date.now()}-${Math.round(
+                    Math.random() * 1e9,
+                  )}${extname(
+                    file.originalname,
+                  )}`;
 
 
-                `${Date.now()}-${Math.round(
 
-                  Math.random() * 1e9,
-
-                )}${extname(
-
-                  file.originalname,
-
-                )}`;
+                callback(
+                  null,
+                  uniqueName,
+                );
 
 
-              callback(
-
-                null,
-
-                uniqueName,
-
-              );
-
-            },
+              },
 
           }),
 
@@ -132,42 +125,41 @@ export class InspectionsController {
 
   )
 
+
   uploadPhotos(
 
     @UploadedFiles()
 
-    files: Express.Multer.File[],
+    files:
+      Express.Multer.File[],
 
   ) {
 
 
     return {
 
-
       message:
-
         'Photos uploaded successfully',
+
 
 
       files:
 
-        files.map(
+        (files ?? [])
+
+        .map(
 
           file => ({
 
-
             originalName:
-
               file.originalname,
 
 
             fileName:
-
               file.filename,
 
 
             path:
-
               `/uploads/${file.filename}`,
 
           }),
@@ -176,39 +168,46 @@ export class InspectionsController {
 
     };
 
+
   }
+
+
+
 
 
   @Get()
 
-  getInspections() {
+  async getInspections() {
 
 
     return this.inspectionsService
-
       .getInspections();
+
 
   }
 
 
+
+
+
   @Get(':id')
 
-  getInspectionById(
+  async getInspectionById(
 
-    @Param('id') id: string,
+    @Param('id')
+
+    id: string,
 
   ) {
 
 
     const inspection =
 
-      this.inspectionsService
-
+      await this.inspectionsService
         .getInspectionById(
-
           id,
-
         );
+
 
 
     if (!inspection) {
@@ -220,11 +219,15 @@ export class InspectionsController {
 
       );
 
+
     }
+
 
 
     return inspection;
 
+
   }
+
 
 }

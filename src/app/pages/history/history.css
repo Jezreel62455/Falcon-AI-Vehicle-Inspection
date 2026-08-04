@@ -466,3 +466,143 @@
   }
 
 }
+/* SUMMARY CARDS */
+
+.history-summary {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 20px;
+
+  margin-bottom: 32px;
+
+}
+
+
+.summary-card {
+
+  background: white;
+
+  border-radius: 14px;
+
+  padding: 22px;
+
+  border: 1px solid #e5e7eb;
+
+  box-shadow:
+    0 4px 12px rgba(0,0,0,0.05);
+
+}
+
+
+.summary-card h3 {
+
+  margin: 0 0 8px;
+
+  font-size: 30px;
+
+  font-weight: 700;
+
+  color: #111827;
+
+}
+
+
+.summary-card span {
+
+  color: #6b7280;
+
+  font-size: 14px;
+
+}
+
+
+/* TOOLBAR */
+
+.history-toolbar {
+
+  display: flex;
+
+  gap: 16px;
+
+  margin-bottom: 32px;
+
+  background: white;
+
+  padding: 20px;
+
+  border-radius: 14px;
+
+  border: 1px solid #e5e7eb;
+
+}
+
+
+.history-toolbar input,
+.history-toolbar select {
+
+  height: 42px;
+
+  padding: 0 14px;
+
+  border-radius: 8px;
+
+  border: 1px solid #d1d5db;
+
+  font-size: 14px;
+
+}
+
+
+.history-toolbar input {
+
+  flex: 1;
+
+}
+
+
+/* MOBILE SUMMARY */
+
+@media (max-width: 900px) {
+
+
+  .history-summary {
+
+    grid-template-columns:
+      repeat(2, minmax(0,1fr));
+
+  }
+
+
+}
+
+
+@media (max-width: 600px) {
+
+
+  .history-summary {
+
+    grid-template-columns: 1fr;
+
+  }
+
+
+  .history-toolbar {
+
+    flex-direction: column;
+
+  }
+
+
+  .history-toolbar input,
+  .history-toolbar select {
+
+    width: 100%;
+
+  }
+
+
+}
