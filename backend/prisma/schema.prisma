@@ -10,17 +10,34 @@ datasource db {
 model Inspection {
   id                String   @id @default(uuid())
 
-  // Inspection Information
+  // =========================================================
+  // INSPECTION REQUEST
+  // =========================================================
+
+  reference         String?  @unique
   status            String
   inspectionType    String?
 
-  // Customer
+  // =========================================================
+  // CUSTOMER
+  // =========================================================
+
   customerFirstName String?
   customerSurname   String?
+  customerEmail     String?
+  customerPhone     String?
+
+  // =========================================================
+  // POLICY
+  // =========================================================
+
   policyNumber      String?
   insuranceCompany  String?
 
-  // Vehicle
+  // =========================================================
+  // VEHICLE
+  // =========================================================
+
   registration      String?
   make              String?
   model             String?
@@ -28,13 +45,16 @@ model Inspection {
   colour            String?
   mileage           String?
 
-  // Photos
+  // =========================================================
+  // PHOTOS
+  // =========================================================
+
   photos            Json?
   damagePhotos      Json?
 
-  // ==========================
-  // AI Processing
-  // ==========================
+  // =========================================================
+  // AI PROCESSING
+  // =========================================================
 
   aiStatus          String   @default("PENDING")
 
@@ -52,7 +72,9 @@ model Inspection {
 
   processedAt       DateTime?
 
-  // ==========================
+  // =========================================================
+  // TIMESTAMPS
+  // =========================================================
 
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt

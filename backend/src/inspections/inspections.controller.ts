@@ -1,87 +1,164 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
-  Param,
-  Post,
+  HttpException,
+  HttpStatus,
   NotFoundException,
+  Param,
+  Patch,
+  Post,
   UploadedFiles,
-  UseInterceptors,
+  UseInterceptors
 } from '@nestjs/common';
 
 import {
-  FilesInterceptor,
+  FilesInterceptor
 } from '@nestjs/platform-express';
 
 import {
-  diskStorage,
+  diskStorage
 } from 'multer';
 
 import {
   extname,
-  join,
+  join
 } from 'path';
 
 import {
   existsSync,
-  mkdirSync,
+  mkdirSync
 } from 'fs';
 
 import {
-  InspectionsService,
+  InspectionsService
 } from './inspections.service';
 
 
-const uploadPath = join(
-  process.cwd(),
-  'uploads',
-);
+const uploadPath =
+  join(
+    process.cwd(),
+    'uploads'
+  );
 
 
-if (!existsSync(uploadPath)) {
-  mkdirSync(uploadPath);
+if (
+  !existsSync(uploadPath)
+) {
+
+  mkdirSync(
+    uploadPath,
+    {
+      recursive: true
+    }
+  );
 }
 
 
 @Controller('inspections')
 export class InspectionsController {
 
-
   constructor(
     private readonly inspectionsService:
-      InspectionsService,
+      InspectionsService
   ) {}
 
 
+  // =========================================================
+  // CREATE
+  // =========================================================
 
   @Post()
   async createInspection(
-    @Body()
-    inspectionData: any,
+    @Body() inspectionData: any
   ) {
 
-    return this.inspectionsService
-      .createInspection(
-        inspectionData,
+    console.log(
+      '======================================'
+    );
+
+    console.log(
+      'POST /inspections RECEIVED'
+    );
+
+    console.log(
+      inspectionData
+    );
+
+    console.log(
+      '======================================'
+    );
+
+
+    try {
+
+      const result =
+        await this.inspectionsService
+          .createInspection(
+            inspectionData
+          );
+
+
+      console.log(
+        'POST /inspections SUCCESS'
       );
 
+      console.log(
+        result
+      );
+
+
+      return result;
+
+    } catch (error) {
+
+      console.error(
+        '======================================'
+      );
+
+      console.error(
+        'POST /inspections FAILED'
+      );
+
+      console.error(
+        error
+      );
+
+      console.error(
+        '======================================'
+      );
+
+
+      throw new HttpException(
+        {
+          message:
+            'Failed to create inspection request.',
+
+          error:
+            error instanceof Error
+              ? error.message
+              : String(error)
+        },
+
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
   }
 
 
-
+  // =========================================================
+  // UPLOAD
+  // =========================================================
 
   @Post('upload')
 
   @UseInterceptors(
 
     FilesInterceptor(
-
       'files',
-
       20,
-
       {
-
         storage:
 
           diskStorage({
@@ -89,145 +166,264 @@ export class InspectionsController {
             destination:
               uploadPath,
 
-
             filename:
-
               (
                 req,
                 file,
-                callback,
+                callback
               ) => {
 
-
                 const uniqueName =
-
                   `${Date.now()}-${Math.round(
-                    Math.random() * 1e9,
+                    Math.random() * 1e9
                   )}${extname(
-                    file.originalname,
+                    file.originalname
                   )}`;
-
 
 
                 callback(
                   null,
-                  uniqueName,
+                  uniqueName
                 );
-
-
-              },
-
-          }),
-
-      },
-
-    ),
-
+              }
+          })
+      }
+    )
   )
-
 
   uploadPhotos(
 
     @UploadedFiles()
-
     files:
       Express.Multer.File[],
 
+    @Body()
+    body: any
   ) {
-
 
     return {
 
       message:
         'Photos uploaded successfully',
 
-
+      inspectionId:
+        body?.inspectionId ??
+        null,
 
       files:
-
         (files ?? [])
+          .map(
+            file => ({
 
-        .map(
+              originalName:
+                file.originalname,
 
-          file => ({
+              fileName:
+                file.filename,
 
-            originalName:
-              file.originalname,
+              path:
+                `/uploads/${file.filename}`
 
-
-            fileName:
-              file.filename,
-
-
-            path:
-              `/uploads/${file.filename}`,
-
-          }),
-
-        ),
-
+            })
+          )
     };
-
-
   }
 
 
-
-
+  // =========================================================
+  // GET ALL
+  // =========================================================
 
   @Get()
-
   async getInspections() {
-
 
     return this.inspectionsService
       .getInspections();
-
-
   }
 
 
+  // =========================================================
+  // GET BY REFERENCE
+  // =========================================================
 
+  @Get('reference/:reference')
+  async getInspectionByReference(
 
-
-  @Get(':id')
-
-  async getInspectionById(
-
-    @Param('id')
-
-    id: string,
+    @Param('reference')
+    reference: string
 
   ) {
 
-
     const inspection =
-
       await this.inspectionsService
-        .getInspectionById(
-          id,
+        .getInspectionByReference(
+          reference
         );
-
 
 
     if (!inspection) {
 
-
       throw new NotFoundException(
-
-        'Inspection not found',
-
+        'Inspection request not found'
       );
-
-
     }
 
 
-
     return inspection;
-
-
   }
 
 
+  // =========================================================
+  // UPDATE
+  // =========================================================
+
+  @Patch(':id')
+  async updateInspection(
+
+    @Param('id')
+    id: string,
+
+    @Body()
+    inspectionData: any
+
+  ) {
+
+    try {
+
+      const inspection =
+        await this.inspectionsService
+          .updateInspection(
+            id,
+            inspectionData
+          );
+
+
+      if (!inspection) {
+
+        throw new NotFoundException(
+          'Inspection not found'
+        );
+      }
+
+
+      return inspection;
+
+    } catch (error) {
+
+      console.error(
+        'UPDATE INSPECTION ERROR:',
+        error
+      );
+
+
+      if (
+        error instanceof NotFoundException
+      ) {
+
+        throw error;
+      }
+
+
+      throw new HttpException(
+        {
+          message:
+            'Failed to update inspection.',
+
+          error:
+            error instanceof Error
+              ? error.message
+              : String(error)
+        },
+
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+
+  // =========================================================
+  // DELETE
+  // =========================================================
+
+  @Delete(':id')
+  async deleteInspection(
+
+    @Param('id')
+    id: string
+
+  ) {
+
+    try {
+
+      const result =
+        await this.inspectionsService
+          .deleteInspection(
+            id
+          );
+
+
+      if (!result) {
+
+        throw new NotFoundException(
+          'Inspection not found'
+        );
+      }
+
+
+      return result;
+
+    } catch (error) {
+
+      console.error(
+        'DELETE INSPECTION ERROR:',
+        error
+      );
+
+
+      throw new HttpException(
+        {
+          message:
+            'Failed to delete inspection.',
+
+          error:
+            error instanceof Error
+              ? error.message
+              : String(error)
+        },
+
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+
+  // =========================================================
+  // GET BY ID
+  // =========================================================
+
+  @Get(':id')
+  async getInspectionById(
+
+    @Param('id')
+    id: string
+
+  ) {
+
+    const inspection =
+      await this.inspectionsService
+        .getInspectionById(
+          id
+        );
+
+
+    if (!inspection) {
+
+      throw new NotFoundException(
+        'Inspection not found'
+      );
+    }
+
+
+    return inspection;
+  }
 }

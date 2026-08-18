@@ -9,681 +9,1325 @@ import {
 
 import {
   Observable,
-  map
+  of,
+  throwError
 } from 'rxjs';
 
-export interface InspectionCustomer {
+import {
+  catchError
+} from 'rxjs/operators';
+
+
+/* =========================================================
+   INSPECTION TYPES
+   ========================================================= */
+
+export type InspectionType =
+  | 'pre-cover'
+  | 'accident';
+
+
+export type InspectionInputType =
+  | 'pre-cover'
+  | 'accident'
+  | 'pre_cover'
+  | 'accident-claim';
+
+
+/* =========================================================
+   INSPECTION STATUS
+   ========================================================= */
+
+export type InspectionStatus =
+  | 'pending'
+  | 'draft'
+  | 'in-progress'
+  | 'review'
+  | 'submitted'
+  | 'completed';
+
+
+/* =========================================================
+   CUSTOMER
+   ========================================================= */
+
+export interface Customer {
 
   firstName: string;
 
-  surname: string;
+  surname?: string;
 
+  lastName?: string;
+
+  email?: string;
+
+  phone?: string;
 }
 
-export interface InspectionVehicle {
 
-  registration: string;
+/* =========================================================
+   VEHICLE
+   ========================================================= */
 
-  make: string;
+export interface Vehicle {
 
-  model: string;
+  make?: string;
 
-  year: string | number;
+  model?: string;
 
-  colour: string;
+  year?: string | number;
 
-  mileage: string | number;
+  registration?: string;
 
+  colour?: string;
+
+  mileage?: string | number;
+
+  vin?: string;
 }
 
-export interface InspectionPolicy {
 
-  policyNumber: string;
+/* =========================================================
+   POLICY
+   ========================================================= */
 
-  insuranceCompany: string;
+export interface Policy {
 
+  policyNumber?: string;
+
+  insuranceCompany?: string;
+
+  claimNumber?: string;
 }
+
+
+/* =========================================================
+   AI
+   ========================================================= */
+
+export interface InspectionAI {
+
+  status?: string;
+
+  score?: number | null;
+
+  vin?: string;
+
+  damageDetected?: boolean;
+
+  provider?: string;
+
+  damageSummary?: string;
+}
+
+
+/* =========================================================
+   VEHICLE PHOTO
+   ========================================================= */
 
 export interface InspectionPhoto {
 
-  id?: string | number;
+  id: string;
 
-  title: string;
+  label?: string;
 
-  path: string;
+  name?: string;
+
+  title?: string;
+
+  imageUrl?: string;
+
+  url?: string;
+
+  path?: string;
 
   fileName?: string;
 
-  originalName?: string;
+  fileType?: string;
 
+  fileSize?: number;
+
+  uploaded?: boolean;
+
+  required?: boolean;
 }
+
+
+/* =========================================================
+   ACCIDENT PHOTO
+   ========================================================= */
+
+export interface AccidentPhoto {
+
+  id: string;
+
+  label?: string;
+
+  name?: string;
+
+  title?: string;
+
+  imageUrl?: string;
+
+  url?: string;
+
+  path?: string;
+
+  fileName?: string;
+
+  fileType?: string;
+
+  fileSize?: number;
+
+  uploaded?: boolean;
+
+  required?: boolean;
+}
+
+
+/* =========================================================
+   MAIN INSPECTION
+   ========================================================= */
 
 export interface Inspection {
 
-  id: string | number;
+  id?: string;
 
-  status: string;
+  reference: string;
 
-  inspectionType: string;
 
-  createdAt: string | Date;
+  /* ---------------------------------------------------------
+     INSPECTION TYPE
+     --------------------------------------------------------- */
 
-  customer: InspectionCustomer;
+  inspectionType: InspectionType;
 
-  vehicle: InspectionVehicle;
+  /**
+   * Legacy compatibility.
+   *
+   * Older pages were using inspection.type.
+   * Keep this optional so those pages compile.
+   */
+  type?: InspectionType;
 
-  policy: InspectionPolicy;
+
+  /* ---------------------------------------------------------
+     STATUS
+     --------------------------------------------------------- */
+
+  status: InspectionStatus;
+
+
+  /* ---------------------------------------------------------
+     DATES
+     --------------------------------------------------------- */
+
+  createdAt: string;
+
+  updatedAt?: string;
+
+  submittedAt?: string;
+
+
+  /* ---------------------------------------------------------
+     CUSTOMER
+     --------------------------------------------------------- */
+
+  customer: Customer;
+
+  customerFirstName?: string;
+
+  customerSurname?: string;
+
+  customerLastName?: string;
+
+  customerEmail?: string;
+
+  customerPhone?: string;
+
+  customerName?: string;
+
+
+  /* ---------------------------------------------------------
+     VEHICLE
+     --------------------------------------------------------- */
+
+  vehicle: Vehicle;
+
+  make?: string;
+
+  model?: string;
+
+  year?: string | number;
+
+  registration?: string;
+
+  colour?: string;
+
+  mileage?: string | number;
+
+  vin?: string;
+
+
+  /* ---------------------------------------------------------
+     PHOTOS
+     --------------------------------------------------------- */
 
   photos: InspectionPhoto[];
 
+  accidentPhotos: AccidentPhoto[];
+
+  damagePhotos?: AccidentPhoto[];
+
+
+  /* ---------------------------------------------------------
+     POLICY
+     --------------------------------------------------------- */
+
+  policy?: Policy;
+
+  policyNumber?: string;
+
+  claimNumber?: string;
+
+  insuranceCompany?: string;
+
+
+  /* ---------------------------------------------------------
+     AI
+     --------------------------------------------------------- */
+
+  ai?: InspectionAI;
+
+
+  /* ---------------------------------------------------------
+     LINKS
+     --------------------------------------------------------- */
+
+  inspectionUrl?: string;
+
+  secureLink?: string;
+}
+
+
+/* =========================================================
+   CREATE REQUEST PAYLOAD
+   ========================================================= */
+
+export interface CreateInspectionRequestPayload {
+
+  inspectionType: InspectionInputType;
+
+
+  /* ---------------------------------------------------------
+     STATUS
+     --------------------------------------------------------- */
+
+  status?: InspectionStatus | string | null;
+
+
+  /* ---------------------------------------------------------
+     REFERENCE
+     --------------------------------------------------------- */
+
+  reference?: string | null;
+
+
+  /* ---------------------------------------------------------
+     NESTED CUSTOMER / VEHICLE / POLICY
+     --------------------------------------------------------- */
+
+  customer?: Customer | null;
+
+  vehicle?: Vehicle | null;
+
+  policy?: Policy | null;
+
+
+  /* ---------------------------------------------------------
+     POLICY
+     --------------------------------------------------------- */
+
+  policyNumber?: string | null;
+
+  claimNumber?: string | null;
+
+  insuranceCompany?: string | null;
+
+
+  /* ---------------------------------------------------------
+     CUSTOMER
+     --------------------------------------------------------- */
+
+  customerFirstName?: string | null;
+
+  customerSurname?: string | null;
+
+  customerLastName?: string | null;
+
+  customerEmail?: string | null;
+
+  customerPhone?: string | null;
+
+
+  /* ---------------------------------------------------------
+     VEHICLE - NESTED STYLE
+     --------------------------------------------------------- */
+
+  vehicleMake?: string | null;
+
+  vehicleModel?: string | null;
+
+  vehicleYear?: string | number | null;
+
+  vehicleRegistration?: string | null;
+
+  vehicleColour?: string | null;
+
+  vehicleMileage?: string | number | null;
+
+  vehicleVin?: string | null;
+
+
+  /* ---------------------------------------------------------
+     VEHICLE - LEGACY FLAT STYLE
+     --------------------------------------------------------- */
+
+  make?: string | null;
+
+  model?: string | null;
+
+  year?: string | number | null;
+
+  registration?: string | null;
+
+  colour?: string | null;
+
+  mileage?: string | number | null;
+
+  vin?: string | null;
+
+
+  /* ---------------------------------------------------------
+     PHOTOS
+     --------------------------------------------------------- */
+
+  photos?: unknown[];
+
+  accidentPhotos?: unknown[];
+
+  damagePhotos?: unknown[];
+}
+
+
+/* =========================================================
+   BACKWARDS COMPATIBILITY
+   ========================================================= */
+
+export type CreateInspectionRequest =
+  CreateInspectionRequestPayload;
+
+
+/* =========================================================
+   CREATE RESPONSE
+   ========================================================= */
+
+export interface CreateInspectionResponse {
+
+  id?: string;
+
+  reference: string;
+
+  inspectionType: InspectionType;
+
+  status?: InspectionStatus | string;
+
+  createdAt?: string;
+
+  inspectionUrl?: string;
+
+  secureLink?: string;
+
+  url?: string;
+
+  inspection?: Inspection;
+}
+
+
+/* =========================================================
+   UPLOAD RESPONSE
+   ========================================================= */
+
+export interface UploadPhotoResponse {
+
+  files?: Array<{
+
+    id?: string;
+
+    path?: string;
+
+    url?: string;
+
+    imageUrl?: string;
+
+    fileName?: string;
+
+    fileType?: string;
+
+    fileSize?: number;
+
+  }>;
+
   [key: string]: unknown;
-
 }
 
-interface UploadFileResponse {
 
-  originalName: string;
-
-  fileName: string;
-
-  path: string;
-
-}
-
-interface UploadResponse {
-
-  message: string;
-
-  files: UploadFileResponse[];
-
-}
+/* =========================================================
+   SERVICE
+   ========================================================= */
 
 @Injectable({
-
   providedIn: 'root'
-
 })
 export class InspectionService {
 
   private readonly http =
     inject(HttpClient);
 
+
   private readonly apiUrl =
     'http://localhost:3000/inspections';
 
-  createInspection(
-    inspectionData: unknown
-  ): Observable<Inspection> {
 
-    return this.http
+  /* =======================================================
+     NORMALISE INSPECTION TYPE
+     ======================================================= */
 
-      .post<unknown>(
-        this.apiUrl,
-        inspectionData
-      )
+  normalizeInspectionType(
+    type:
+      | InspectionInputType
+      | string
+      | null
+      | undefined
+  ): InspectionType {
 
-      .pipe(
+    switch (type) {
 
-        map(
-          response =>
-            this.normalizeInspection(
-              response
-            )
-        )
+      case 'accident':
+      case 'accident-claim':
 
-      );
+        return 'accident';
 
+
+      case 'pre-cover':
+      case 'pre_cover':
+
+        return 'pre-cover';
+
+
+      default:
+
+        return 'pre-cover';
+    }
   }
 
-  uploadPhotos(
-    files: File[]
-  ): Observable<UploadResponse> {
 
-    const formData =
-      new FormData();
+  /* =======================================================
+     NORMALISE STATUS
+     ======================================================= */
 
-    for (
-      const file of files
+  normalizeInspectionStatus(
+    status:
+      | InspectionStatus
+      | string
+      | null
+      | undefined
+  ): InspectionStatus {
+
+    switch (
+      String(status ?? '')
+        .toLowerCase()
+        .trim()
     ) {
 
-      formData.append(
-        'files',
-        file
-      );
+      case 'completed':
+        return 'completed';
 
+      case 'submitted':
+        return 'submitted';
+
+      case 'review':
+      case 'under-review':
+      case 'under review':
+        return 'review';
+
+      case 'in-progress':
+      case 'inprogress':
+      case 'in progress':
+        return 'in-progress';
+
+      case 'draft':
+        return 'draft';
+
+      case 'pending':
+        return 'pending';
+
+      default:
+        return 'pending';
     }
-
-    return this.http.post<UploadResponse>(
-      `${this.apiUrl}/upload`,
-      formData
-    );
-
   }
 
-  getInspections(): Observable<Inspection[]> {
 
-    return this.http
+  /* =======================================================
+     NORMALISE INSPECTION
+     ======================================================= */
 
-      .get<unknown>(
-        this.apiUrl
-      )
-
-      .pipe(
-
-        map(
-          response => {
-
-            const inspections =
-              Array.isArray(response)
-                ? response
-                : [];
-
-            return inspections.map(
-              inspection =>
-                this.normalizeInspection(
-                  inspection
-                )
-            );
-
-          }
-        )
-
-      );
-
-  }
-
-  getInspectionById(
-    id: string
-  ): Observable<Inspection> {
-
-    return this.http
-
-      .get<unknown>(
-        `${this.apiUrl}/${encodeURIComponent(id)}`
-      )
-
-      .pipe(
-
-        map(
-          response =>
-            this.normalizeInspection(
-              response
-            )
-        )
-
-      );
-
-  }
-
-  getPhotoUrl(
-    photoPath: string
-  ): string {
-
-    if (!photoPath) {
-
-      return '';
-
-    }
-
-    if (
-
-      photoPath.startsWith(
-        'http://'
-      )
-
-      ||
-
-      photoPath.startsWith(
-        'https://'
-      )
-
-    ) {
-
-      return photoPath;
-
-    }
-
-    const normalizedPath =
-      photoPath.startsWith('/')
-        ? photoPath
-        : `/${photoPath}`;
-
-    return `http://localhost:3000${normalizedPath}`;
-
-  }
-
-  private normalizeInspection(
-    raw: unknown
+  normalizeInspection(
+    inspection: Inspection
   ): Inspection {
 
-    const inspection =
-      this.asRecord(
-        raw
+    const customer =
+      inspection.customer ?? {
+        firstName: ''
+      };
+
+
+    const vehicle =
+      inspection.vehicle ?? {};
+
+
+    const inspectionType =
+      this.normalizeInspectionType(
+        inspection.inspectionType ??
+        inspection.type
       );
 
-    const rawCustomer =
-      this.asRecord(
-        inspection['customer']
+
+    const status =
+      this.normalizeInspectionStatus(
+        inspection.status
       );
 
-    const rawVehicle =
-      this.asRecord(
-        inspection['vehicle']
-      );
 
-    const rawPolicy =
-      this.asRecord(
-        inspection['policy']
-      );
+    const photos =
+      inspection.photos ?? [];
 
-    const rawPhotos =
-      Array.isArray(
-        inspection['photos']
-      )
 
-        ? inspection['photos']
+    const accidentPhotos =
+      inspection.accidentPhotos ??
+      inspection.damagePhotos ??
+      [];
 
-        : [];
 
-    const customer:
-      InspectionCustomer = {
+    /* -------------------------------------------------------
+       CUSTOMER
+       ------------------------------------------------------- */
 
-      firstName:
+    const firstName =
+      inspection.customerFirstName ??
+      customer.firstName ??
+      '';
 
-        this.toStringValue(
 
-          rawCustomer['firstName']
+    const surname =
+      inspection.customerSurname ??
+      customer.surname ??
+      customer.lastName ??
+      '';
 
-          ??
 
-          inspection[
-            'customerFirstName'
-          ]
+    const email =
+      inspection.customerEmail ??
+      customer.email ??
+      '';
 
-        ),
 
-      surname:
+    const phone =
+      inspection.customerPhone ??
+      customer.phone ??
+      '';
 
-        this.toStringValue(
 
-          rawCustomer['surname']
+    /* -------------------------------------------------------
+       VEHICLE
+       ------------------------------------------------------- */
 
-          ??
+    const make =
+      inspection.make ??
+      vehicle.make ??
+      '';
 
-          inspection[
-            'customerSurname'
-          ]
 
-        )
+    const model =
+      inspection.model ??
+      vehicle.model ??
+      '';
 
-    };
 
-    const vehicle:
-      InspectionVehicle = {
+    const year =
+      inspection.year ??
+      vehicle.year ??
+      '';
 
-      registration:
 
-        this.toStringValue(
+    const registration =
+      inspection.registration ??
+      vehicle.registration ??
+      '';
 
-          rawVehicle[
-            'registration'
-          ]
 
-          ??
+    const colour =
+      inspection.colour ??
+      vehicle.colour ??
+      '';
 
-          inspection[
-            'registration'
-          ]
 
-        ),
+    const mileage =
+      inspection.mileage ??
+      vehicle.mileage ??
+      '';
 
-      make:
 
-        this.toStringValue(
+    const vin =
+      inspection.vin ??
+      vehicle.vin ??
+      '';
 
-          rawVehicle[
-            'make'
-          ]
 
-          ??
-
-          inspection[
-            'make'
-          ]
-
-        ),
-
-      model:
-
-        this.toStringValue(
-
-          rawVehicle[
-            'model'
-          ]
-
-          ??
-
-          inspection[
-            'model'
-          ]
-
-        ),
-
-      year:
-
-        this.toStringOrNumberValue(
-
-          rawVehicle[
-            'year'
-          ]
-
-          ??
-
-          inspection[
-            'year'
-          ]
-
-        ),
-
-      colour:
-
-        this.toStringValue(
-
-          rawVehicle[
-            'colour'
-          ]
-
-          ??
-
-          inspection[
-            'colour'
-          ]
-
-        ),
-
-      mileage:
-
-        this.toStringOrNumberValue(
-
-          rawVehicle[
-            'mileage'
-          ]
-
-          ??
-
-          inspection[
-            'mileage'
-          ]
-
-        )
-
-    };
-
-    const policy:
-      InspectionPolicy = {
-
-      policyNumber:
-
-        this.toStringValue(
-
-          rawPolicy[
-            'policyNumber'
-          ]
-
-          ??
-
-          inspection[
-            'policyNumber'
-          ]
-
-          ??
-
-          inspection[
-            'policy'
-          ]
-
-        ),
-
-      insuranceCompany:
-
-        this.toStringValue(
-
-          rawPolicy[
-            'insuranceCompany'
-          ]
-
-          ??
-
-          inspection[
-            'insuranceCompany'
-          ]
-
-        )
-
-    };
-
-    const photos:
-      InspectionPhoto[] =
-
-      rawPhotos.map(
-
-        photo => {
-
-          const rawPhoto =
-            this.asRecord(
-              photo
-            );
-
-          return {
-
-            id:
-
-              rawPhoto[
-                'id'
-              ] as
-                | string
-                | number
-                | undefined,
-
-            title:
-
-              this.toStringValue(
-
-                rawPhoto[
-                  'title'
-                ]
-
-                ??
-
-                rawPhoto[
-                  'originalName'
-                ]
-
-                ??
-
-                rawPhoto[
-                  'fileName'
-                ]
-
-                ??
-
-                'Inspection Photo'
-
-              ),
-
-            path:
-
-              this.toStringValue(
-
-                rawPhoto[
-                  'path'
-                ]
-
-                ??
-
-                rawPhoto[
-                  'url'
-                ]
-
-              ),
-
-            fileName:
-
-              this.toStringValue(
-
-                rawPhoto[
-                  'fileName'
-                ]
-
-              ),
-
-            originalName:
-
-              this.toStringValue(
-
-                rawPhoto[
-                  'originalName'
-                ]
-
-              )
-
-          };
-
-        }
-
-      );
+    /* -------------------------------------------------------
+       RETURN NORMALISED INSPECTION
+       ------------------------------------------------------- */
 
     return {
 
       ...inspection,
 
-      id:
+      inspectionType,
 
-        inspection[
-          'id'
-        ] as
-          | string
-          | number,
+      type: inspectionType,
 
-      status:
+      status,
 
-        this.toStringValue(
+      updatedAt:
+        inspection.updatedAt ??
+        inspection.createdAt,
 
-          inspection[
-            'status'
-          ],
 
-          'SUBMITTED'
+      /* CUSTOMER */
 
-        ),
+      customer: {
 
-      inspectionType:
+        ...customer,
 
-        this.toStringValue(
+        firstName,
 
-          inspection[
-            'inspectionType'
-          ]
+        surname:
+          surname || undefined,
 
-          ??
+        lastName:
+          surname || undefined,
 
-          inspection[
-            'type'
-          ],
+        email:
+          email || undefined,
 
-          'Pre-Cover Inspection'
+        phone:
+          phone || undefined
+      },
 
-        ),
 
-      createdAt:
+      customerFirstName:
+        firstName || undefined,
 
-        inspection[
-          'createdAt'
-        ] as
-          | string
-          | Date,
+      customerSurname:
+        surname || undefined,
 
-      customer,
+      customerLastName:
+        surname || undefined,
 
-      vehicle,
+      customerEmail:
+        email || undefined,
 
-      policy,
+      customerPhone:
+        phone || undefined,
 
-      photos
+
+      /* VEHICLE */
+
+      vehicle: {
+
+        ...vehicle,
+
+        make,
+
+        model,
+
+        year,
+
+        registration,
+
+        colour,
+
+        mileage,
+
+        vin
+      },
+
+
+      make,
+
+      model,
+
+      year,
+
+      registration,
+
+      colour,
+
+      mileage,
+
+      vin,
+
+
+      /* POLICY */
+
+      policy: {
+
+        ...(inspection.policy ?? {}),
+
+        policyNumber:
+          inspection.policy?.policyNumber ??
+          inspection.policyNumber,
+
+        claimNumber:
+          inspection.policy?.claimNumber ??
+          inspection.claimNumber,
+
+        insuranceCompany:
+          inspection.policy?.insuranceCompany ??
+          inspection.insuranceCompany
+      },
+
+
+      policyNumber:
+        inspection.policyNumber ??
+        inspection.policy?.policyNumber,
+
+      claimNumber:
+        inspection.claimNumber ??
+        inspection.policy?.claimNumber,
+
+      insuranceCompany:
+        inspection.insuranceCompany ??
+        inspection.policy?.insuranceCompany,
+
+
+      /* PHOTOS */
+
+      photos,
+
+      accidentPhotos,
+
+      damagePhotos:
+        accidentPhotos,
+
+
+      /* AI */
+
+      ai:
+        inspection.ai ?? undefined
+    };
+  }
+
+
+  /* =======================================================
+     GET ALL
+     ======================================================= */
+
+  getInspections():
+    Observable<Inspection[]> {
+
+    return this.http
+      .get<Inspection[]>(
+        this.apiUrl
+      )
+      .pipe(
+
+        catchError(error => {
+
+          console.error(
+            'Failed to load inspections:',
+            error
+          );
+
+          return of([]);
+        })
+
+      );
+  }
+
+
+  /* =======================================================
+     GET SINGLE
+     ======================================================= */
+
+  getInspection(
+    idOrReference: string
+  ): Observable<Inspection> {
+
+    return this.http
+      .get<Inspection>(
+        `${this.apiUrl}/${encodeURIComponent(idOrReference)}`
+      )
+      .pipe(
+
+        catchError(error => {
+
+          console.error(
+            'Failed to load inspection:',
+            error
+          );
+
+          return throwError(
+            () => error
+          );
+        })
+
+      );
+  }
+
+
+  /* =======================================================
+     GET BY ID
+     ======================================================= */
+
+  getInspectionById(
+    id: string
+  ): Observable<Inspection> {
+
+    return this.getInspection(id);
+  }
+
+
+  /* =======================================================
+     GET BY REFERENCE
+     ======================================================= */
+
+  getInspectionByReference(
+    reference: string
+  ): Observable<Inspection> {
+
+    return this.http
+      .get<Inspection>(
+        `${this.apiUrl}/reference/${encodeURIComponent(reference)}`
+      )
+      .pipe(
+
+        catchError(error => {
+
+          console.error(
+            'Failed to load inspection by reference:',
+            error
+          );
+
+          return throwError(
+            () => error
+          );
+        })
+
+      );
+  }
+
+
+  /* =======================================================
+     CREATE
+     ======================================================= */
+
+  createInspection(
+    payload: CreateInspectionRequestPayload
+  ): Observable<CreateInspectionResponse> {
+
+    const inspectionType =
+      this.normalizeInspectionType(
+        payload.inspectionType
+      );
+
+
+    const requestPayload = {
+
+      ...payload,
+
+      inspectionType,
+
+      /*
+       * The backend can receive the status if supplied.
+       * If omitted, backend controls the initial status.
+       */
+      ...(payload.status !== undefined
+        ? {
+            status:
+              this.normalizeInspectionStatus(
+                payload.status
+              )
+          }
+        : {})
 
     };
 
+
+    return this.http
+      .post<CreateInspectionResponse>(
+        this.apiUrl,
+        requestPayload
+      )
+      .pipe(
+
+        catchError(error => {
+
+          console.error(
+            'Failed to create inspection:',
+            error
+          );
+
+          return throwError(
+            () => error
+          );
+        })
+
+      );
   }
 
-  private asRecord(
-    value: unknown
-  ): Record<string, unknown> {
 
-    if (
+  /* =======================================================
+     CREATE REQUEST
+     ======================================================= */
 
-      value !== null
+  createRequest(
+    payload: CreateInspectionRequestPayload
+  ): Observable<CreateInspectionResponse> {
 
-      &&
+    return this.createInspection(
+      payload
+    );
+  }
 
-      typeof value === 'object'
 
-    ) {
+  /* =======================================================
+     UPDATE
+     ======================================================= */
 
-      return value as
-        Record<string, unknown>;
+  updateInspection(
+    id: string,
+
+    data:
+      | Partial<Inspection>
+      | Record<string, unknown>
+  ): Observable<Inspection> {
+
+    return this.http
+      .patch<Inspection>(
+        `${this.apiUrl}/${encodeURIComponent(id)}`,
+        data
+      )
+      .pipe(
+
+        catchError(error => {
+
+          console.error(
+            'Failed to update inspection:',
+            error
+          );
+
+          return throwError(
+            () => error
+          );
+        })
+
+      );
+  }
+
+
+  /* =======================================================
+     DELETE
+     ======================================================= */
+
+  deleteInspection(
+    id: string
+  ): Observable<void> {
+
+    return this.http
+      .delete<void>(
+        `${this.apiUrl}/${encodeURIComponent(id)}`
+      )
+      .pipe(
+
+        catchError(error => {
+
+          console.error(
+            'Failed to delete inspection:',
+            error
+          );
+
+          return throwError(
+            () => error
+          );
+        })
+
+      );
+  }
+
+
+  /* =======================================================
+     UPLOAD PHOTOS
+     
+     Supports BOTH:
+     
+       uploadPhotos(files, inspectionId)
+
+     AND:
+
+       uploadPhotos(inspectionId, files)
+     ======================================================= */
+
+  uploadPhotos(
+    files: File[],
+    inspectionId: string
+  ): Observable<UploadPhotoResponse>;
+
+  uploadPhotos(
+    inspectionId: string,
+    files: File[]
+  ): Observable<UploadPhotoResponse>;
+
+  uploadPhotos(
+    first: File[] | string,
+    second: File[] | string
+  ): Observable<UploadPhotoResponse> {
+
+    let files: File[];
+
+    let inspectionId: string;
+
+
+    if (Array.isArray(first)) {
+
+      files = first;
+
+      inspectionId =
+        second as string;
+
+    } else {
+
+      inspectionId =
+        first;
+
+      files =
+        second as File[];
 
     }
 
-    return {};
 
+    return this.performPhotoUpload(
+      files,
+      inspectionId
+    );
   }
 
-  private toStringValue(
-    value: unknown,
-    fallback = ''
-  ): string {
 
-    if (
+  /* =======================================================
+     LEGACY UPLOAD METHOD
+     ======================================================= */
 
-      value === null
+  uploadPhotosLegacy(
+    inspectionId: string,
+    files: File[]
+  ): Observable<UploadPhotoResponse> {
 
-      ||
+    return this.performPhotoUpload(
+      files,
+      inspectionId
+    );
+  }
 
-      value === undefined
 
-    ) {
+  /* =======================================================
+     INTERNAL PHOTO UPLOAD
+     ======================================================= */
 
-      return fallback;
+  private performPhotoUpload(
+    files: File[],
+    inspectionId: string
+  ): Observable<UploadPhotoResponse> {
+
+    const formData =
+      new FormData();
+
+
+    for (const file of files) {
+
+      formData.append(
+        'files',
+        file,
+        file.name
+      );
 
     }
 
-    return String(
-      value
+
+    formData.append(
+      'inspectionId',
+      inspectionId
     );
 
+
+    return this.http
+      .post<UploadPhotoResponse>(
+        `${this.apiUrl}/upload`,
+        formData
+      )
+      .pipe(
+
+        catchError(error => {
+
+          console.error(
+            'Failed to upload photos:',
+            error
+          );
+
+          return throwError(
+            () => error
+          );
+        })
+
+      );
   }
 
-  private toStringOrNumberValue(
-    value: unknown,
-    fallback: string | number = ''
-  ): string | number {
 
-    if (
+  /* =======================================================
+     SINGLE PHOTO
+     ======================================================= */
 
-      typeof value === 'string'
+  uploadPhoto(
+    file: File,
+    inspectionId: string
+  ): Observable<UploadPhotoResponse> {
 
-      ||
+    return this.performPhotoUpload(
+      [file],
+      inspectionId
+    );
+  }
 
-      typeof value === 'number'
 
-    ) {
+  /* =======================================================
+     PHOTO URL
+     ======================================================= */
 
-      return value;
+  getPhotoUrl(
+    path?: string | null
+  ): string {
 
+    if (!path) {
+
+      return '';
     }
 
-    return fallback;
 
+    if (
+      path.startsWith('http://') ||
+      path.startsWith('https://') ||
+      path.startsWith('data:')
+    ) {
+
+      return path;
+    }
+
+
+    if (path.startsWith('/')) {
+
+      return `http://localhost:3000${path}`;
+    }
+
+
+    return `http://localhost:3000/${path}`;
+  }
+
+
+  /* =======================================================
+     SUBMIT
+     ======================================================= */
+
+  submitInspection(
+    id: string
+  ): Observable<Inspection> {
+
+    return this.http
+      .post<Inspection>(
+        `${this.apiUrl}/${encodeURIComponent(id)}/submit`,
+        {}
+      )
+      .pipe(
+
+        catchError(error => {
+
+          console.error(
+            'Failed to submit inspection:',
+            error
+          );
+
+          return throwError(
+            () => error
+          );
+        })
+
+      );
+  }
+
+
+  /* =======================================================
+     COMPLETE
+     ======================================================= */
+
+  completeInspection(
+    id: string
+  ): Observable<Inspection> {
+
+    return this.http
+      .post<Inspection>(
+        `${this.apiUrl}/${encodeURIComponent(id)}/complete`,
+        {}
+      )
+      .pipe(
+
+        catchError(error => {
+
+          console.error(
+            'Failed to complete inspection:',
+            error
+          );
+
+          return throwError(
+            () => error
+          );
+        })
+
+      );
+  }
+
+
+  /* =======================================================
+     NORMALISE LIST
+     ======================================================= */
+
+  normalizeInspections(
+    inspections: Inspection[]
+  ): Inspection[] {
+
+    return inspections.map(
+      inspection =>
+        this.normalizeInspection(
+          inspection
+        )
+    );
   }
 
 }

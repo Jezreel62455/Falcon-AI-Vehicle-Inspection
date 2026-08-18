@@ -4,7 +4,9 @@ import {
   inject
 } from '@angular/core';
 
-import { CommonModule } from '@angular/common';
+import {
+  CommonModule
+} from '@angular/common';
 
 import {
   ReactiveFormsModule,
@@ -12,17 +14,41 @@ import {
   Validators
 } from '@angular/forms';
 
-import { ActivatedRoute } from '@angular/router';
+import {
+  ActivatedRoute
+} from '@angular/router';
 
-import { MatStepperModule } from '@angular/material/stepper';
-import { MatButtonModule } from '@angular/material/button';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatCardModule } from '@angular/material/card';
-import { MatSelectModule } from '@angular/material/select';
-import { MatIconModule } from '@angular/material/icon';
+import {
+  MatStepperModule
+} from '@angular/material/stepper';
 
-import { InspectionService } from '../../services/inspection.service';
+import {
+  MatButtonModule
+} from '@angular/material/button';
+
+import {
+  MatInputModule
+} from '@angular/material/input';
+
+import {
+  MatFormFieldModule
+} from '@angular/material/form-field';
+
+import {
+  MatCardModule
+} from '@angular/material/card';
+
+import {
+  MatSelectModule
+} from '@angular/material/select';
+
+import {
+  MatIconModule
+} from '@angular/material/icon';
+
+import {
+  InspectionService
+} from '../../services/inspection.service';
 
 
 interface InspectionPhoto {
@@ -192,274 +218,129 @@ export class NewInspection implements OnInit {
     InspectionPhoto[] = [
 
       {
-
-        id:
-          'front',
-
-        title:
-          'Front of Vehicle',
-
+        id: 'front',
+        title: 'Front of Vehicle',
         description:
           'Capture a clear image showing the entire front of the vehicle.',
-
-        file:
-          null,
-
-        preview:
-          null,
-
-        required:
-          true
-
+        file: null,
+        preview: null,
+        required: true
       },
 
       {
-
-        id:
-          'rear',
-
-        title:
-          'Rear of Vehicle',
-
+        id: 'rear',
+        title: 'Rear of Vehicle',
         description:
           'Capture a clear image showing the entire rear of the vehicle.',
-
-        file:
-          null,
-
-        preview:
-          null,
-
-        required:
-          true
-
+        file: null,
+        preview: null,
+        required: true
       },
 
       {
-
-        id:
-          'left-side',
-
-        title:
-          'Left Side',
-
+        id: 'left-side',
+        title: 'Left Side',
         description:
           'Capture the complete left side of the vehicle.',
-
-        file:
-          null,
-
-        preview:
-          null,
-
-        required:
-          true
-
+        file: null,
+        preview: null,
+        required: true
       },
 
       {
-
-        id:
-          'right-side',
-
-        title:
-          'Right Side',
-
+        id: 'right-side',
+        title: 'Right Side',
         description:
           'Capture the complete right side of the vehicle.',
-
-        file:
-          null,
-
-        preview:
-          null,
-
-        required:
-          true
-
+        file: null,
+        preview: null,
+        required: true
       },
 
       {
-
-        id:
-          'front-left',
-
-        title:
-          'Front Left Corner',
-
+        id: 'front-left',
+        title: 'Front Left Corner',
         description:
           'Capture the front-left corner of the vehicle.',
-
-        file:
-          null,
-
-        preview:
-          null,
-
-        required:
-          true
-
+        file: null,
+        preview: null,
+        required: true
       },
 
       {
-
-        id:
-          'front-right',
-
-        title:
-          'Front Right Corner',
-
+        id: 'front-right',
+        title: 'Front Right Corner',
         description:
           'Capture the front-right corner of the vehicle.',
-
-        file:
-          null,
-
-        preview:
-          null,
-
-        required:
-          true
-
+        file: null,
+        preview: null,
+        required: true
       },
 
       {
-
-        id:
-          'rear-left',
-
-        title:
-          'Rear Left Corner',
-
+        id: 'rear-left',
+        title: 'Rear Left Corner',
         description:
           'Capture the rear-left corner of the vehicle.',
-
-        file:
-          null,
-
-        preview:
-          null,
-
-        required:
-          true
-
+        file: null,
+        preview: null,
+        required: true
       },
 
       {
-
-        id:
-          'rear-right',
-
-        title:
-          'Rear Right Corner',
-
+        id: 'rear-right',
+        title: 'Rear Right Corner',
         description:
           'Capture the rear-right corner of the vehicle.',
-
-        file:
-          null,
-
-        preview:
-          null,
-
-        required:
-          true
-
+        file: null,
+        preview: null,
+        required: true
       },
 
       {
-
-        id:
-          'odometer',
-
-        title:
-          'Odometer',
-
+        id: 'odometer',
+        title: 'Odometer',
         description:
           'Capture the dashboard showing the current mileage.',
-
-        file:
-          null,
-
-        preview:
-          null,
-
-        required:
-          true
-
+        file: null,
+        preview: null,
+        required: true
       },
 
       {
-
-        id:
-          'vin',
-
-        title:
-          'VIN Number',
-
+        id: 'vin',
+        title: 'VIN Number',
         description:
           'Capture a clear image of the vehicle identification number.',
-
-        file:
-          null,
-
-        preview:
-          null,
-
-        required:
-          true
-
+        file: null,
+        preview: null,
+        required: true
       },
 
       {
-
-        id:
-          'interior',
-
-        title:
-          'Vehicle Interior',
-
+        id: 'interior',
+        title: 'Vehicle Interior',
         description:
           'Capture a clear image showing the interior of the vehicle.',
-
-        file:
-          null,
-
-        preview:
-          null,
-
-        required:
-          true
-
+        file: null,
+        preview: null,
+        required: true
       },
 
       {
-
-        id:
-          'engine',
-
-        title:
-          'Engine Bay',
-
+        id: 'engine',
+        title: 'Engine Bay',
         description:
           'Capture a clear image of the engine bay.',
-
-        file:
-          null,
-
-        preview:
-          null,
-
-        required:
-          true
-
+        file: null,
+        preview: null,
+        required: true
       }
 
     ];
 
 
-  ngOnInit():
-    void {
+  ngOnInit(): void {
 
     this.route.queryParams.subscribe(
 
@@ -469,34 +350,24 @@ export class NewInspection implements OnInit {
           params['type'];
 
 
-        if (
-
-          type === 'accident'
-
-        ) {
+        if (type === 'accident') {
 
           this.inspectionType =
             'accident';
 
-
           this.inspectionTitle =
             'Accident Claim Inspection';
-
 
           this.inspectionDescription =
             'Document the damage to your vehicle to support your insurance claim.';
 
-        }
-
-        else {
+        } else {
 
           this.inspectionType =
             'pre-cover';
 
-
           this.inspectionTitle =
             'Pre-Cover Vehicle Inspection';
-
 
           this.inspectionDescription =
             'Complete this inspection before your vehicle receives full insurance cover.';
@@ -510,20 +381,16 @@ export class NewInspection implements OnInit {
   }
 
 
-  get currentPhoto():
-    InspectionPhoto {
+  get currentPhoto(): InspectionPhoto {
 
     return this.photos[
-
       this.currentPhotoIndex
-
     ];
 
   }
 
 
-  get completedPhotoCount():
-    number {
+  get completedPhotoCount(): number {
 
     return this.photos.filter(
 
@@ -535,8 +402,7 @@ export class NewInspection implements OnInit {
   }
 
 
-  updatePhotoCompletionStatus():
-    void {
+  updatePhotoCompletionStatus(): void {
 
     this.allRequiredPhotosComplete =
 
@@ -560,24 +426,17 @@ export class NewInspection implements OnInit {
 
 
   onPhotoSelected(
-
     event: Event,
-
     photo: InspectionPhoto
-
-  ):
-    void {
+  ): void {
 
     const input =
       event.target as HTMLInputElement;
 
 
     if (
-
       !input.files ||
-
       input.files.length === 0
-
     ) {
 
       return;
@@ -610,23 +469,17 @@ export class NewInspection implements OnInit {
 
 
     reader.readAsDataURL(
-
       file
-
     );
 
   }
 
 
-  nextPhoto():
-    void {
+  nextPhoto(): void {
 
     if (
-
       this.currentPhotoIndex <
-
       this.photos.length - 1
-
     ) {
 
       this.currentPhotoIndex++;
@@ -636,13 +489,10 @@ export class NewInspection implements OnInit {
   }
 
 
-  previousPhoto():
-    void {
+  previousPhoto(): void {
 
     if (
-
       this.currentPhotoIndex > 0
-
     ) {
 
       this.currentPhotoIndex--;
@@ -653,11 +503,8 @@ export class NewInspection implements OnInit {
 
 
   goToPhoto(
-
     index: number
-
-  ):
-    void {
+  ): void {
 
     this.currentPhotoIndex =
       index;
@@ -666,21 +513,14 @@ export class NewInspection implements OnInit {
 
 
   onDamagePhotosSelected(
-
     event: Event
-
-  ):
-    void {
+  ): void {
 
     const input =
       event.target as HTMLInputElement;
 
 
-    if (
-
-      !input.files
-
-    ) {
+    if (!input.files) {
 
       return;
 
@@ -689,9 +529,7 @@ export class NewInspection implements OnInit {
 
     this.damagePhotos =
       Array.from(
-
         input.files
-
       );
 
 
@@ -711,18 +549,14 @@ export class NewInspection implements OnInit {
           () => {
 
             this.damagePhotoPreviews.push(
-
               reader.result as string
-
             );
 
           };
 
 
         reader.readAsDataURL(
-
           file
-
         );
 
       }
@@ -732,85 +566,52 @@ export class NewInspection implements OnInit {
   }
 
 
-  submitInspection():
-    void {
+  submitInspection(): void {
 
-
-    if (
-
-      !this.customerForm.valid
-
-    ) {
+    if (!this.customerForm.valid) {
 
       this.customerForm.markAllAsTouched();
 
-
       alert(
-
         'Please complete the customer information.'
-
       );
-
 
       return;
 
     }
 
 
-    if (
-
-      !this.policyForm.valid
-
-    ) {
+    if (!this.policyForm.valid) {
 
       this.policyForm.markAllAsTouched();
 
-
       alert(
-
         'Please complete the policy information.'
-
       );
-
 
       return;
 
     }
 
 
-    if (
-
-      !this.vehicleForm.valid
-
-    ) {
+    if (!this.vehicleForm.valid) {
 
       this.vehicleForm.markAllAsTouched();
 
-
       alert(
-
         'Please complete the vehicle information.'
-
       );
-
 
       return;
 
     }
 
 
-    if (
-
-      !this.allRequiredPhotosComplete
-
-    ) {
+    if (!this.allRequiredPhotosComplete) {
 
       alert(
-
         'Please complete all required vehicle photos before submitting.'
-
       );
-
 
       return;
 
@@ -821,266 +622,314 @@ export class NewInspection implements OnInit {
       true;
 
 
-    const vehicleFiles =
-
-      this.photos
-
-        .filter(
-
-          photo =>
-            photo.file !== null
-
-        )
-
-        .map(
-
-          photo =>
-            photo.file as File
-
-        );
+    const customer =
+      this.customerForm.getRawValue();
 
 
-    const allFiles = [
+    const policy =
+      this.policyForm.getRawValue();
 
-      ...vehicleFiles,
 
-      ...this.damagePhotos
+    const vehicle =
+      this.vehicleForm.getRawValue();
 
-    ];
+
+    const inspectionData = {
+
+      inspectionType:
+        this.inspectionType,
+
+
+      customerFirstName:
+        customer.firstName || null,
+
+      customerSurname:
+        customer.surname || null,
+
+      customerEmail:
+        customer.email || null,
+
+      customerPhone:
+        customer.phone || null,
+
+
+      policyNumber:
+        policy.policy || null,
+
+      insuranceCompany:
+        policy.company || null,
+
+
+      registration:
+        vehicle.registration || null,
+
+      vin:
+        vehicle.vin || null,
+
+      make:
+        vehicle.make || null,
+
+      model:
+        vehicle.model || null,
+
+      year:
+        vehicle.year
+          ? String(vehicle.year)
+          : null,
+
+      colour:
+        vehicle.colour || null,
+
+      mileage:
+        vehicle.mileage
+          ? String(vehicle.mileage)
+          : null,
+
+
+      photos: [],
+
+      damagePhotos: []
+
+    };
+
+
+    console.log(
+      'CREATING INSPECTION:',
+      inspectionData
+    );
 
 
     this.inspectionService
 
-      .uploadPhotos(
-
-        allFiles
-
+      .createInspection(
+        inspectionData
       )
 
       .subscribe({
 
         next:
+          (createdInspection) => {
 
-          (uploadResponse) => {
+            console.log(
+              'INSPECTION CREATED:',
+              createdInspection
+            );
 
 
-            const uploadedFiles =
-              uploadResponse.files;
+            const inspectionId =
+              createdInspection.id;
 
 
-            const uploadedVehiclePhotos =
+            if (!inspectionId) {
+
+              this.isSubmitting =
+                false;
+
+              console.error(
+                'No inspection ID returned:',
+                createdInspection
+              );
+
+              alert(
+                'The inspection was created, but the server did not return an inspection ID.'
+              );
+
+              return;
+
+            }
+
+
+            const vehicleFiles =
 
               this.photos
 
                 .filter(
-
                   photo =>
                     photo.file !== null
-
                 )
 
                 .map(
-
-                  (photo, index) => ({
-
-                    id:
-                      photo.id,
-
-                    title:
-                      photo.title,
-
-                    fileName:
-                      photo.file?.name,
-
-                    fileType:
-                      photo.file?.type,
-
-                    fileSize:
-                      photo.file?.size,
-
-                    path:
-                      uploadedFiles[index]?.path
-
-                  })
-
+                  photo =>
+                    photo.file as File
                 );
 
 
-            const damageStartIndex =
-              vehicleFiles.length;
+            const allFiles = [
 
+              ...vehicleFiles,
 
-            const uploadedDamagePhotos =
+              ...this.damagePhotos
 
-              this.damagePhotos
+            ];
 
-                .map(
 
-                  (file, index) => ({
+            if (allFiles.length === 0) {
 
-                    fileName:
-                      file.name,
+              this.completeSubmission(
+                inspectionId
+              );
 
-                    fileType:
-                      file.type,
+              return;
 
-                    fileSize:
-                      file.size,
+            }
 
-                    path:
 
-                      uploadedFiles[
-
-                        damageStartIndex + index
-
-                      ]?.path
-
-                  })
-
-                );
-
-
-            const customer =
-              this.customerForm.getRawValue();
-
-
-            const policy =
-              this.policyForm.getRawValue();
-
-
-            const vehicle =
-              this.vehicleForm.getRawValue();
-
-
-            const inspectionData = {
-
-              inspectionType:
-
-                this.inspectionType,
-
-
-              customerFirstName:
-
-                customer.firstName || null,
-
-
-              customerSurname:
-
-                customer.surname || null,
-
-
-              policyNumber:
-
-                policy.policy || null,
-
-
-              insuranceCompany:
-
-                policy.company || null,
-
-
-              registration:
-
-                vehicle.registration || null,
-
-
-              make:
-
-                vehicle.make || null,
-
-
-              model:
-
-                vehicle.model || null,
-
-
-              year:
-
-                vehicle.year
-
-                  ? String(vehicle.year)
-
-                  : null,
-
-
-              colour:
-
-                vehicle.colour || null,
-
-
-              mileage:
-
-                vehicle.mileage
-
-                  ? String(vehicle.mileage)
-
-                  : null,
-
-
-              photos:
-
-                uploadedVehiclePhotos,
-
-
-              damagePhotos:
-
-                uploadedDamagePhotos
-
-            };
-
-
-            console.log(
-
-              'FINAL INSPECTION DATA SENT TO BACKEND:',
-
-              inspectionData
-
-            );
-
-
-            this.inspectionService
-
-              .createInspection(
-
-                inspectionData
-
+             this.inspectionService.uploadPhotos(
+              allFiles,
+              inspectionId
               )
 
               .subscribe({
 
                 next:
+                  (uploadResponse) => {
 
-                  () => {
-
-
-                    this.isSubmitting =
-                      false;
-
-
-                    this.inspectionSubmitted =
-                      true;
-
-
-                    alert(
-
-                      'Inspection submitted successfully!'
-
+                    console.log(
+                      'PHOTO UPLOAD RESPONSE:',
+                      uploadResponse
                     );
+
+
+                    const uploadedFiles =
+                      uploadResponse.files || [];
+
+
+                    const uploadedVehiclePhotos =
+
+                      this.photos
+
+                        .filter(
+                          photo =>
+                            photo.file !== null
+                        )
+
+                        .map(
+                          (photo, index) => ({
+
+                            id:
+                              photo.id,
+
+                            title:
+                              photo.title,
+
+                            fileName:
+                              photo.file?.name,
+
+                            fileType:
+                              photo.file?.type,
+
+                            fileSize:
+                              photo.file?.size,
+
+                            path:
+                              uploadedFiles[
+                                index
+                              ]?.path
+
+                          })
+                        );
+
+
+                    const damageStartIndex =
+                      vehicleFiles.length;
+
+
+                    const uploadedDamagePhotos =
+
+                      this.damagePhotos
+
+                        .map(
+                          (file, index) => ({
+
+                            fileName:
+                              file.name,
+
+                            fileType:
+                              file.type,
+
+                            fileSize:
+                              file.size,
+
+                            path:
+                              uploadedFiles[
+                                damageStartIndex +
+                                index
+                              ]?.path
+
+                          })
+                        );
+
+
+                    const updateData = {
+
+                      photos:
+                        uploadedVehiclePhotos,
+
+                      damagePhotos:
+                        uploadedDamagePhotos,
+
+                      status:
+                        'submitted',
+
+                      submittedAt:
+                        new Date().toISOString()
+
+                    };
+
+
+                    console.log(
+                      'UPDATING INSPECTION:',
+                      updateData
+                    );
+
+
+                    this.inspectionService
+
+                      .updateInspection(
+                        inspectionId,
+                        updateData
+                      )
+
+                      .subscribe({
+
+                        next:
+                          () => {
+
+                            this.completeSubmission(
+                              inspectionId
+                            );
+
+                          },
+
+                        error:
+                          (error: any) => {
+
+                            console.error(
+                              'INSPECTION UPDATE FAILED:',
+                              error
+                            );
+
+
+                            this.isSubmitting =
+                              false;
+
+
+                            alert(
+                              'Photos uploaded, but the inspection could not be updated.'
+                            );
+
+                          }
+
+                      });
 
                   },
 
-
                 error:
-
                   (error: any) => {
 
-
                     console.error(
-
-                      'Inspection submission failed:',
-
+                      'PHOTO UPLOAD FAILED:',
                       error
-
                     );
 
 
@@ -1089,9 +938,7 @@ export class NewInspection implements OnInit {
 
 
                     alert(
-
-                      'There was a problem submitting the inspection. Please try again.'
-
+                      'The inspection was created, but the photos could not be uploaded.'
                     );
 
                   }
@@ -1100,18 +947,12 @@ export class NewInspection implements OnInit {
 
           },
 
-
         error:
-
           (error: any) => {
 
-
             console.error(
-
-              'Photo upload failed:',
-
+              'INSPECTION CREATION FAILED:',
               error
-
             );
 
 
@@ -1120,14 +961,37 @@ export class NewInspection implements OnInit {
 
 
             alert(
-
-              'There was a problem uploading the photos. Please try again.'
-
+              'There was a problem creating the inspection. Please try again.'
             );
 
           }
 
       });
+
+  }
+
+
+  private completeSubmission(
+    inspectionId: string
+  ): void {
+
+    console.log(
+      'INSPECTION SUBMISSION COMPLETE:',
+      inspectionId
+    );
+
+
+    this.isSubmitting =
+      false;
+
+
+    this.inspectionSubmitted =
+      true;
+
+
+    alert(
+      'Inspection submitted successfully!'
+    );
 
   }
 

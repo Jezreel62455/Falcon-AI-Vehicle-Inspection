@@ -1,7 +1,8 @@
 <div class="request-page">
 
-
+  <!-- ===================================================== -->
   <!-- HEADER -->
+  <!-- ===================================================== -->
 
   <section class="page-header">
 
@@ -16,8 +17,8 @@
       </h1>
 
       <p>
-        Send a customer a secure vehicle inspection request
-        and monitor the completed assessment.
+        Create a secure vehicle inspection link
+        for your customer.
       </p>
 
     </div>
@@ -26,274 +27,534 @@
     <button
       type="button"
       class="back-button"
-      (click)="cancel()">
-
+      [disabled]="isSubmitting"
+      (click)="cancel()"
+    >
       ← Back
-
     </button>
-
 
   </section>
 
 
+  <!-- ===================================================== -->
+  <!-- SUCCESS -->
+  <!-- ===================================================== -->
 
-  <!-- FORM CARD -->
+  <section
+    class="success-card"
+    *ngIf="requestCreated"
+  >
 
-  <section class="request-card">
+    <div class="success-icon">
+      ✓
+    </div>
 
+    <div class="success-content">
 
-    <form
-      [formGroup]="requestForm"
-      (ngSubmit)="submitRequest()">
+      <span class="success-eyebrow">
+        REQUEST CREATED
+      </span>
 
+      <h2>
+        Inspection request created successfully
+      </h2>
 
-
-      <div class="section-title">
-
-        <h2>
-          Customer Information
-        </h2>
-
-        <p>
-          Enter the customer details that will receive the inspection link.
-        </p>
-
-      </div>
-
-
-
-
-      <div class="form-grid">
-
-
-        <div class="form-field">
-
-          <label>
-            First Name
-          </label>
-
-          <input
-            type="text"
-            formControlName="firstName"
-            placeholder="Enter first name">
-
-        </div>
+      <p>
+        Send the secure inspection link below
+        to the customer.
+      </p>
 
 
+      <div class="reference-box">
 
+        <span>
+          Reference
+        </span>
 
-        <div class="form-field">
-
-          <label>
-            Surname
-          </label>
-
-          <input
-            type="text"
-            formControlName="surname"
-            placeholder="Enter surname">
-
-        </div>
-
-
-
-
-        <div class="form-field">
-
-          <label>
-            Email Address
-          </label>
-
-          <input
-            type="email"
-            formControlName="email"
-            placeholder="customer@email.com">
-
-        </div>
-
-
-
-
-        <div class="form-field">
-
-          <label>
-            Phone Number
-          </label>
-
-          <input
-            type="tel"
-            formControlName="phone"
-            placeholder="+27">
-
-        </div>
-
+        <strong>
+          {{ generatedReference }}
+        </strong>
 
       </div>
 
 
+      <div class="link-box">
 
-
-
-      <div class="section-title">
-
-        <h2>
-          Insurance Details
-        </h2>
-
-        <p>
-          Link the inspection request to the customer's policy.
-        </p>
-
-      </div>
-
-
-
-
-      <div class="form-grid">
-
-
-        <div class="form-field">
-
-          <label>
-            Policy Number
-          </label>
-
-          <input
-            type="text"
-            formControlName="policyNumber"
-            placeholder="Policy reference">
-
-        </div>
-
-
-
-
-        <div class="form-field">
-
-          <label>
-            Insurance Company
-          </label>
-
-          <input
-            type="text"
-            formControlName="insuranceCompany"
-            placeholder="Insurance provider">
-
-        </div>
-
-
-      </div>
-
-
-
-
-
-      <div class="section-title">
-
-        <h2>
-          Inspection Type
-        </h2>
-
-      </div>
-
-
-
-
-      <div class="inspection-options">
-
-
-        <label class="option-card">
-
-
-          <input
-            type="radio"
-            value="pre-cover"
-            formControlName="inspectionType">
-
-
-          <div>
-
-            <strong>
-              🛡️ Pre-Cover Inspection
-            </strong>
-
-            <span>
-              Verify vehicle condition before insurance cover.
-            </span>
-
-          </div>
-
-
+        <label>
+          Customer Inspection Link
         </label>
 
-
-
-
-
-        <label class="option-card">
-
+        <div class="link-row">
 
           <input
-            type="radio"
-            value="accident"
-            formControlName="inspectionType">
+            type="text"
+            readonly
+            [value]="customerLink"
+          />
 
+          <button
+            type="button"
+            class="copy-button"
+            (click)="copyLink()"
+          >
+            Copy Link
+          </button>
 
-          <div>
-
-            <strong>
-              🚨 Accident Claim
-            </strong>
-
-            <span>
-              Capture vehicle damage after an incident.
-            </span>
-
-          </div>
-
-
-        </label>
-
-
+        </div>
 
       </div>
 
 
-
-
-
-      <div class="form-actions">
-
+      <div class="success-actions">
 
         <button
           type="button"
           class="secondary-button"
-          (click)="cancel()">
-
-          Cancel
-
+          (click)="createAnotherRequest()"
+        >
+          Create Another Request
         </button>
-
-
-
 
         <button
-          type="submit"
-          class="primary-button">
-
-          Create Inspection Request
-
+          type="button"
+          class="primary-button"
+          (click)="cancel()"
+        >
+          Back to Dashboard
         </button>
 
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- ===================================================== -->
+  <!-- FORM -->
+  <!-- ===================================================== -->
+
+  <form
+    *ngIf="!requestCreated"
+    [formGroup]="requestForm"
+    (ngSubmit)="submitRequest($event)"
+    novalidate
+  >
+
+
+    <!-- =================================================== -->
+    <!-- STEP 1 -->
+    <!-- =================================================== -->
+
+    <section class="form-card">
+
+      <div class="step-header">
+
+        <div class="step-number">
+          01
+        </div>
+
+        <div>
+
+          <h2>
+            Inspection Type
+          </h2>
+
+          <p>
+            Select the type of inspection
+            the customer needs to complete.
+          </p>
+
+        </div>
 
       </div>
 
 
+      <div class="inspection-types">
 
-    </form>
+
+        <!-- PRE-COVER -->
+
+        <button
+          type="button"
+          class="inspection-type"
+          [class.selected]="inspectionType === 'pre-cover'"
+          [disabled]="isSubmitting"
+          (click)="selectInspectionType('pre-cover')"
+        >
+
+          <div class="type-icon">
+            🚗
+          </div>
+
+          <div class="type-content">
+
+            <strong>
+              Pre-Cover Inspection
+            </strong>
+
+            <span>
+              Verify vehicle condition before
+              insurance cover begins.
+            </span>
+
+          </div>
+
+          <div
+            class="selected-indicator"
+            *ngIf="inspectionType === 'pre-cover'"
+          >
+            ✓
+          </div>
+
+        </button>
 
 
-  </section>
+        <!-- ACCIDENT -->
 
+        <button
+          type="button"
+          class="inspection-type"
+          [class.selected]="inspectionType === 'accident'"
+          [disabled]="isSubmitting"
+          (click)="selectInspectionType('accident')"
+        >
+
+          <div class="type-icon">
+            🚨
+          </div>
+
+          <div class="type-content">
+
+            <strong>
+              Accident Claim
+            </strong>
+
+            <span>
+              Capture vehicle damage
+              after an accident.
+            </span>
+
+          </div>
+
+          <div
+            class="selected-indicator"
+            *ngIf="inspectionType === 'accident'"
+          >
+            ✓
+          </div>
+
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- =================================================== -->
+    <!-- STEP 2 -->
+    <!-- =================================================== -->
+
+    <section class="form-card">
+
+      <div class="step-header">
+
+        <div class="step-number">
+          02
+        </div>
+
+        <div>
+
+          <h2>
+            Customer Details
+          </h2>
+
+          <p>
+            Enter the customer's contact information.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="form-grid">
+
+
+        <!-- FIRST NAME -->
+
+        <div class="field">
+
+          <label for="firstName">
+            First Name
+          </label>
+
+          <input
+            id="firstName"
+            type="text"
+            formControlName="firstName"
+            placeholder="Enter first name"
+          />
+
+          <small
+            class="field-error"
+            *ngIf="hasError('firstName')"
+          >
+            First name is required.
+          </small>
+
+        </div>
+
+
+        <!-- SURNAME -->
+
+        <div class="field">
+
+          <label for="surname">
+            Surname
+          </label>
+
+          <input
+            id="surname"
+            type="text"
+            formControlName="surname"
+            placeholder="Enter surname"
+          />
+
+          <small
+            class="field-error"
+            *ngIf="hasError('surname')"
+          >
+            Surname is required.
+          </small>
+
+        </div>
+
+
+        <!-- EMAIL -->
+
+        <div class="field">
+
+          <label for="email">
+            Email Address
+          </label>
+
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            placeholder="customer@example.com"
+          />
+
+          <small
+            class="field-error"
+            *ngIf="hasError('email')"
+          >
+            Enter a valid email address.
+          </small>
+
+        </div>
+
+
+        <!-- PHONE -->
+
+        <div class="field">
+
+          <label for="phone">
+            Phone Number
+          </label>
+
+          <input
+            id="phone"
+            type="tel"
+            formControlName="phone"
+            placeholder="Enter phone number"
+          />
+
+          <small
+            class="field-error"
+            *ngIf="hasError('phone')"
+          >
+            Phone number is required.
+          </small>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =================================================== -->
+    <!-- STEP 3 -->
+    <!-- =================================================== -->
+
+    <section class="form-card">
+
+      <div class="step-header">
+
+        <div class="step-number">
+          03
+        </div>
+
+        <div>
+
+          <h2>
+            Insurance Details
+          </h2>
+
+          <p>
+            Enter the customer's policy information.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="form-grid">
+
+
+        <!-- POLICY -->
+
+        <div class="field">
+
+          <label for="policyNumber">
+            Policy Number
+          </label>
+
+          <input
+            id="policyNumber"
+            type="text"
+            formControlName="policyNumber"
+            placeholder="Enter policy number"
+          />
+
+          <small
+            class="field-error"
+            *ngIf="hasError('policyNumber')"
+          >
+            Policy number is required.
+          </small>
+
+        </div>
+
+
+        <!-- INSURANCE COMPANY -->
+
+        <div class="field">
+
+          <label for="insuranceCompany">
+            Insurance Company
+          </label>
+
+          <input
+            id="insuranceCompany"
+            type="text"
+            formControlName="insuranceCompany"
+            placeholder="Enter insurance company"
+          />
+
+          <small
+            class="field-error"
+            *ngIf="hasError('insuranceCompany')"
+          >
+            Insurance company is required.
+          </small>
+
+        </div>
+
+      </div>
+
+
+      <!-- PREVIEW -->
+
+      <div class="request-preview">
+
+        <div>
+
+          <span>
+            Inspection Type
+          </span>
+
+          <strong>
+            {{ inspectionTypeLabel }}
+          </strong>
+
+        </div>
+
+
+        <div>
+
+          <span>
+            Reference
+          </span>
+
+          <strong>
+            Generated when request is created
+          </strong>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =================================================== -->
+    <!-- ERROR -->
+    <!-- =================================================== -->
+
+    <div
+      class="error-card"
+      *ngIf="errorMessage"
+    >
+
+      <strong>
+        Unable to create request
+      </strong>
+
+      <span>
+        {{ errorMessage }}
+      </span>
+
+    </div>
+
+
+    <!-- =================================================== -->
+    <!-- ACTIONS -->
+    <!-- =================================================== -->
+
+    <section class="form-actions">
+
+      <button
+        type="button"
+        class="secondary-button"
+        [disabled]="isSubmitting"
+        (click)="cancel()"
+      >
+        Cancel
+      </button>
+
+
+      <button
+        type="submit"
+        class="primary-button"
+        [disabled]="isSubmitting"
+      >
+
+        <span *ngIf="!isSubmitting">
+          Create Request
+        </span>
+
+        <span *ngIf="isSubmitting">
+          Creating Request...
+        </span>
+
+      </button>
+
+    </section>
+
+  </form>
 
 </div>

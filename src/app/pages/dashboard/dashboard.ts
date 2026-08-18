@@ -3,10 +3,11 @@ import {
 } from '@angular/common';
 
 import {
+  ChangeDetectorRef,
   Component,
   OnInit,
-  inject,
-  } from '@angular/core';
+  inject
+} from '@angular/core';
 
 import {
   Router,
@@ -28,6 +29,8 @@ import {
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })
+
+
 export class Dashboard implements OnInit {
 
 
@@ -35,8 +38,12 @@ export class Dashboard implements OnInit {
     inject(InspectionService);
 
 
-  public readonly router = inject(Router);
+  private readonly changeDetector =
+    inject(ChangeDetectorRef);
 
+
+  public readonly router =
+    inject(Router);
 
 
 
@@ -61,11 +68,14 @@ export class Dashboard implements OnInit {
 
 
 
+
   ngOnInit(): void {
 
     this.loadDashboardData();
 
   }
+
+
 
 
 
@@ -79,50 +89,25 @@ export class Dashboard implements OnInit {
       .getInspections()
       .subscribe({
 
-        next: (response: any) => {
+        next: (response:any) => {
 
 
           console.log(
-            'Dashboard inspection response:',
+            'DASHBOARD DATA:',
             response
           );
 
 
-          let data:any[] = [];
 
+          this.inspections =
+            Array.isArray(response)
+              ? response
+              : [];
 
-
-          if (Array.isArray(response)) {
-
-            data = response;
-
-          }
-
-
-          else if (
-            Array.isArray(response?.data)
-          ) {
-
-            data = response.data;
-
-          }
-
-
-          else if (
-            Array.isArray(response?.inspections)
-          ) {
-
-            data = response.inspections;
-
-          }
-
-
-
-          this.inspections = data;
 
 
           this.filteredInspections =
-            [...data];
+            [...this.inspections];
 
 
 
@@ -134,16 +119,23 @@ export class Dashboard implements OnInit {
 
 
 
+          // FIX FIRST LOAD ISSUE
+          setTimeout(() => {
+
+            this.changeDetector.detectChanges();
+
+          });
 
 
         },
 
 
-        error: (error) => {
+
+        error:(error)=>{
 
 
           console.error(
-            'Dashboard loading failed:',
+            'Dashboard error:',
             error
           );
 
@@ -153,16 +145,15 @@ export class Dashboard implements OnInit {
           this.filteredInspections = [];
 
 
-          this.calculateStatistics();
-
-
           this.errorMessage =
-            'Unable to load inspection activity.';
+            'Unable to load inspections.';
 
 
           this.isLoading = false;
 
 
+
+          this.changeDetector.detectChanges();
 
 
         }
@@ -172,6 +163,8 @@ export class Dashboard implements OnInit {
 
 
   }
+
+
 
 
 
@@ -189,8 +182,10 @@ export class Dashboard implements OnInit {
       this.inspections.filter(
         item =>
           this.normaliseStatus(
-            item?.status
-          ) === 'submitted'
+            item.status
+          )
+          ===
+          'submitted'
       )
       .length;
 
@@ -202,12 +197,13 @@ export class Dashboard implements OnInit {
 
           const status =
             this.normaliseStatus(
-              item?.status
+              item.status
             );
 
 
           return (
-            status === 'completed' ||
+            status === 'completed'
+            ||
             status === 'approved'
           );
 
@@ -221,8 +217,10 @@ export class Dashboard implements OnInit {
       this.inspections.filter(
         item =>
           this.normaliseStatus(
-            item?.status
-          ) === 'under-review'
+            item.status
+          )
+          ===
+          'under-review'
       )
       .length;
 
@@ -233,20 +231,22 @@ export class Dashboard implements OnInit {
 
 
 
+
+
   private normaliseStatus(
     status:any
   ):string {
 
 
-    return String(
-      status || ''
-    )
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g,'-');
+    return String(status || '')
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g,'-');
 
 
   }
+
+
 
 
 
@@ -259,27 +259,21 @@ export class Dashboard implements OnInit {
       ...this.inspections
     ]
     .sort(
-      (a,b)=> {
+      (a,b)=>{
 
+        return (
 
-        const dateA =
           new Date(
-            a?.createdAt || 0
-          )
-          .getTime();
+            b.createdAt || 0
+          ).getTime()
 
+          -
 
-
-        const dateB =
           new Date(
-            b?.createdAt || 0
-          )
-          .getTime();
+            a.createdAt || 0
+          ).getTime()
 
-
-
-        return dateB - dateA;
-
+        );
 
       }
     )
@@ -287,6 +281,9 @@ export class Dashboard implements OnInit {
 
 
   }
+
+
+
 
 
 
@@ -300,15 +297,19 @@ export class Dashboard implements OnInit {
     return (
 
       `${inspection?.customer?.firstName || ''}
-      ${inspection?.customer?.surname || ''}`
+       ${inspection?.customer?.surname || ''}`
 
     )
     .trim()
+
     ||
     'Unknown Customer';
 
 
   }
+
+
+
 
 
 
@@ -320,13 +321,20 @@ export class Dashboard implements OnInit {
 
 
     return (
+
       inspection?.vehicle?.registration
+
       ||
+
       'N/A'
+
     );
 
 
   }
+
+
+
 
 
 
@@ -339,24 +347,26 @@ export class Dashboard implements OnInit {
 
     const type =
       String(
-        inspection?.inspectionType ||
-        inspection?.type ||
+        inspection?.inspectionType
+        ||
         ''
       )
       .toLowerCase();
 
 
 
-    if(type.includes('accident'))
+    if(type.includes('accident')){
+
       return 'Accident Claim';
 
+    }
 
 
-    if(
-      type.includes('pre')
-    )
+    if(type.includes('pre')){
+
       return 'Pre-Cover';
 
+    }
 
 
     return 'Inspection';
@@ -368,23 +378,30 @@ export class Dashboard implements OnInit {
 
 
 
+
+
+
   getStatus(
     inspection:any
   ):string {
 
 
     return String(
-      inspection?.status ||
-      'submitted'
+      inspection?.status
+      ||
+      'SUBMITTED'
     )
-    .replace(/-/g,' ')
     .replace(
-      /\b\w/g,
-      x=>x.toUpperCase()
-    );
+      /-/g,
+      ' '
+    )
+    .toUpperCase();
 
 
   }
+
+
+
 
 
 
@@ -396,12 +413,14 @@ export class Dashboard implements OnInit {
 
 
     return this.normaliseStatus(
-      inspection?.status ||
-      'submitted'
+      inspection?.status
     );
 
 
   }
+
+
+
 
 
 
@@ -413,15 +432,22 @@ export class Dashboard implements OnInit {
 
 
     return inspection?.createdAt
+
       ?
+
       new Date(
         inspection.createdAt
       )
+
       :
+
       null;
 
 
   }
+
+
+
 
 
 
@@ -432,18 +458,25 @@ export class Dashboard implements OnInit {
   ):void {
 
 
-    if(!inspection?.id)
+    if(!inspection?.id){
+
       return;
+
+    }
 
 
 
     this.router.navigate([
+
       '/inspection-details',
+
       inspection.id
+
     ]);
 
 
   }
+
 
 
 }

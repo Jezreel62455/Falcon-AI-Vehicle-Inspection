@@ -4,18 +4,21 @@
   [class.mobile-sidebar-open]="isMobileSidebarOpen"
 >
 
-  <!-- MOBILE OVERLAY -->
+  <!-- =========================================================
+       MOBILE OVERLAY
+  ========================================================== -->
 
   @if (isMobileSidebarOpen) {
-
     <div
       class="mobile-overlay"
       (click)="closeMobileSidebar()"
     ></div>
-
   }
 
-  <!-- SIDEBAR -->
+
+  <!-- =========================================================
+       SIDEBAR
+  ========================================================== -->
 
   <aside class="sidebar">
 
@@ -28,12 +31,10 @@
       </div>
 
       @if (!isSidebarCollapsed) {
-
         <div class="brand-copy">
-          <strong>Falcon AI</strong>
+          <strong>Falcon</strong>
           <span>Vehicle Inspection</span>
         </div>
-
       }
 
       <button
@@ -47,7 +48,10 @@
 
     </div>
 
-    <!-- PRIMARY ACTION -->
+
+    <!-- =======================================================
+         CREATE INSPECTION REQUEST
+    ======================================================== -->
 
     <div class="sidebar-action">
 
@@ -62,57 +66,66 @@
         </span>
 
         @if (!isSidebarCollapsed) {
-
           <span>
             Create Inspection Request
           </span>
-
         }
 
       </button>
 
     </div>
 
-    <!-- NAVIGATION -->
+
+    <!-- =======================================================
+         NAVIGATION
+    ======================================================== -->
 
     <nav class="navigation">
+
+      <!-- WORKSPACE -->
 
       <div class="navigation-section">
 
         @if (!isSidebarCollapsed) {
-
           <span class="navigation-label">
             WORKSPACE
           </span>
-
         }
 
- 
-<button
-  type="button"
-  class="navigation-item"
-  (click)="goToDashboard()"
->
 
-  <span class="navigation-icon">
-    <span class="icon-dashboard"></span>
-  </span>
+        <!-- ===================================================
+             DASHBOARD
+        ==================================================== -->
 
-  @if (!isSidebarCollapsed) {
-
-    <span class="navigation-text">
-      Dashboard
-    </span>
-
-  }
-
-</button>
-
-        <a
-          routerLink="/history"
-          routerLinkActive="active"
+        <button
+          type="button"
           class="navigation-item"
-          (click)="closeMobileSidebar()"
+          [class.active]="isActive('/dashboard')"
+          (click)="goToDashboard()"
+        >
+
+          <span class="navigation-icon">
+            <span class="icon-dashboard"></span>
+          </span>
+
+          @if (!isSidebarCollapsed) {
+            <span class="navigation-text">
+              Dashboard
+            </span>
+          }
+
+        </button>
+
+
+        <!-- ===================================================
+             INSPECTION HISTORY
+        ==================================================== -->
+
+        <button
+          type="button"
+          class="navigation-item"
+          [class.active]="isActive('/history')"
+          (click)="goToHistory()"
         >
 
           <span class="navigation-icon">
@@ -120,20 +133,27 @@
           </span>
 
           @if (!isSidebarCollapsed) {
-
             <span class="navigation-text">
               Inspection History
             </span>
-
           }
 
-        </a>
+        </button>
 
-        <a
-          routerLink="/reports"
-          routerLinkActive="active"
+
+        <!-- ===================================================
+             REPORTS
+
+             KEEP THIS AS REPORTS.
+             ROUTE: /reports
+             METHOD: goToReports()
+        ==================================================== -->
+
+        <button
+          type="button"
           class="navigation-item"
-          (click)="closeMobileSidebar()"
+          [class.active]="isActive('/reports')"
+          (click)="goToReports()"
         >
 
           <span class="navigation-icon">
@@ -141,32 +161,36 @@
           </span>
 
           @if (!isSidebarCollapsed) {
-
             <span class="navigation-text">
               Reports
             </span>
-
           }
 
-        </a>
+        </button>
 
       </div>
+
+
+      <!-- =====================================================
+           SYSTEM
+      ====================================================== -->
 
       <div class="navigation-section secondary-navigation">
 
         @if (!isSidebarCollapsed) {
-
           <span class="navigation-label">
             SYSTEM
           </span>
-
         }
 
-        <a
-          routerLink="/settings"
-          routerLinkActive="active"
+
+        <!-- SETTINGS -->
+
+        <button
+          type="button"
           class="navigation-item"
-          (click)="closeMobileSidebar()"
+          [class.active]="isActive('/settings')"
+          (click)="goToSettings()"
         >
 
           <span class="navigation-icon">
@@ -174,21 +198,46 @@
           </span>
 
           @if (!isSidebarCollapsed) {
-
             <span class="navigation-text">
               Settings
             </span>
-
           }
 
-        </a>
+        </button>
+
+
+        <!-- LOGOUT -->
+
+        <button
+          type="button"
+          class="navigation-item"
+          (click)="logout()"
+        >
+
+          <span class="navigation-icon">
+            ⎋
+          </span>
+
+          @if (!isSidebarCollapsed) {
+            <span class="navigation-text">
+              Logout
+            </span>
+          }
+
+        </button>
 
       </div>
 
     </nav>
-        <!-- SIDEBAR FOOTER -->
+
+
+    <!-- =======================================================
+         SIDEBAR FOOTER
+    ======================================================== -->
 
     <div class="sidebar-footer">
+
+      <!-- SUPPORT -->
 
       <div class="support-card">
 
@@ -214,6 +263,9 @@
 
       </div>
 
+
+      <!-- COLLAPSE BUTTON -->
+
       <button
         type="button"
         class="collapse-button"
@@ -229,11 +281,9 @@
         </span>
 
         @if (!isSidebarCollapsed) {
-
           <span>
             Collapse sidebar
           </span>
-
         }
 
       </button>
@@ -242,15 +292,23 @@
 
   </aside>
 
-  <!-- MAIN AREA -->
+
+  <!-- =========================================================
+       MAIN AREA
+  ========================================================== -->
 
   <main class="main-area">
 
-    <!-- TOP BAR -->
+
+    <!-- =======================================================
+         TOP BAR
+    ======================================================== -->
 
     <header class="topbar">
 
       <div class="topbar-left">
+
+        <!-- MOBILE MENU -->
 
         <button
           type="button"
@@ -260,6 +318,9 @@
         >
           ☰
         </button>
+
+
+        <!-- BREADCRUMB -->
 
         <div class="breadcrumb">
 
@@ -279,7 +340,14 @@
 
       </div>
 
+
+      <!-- =====================================================
+           TOPBAR RIGHT
+      ====================================================== -->
+
       <div class="topbar-right">
+
+        <!-- NOTIFICATIONS -->
 
         <button
           type="button"
@@ -297,7 +365,11 @@
 
         </button>
 
+
         <div class="topbar-divider"></div>
+
+
+        <!-- USER MENU -->
 
         <button
           type="button"
@@ -305,17 +377,17 @@
         >
 
           <div class="user-avatar">
-            JD
+            {{ userInitials }}
           </div>
 
           <div class="user-details">
 
             <strong>
-              Inspection User
+              {{ userName }}
             </strong>
 
             <span>
-              Administrator
+              {{ userRole }}
             </span>
 
           </div>
@@ -330,10 +402,18 @@
 
     </header>
 
-    <!-- PAGE CONTENT -->
 
-    <section class="page-content"> 
-            <router-outlet></router-outlet>
+    <!-- =======================================================
+         PAGE CONTENT
+         
+         Dashboard / Inspection History / Reports /
+         Settings / Create Inspection Request
+         render here.
+    ======================================================== -->
+
+    <section class="page-content">
+
+      <router-outlet></router-outlet>
 
     </section>
 

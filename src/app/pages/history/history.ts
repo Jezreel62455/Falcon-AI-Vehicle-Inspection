@@ -1,30 +1,34 @@
 import { CommonModule } from '@angular/common';
+
 import {
+  ChangeDetectorRef,
   Component,
   OnInit,
-  computed,
-  inject,
-  signal,
+  inject
 } from '@angular/core';
+
 import {
-  Router,
-  RouterLink,
+  Router
 } from '@angular/router';
 
 import {
   Inspection,
-  InspectionService,
+  InspectionService
 } from '../../services/inspection.service';
+
 
 @Component({
   selector: 'app-history',
+
   standalone: true,
+
   imports: [
-    CommonModule,
-    RouterLink,
+    CommonModule
   ],
+
   templateUrl: './history.html',
-  styleUrl: './history.css',
+
+  styleUrl: './history.css'
 })
 export class History implements OnInit {
 
@@ -34,108 +38,24 @@ export class History implements OnInit {
   private readonly router =
     inject(Router);
 
-  inspections = signal<Inspection[]>([]);
+  private readonly cdr =
+    inject(ChangeDetectorRef);
+
+
+  /* =========================================================
+     DATA
+  ========================================================= */
+
+  inspections: Inspection[] = [];
 
   isLoading = true;
 
   errorMessage = '';
 
-  searchTerm = '';
 
-  selectedStatus = 'ALL';
-
-  readonly filteredInspections = computed(() => {
-
-    const search =
-      this.searchTerm
-        .trim()
-        .toLowerCase();
-
-    return this.inspections().filter(inspection => {
-
-      const matchesStatus =
-        this.selectedStatus === 'ALL'
-          || inspection.status === this.selectedStatus;
-
-      if (!matchesStatus) {
-        return false;
-      }
-
-      if (!search) {
-        return true;
-      }
-
-      const values = [
-
-        inspection.id,
-
-        inspection.vehicle?.registration,
-
-        inspection.vehicle?.make,
-
-        inspection.vehicle?.model,
-
-        inspection.vehicle?.year,
-
-        inspection.vehicle?.colour,
-
-        inspection.customer?.firstName,
-
-        inspection.customer?.surname,
-
-        inspection.policy?.policyNumber,
-
-        inspection.policy?.insuranceCompany,
-
-        inspection.inspectionType,
-
-        inspection.status,
-
-      ];
-
-      return values
-        .filter(value => value !== undefined && value !== null)
-        .some(value =>
-          String(value)
-            .toLowerCase()
-            .includes(search),
-        );
-
-    });
-
-  });
-
-  readonly submittedCount = computed(() =>
-    this.inspections()
-      .filter(x => x.status === 'SUBMITTED')
-      .length,
-  );
-
-  readonly completedCount = computed(() =>
-    this.inspections()
-      .filter(x => x.status === 'COMPLETED')
-      .length,
-  );
-
-  readonly preCoverCount = computed(() =>
-    this.inspections()
-      .filter(x =>
-        (x.inspectionType ?? '')
-          .toLowerCase()
-          .includes('pre'),
-      )
-      .length,
-  );
-
-  readonly accidentCount = computed(() =>
-    this.inspections()
-      .filter(x =>
-        (x.inspectionType ?? '')
-          .toLowerCase()
-          .includes('accident'),
-      )
-      .length,
-  );
+  /* =========================================================
+     INITIAL LOAD
+  ========================================================= */
 
   ngOnInit(): void {
 
@@ -143,124 +63,175 @@ export class History implements OnInit {
 
   }
 
-  refresh(): void {
 
-    this.loadInspections();
+  /* =========================================================
+     LOAD INSPECTIONS
+  ========================================================= */
+
+  private loadInspections(): void {
+
+    this.isLoading = true;
+
+    this.errorMessage = '';
+
+
+    this.inspectionService
+      .getInspections()
+      .subscribe({
+
+        next: (data) => {
+
+          this.inspections =
+            Array.isArray(data)
+              ? data
+              : [];
+
+
+          this.isLoading = false;
+
+
+          /*
+           * Force the same immediate UI refresh
+           * used by Reports.
+           */
+          this.cdr.detectChanges();
+
+        },
+
+
+        error: (error) => {
+
+          console.error(
+            'Failed to load inspection history:',
+            error
+          );
+
+
+          this.inspections = [];
+
+          this.errorMessage =
+            'Unable to load inspection history. Please try again.';
+
+          this.isLoading = false;
+
+
+          this.cdr.detectChanges();
+
+        }
+
+      });
 
   }
 
-  onSearch(value: string): void {
 
-    this.searchTerm = value;
-
-  }
-
-  onStatusChange(value: string): void {
-
-    this.selectedStatus = value;
-
-  }
-
-  trackInspection(
-    index: number,
-    inspection: Inspection,
-  ): string | number {
-
-    return inspection.id;
-
-  }
-
-  viewInspection(
-    inspection: Inspection,
-  ): void {
-
-    if (!inspection.id) {
-
-      console.error(
-        'Inspection ID missing.',
-        inspection,
-      );
-
-      return;
-
-    }
-
-    void this.router.navigate([
-      '/inspection-details',
-      inspection.id,
-    ]);
-
-  }
+  /* =========================================================
+     CUSTOMER
+  ========================================================= */
 
   getCustomerName(
-    inspection: Inspection,
+    inspection: Inspection
   ): string {
 
-    const first =
-      inspection.customer?.firstName ?? '';
+    const firstName =
+      inspection.customer?.firstName
+      || '';
 
     const surname =
-      inspection.customer?.surname ?? '';
+      inspection.customer?.surname
+      || '';
+
 
     const fullName =
-      `${first} ${surname}`.trim();
+      `${firstName} ${surname}`.trim();
 
-    return fullName || 'Customer not supplied';
 
-  }
-
-  getVehicleTitle(
-    inspection: Inspection,
-  ): string {
-
-    const make =
-      inspection.vehicle?.make ?? '';
-
-    const model =
-      inspection.vehicle?.model ?? '';
-
-    const title =
-      `${make} ${model}`.trim();
-
-    return title || 'Vehicle Inspection';
+    return fullName || 'Unknown Customer';
 
   }
 
-  getRegistration(
-    inspection: Inspection,
+
+  /* =========================================================
+     VEHICLE
+  ========================================================= */
+
+  getVehicleRegistration(
+    inspection: Inspection
   ): string {
 
     return (
       inspection.vehicle?.registration
-      || 'Registration pending'
+      || '-'
     );
 
   }
 
-  getPolicyNumber(
-    inspection: Inspection,
+
+  getVehicleMake(
+    inspection: Inspection
   ): string {
 
     return (
-      inspection.policy?.policyNumber
-      || 'No policy number'
+      inspection.vehicle?.make
+      || 'Not provided'
     );
 
   }
 
-  getInsuranceCompany(
-    inspection: Inspection,
+
+  getVehicleModel(
+    inspection: Inspection
   ): string {
 
     return (
-      inspection.policy?.insuranceCompany
-      || 'Insurance company not supplied'
+      inspection.vehicle?.model
+      || 'Not provided'
     );
 
   }
+
+
+  getVehicleYear(
+    inspection: Inspection
+  ): string | number {
+
+    return (
+      inspection.vehicle?.year
+      || 'Not provided'
+    );
+
+  }
+
+
+  getVehicleColour(
+    inspection: Inspection
+  ): string {
+
+    return (
+      inspection.vehicle?.colour
+      || 'Not provided'
+    );
+
+  }
+
+
+  getVehicleMileage(
+    inspection: Inspection
+  ): string | number {
+
+    return (
+      inspection.vehicle?.mileage
+      || 'Not provided'
+    );
+
+  }
+
+
+  /* =========================================================
+     INSPECTION TYPE
+  ========================================================= */
 
   getInspectionType(
-    inspection: Inspection,
+    inspection: Inspection
   ): string {
 
     return (
@@ -270,87 +241,137 @@ export class History implements OnInit {
 
   }
 
-  getStatusClass(
-    status: string,
+
+  /* =========================================================
+     STATUS
+  ========================================================= */
+
+  getStatus(
+    inspection: Inspection
   ): string {
 
-    switch ((status ?? '').toUpperCase()) {
+    return (
+      inspection.status
+      || 'Unknown'
+    );
+
+  }
+
+
+  getStatusClass(
+    inspection: Inspection
+  ): string {
+
+    switch (
+      this.getStatus(inspection)
+        .toUpperCase()
+    ) {
 
       case 'COMPLETED':
-        return 'status-completed';
+
+        return 'status-approved';
+
 
       case 'PROCESSING':
+
         return 'status-processing';
 
+
+      case 'UNDER REVIEW':
+
+      case 'REVIEW':
+
+        return 'status-under-review';
+
+
       case 'PENDING':
+
         return 'status-pending';
 
+
       case 'SUBMITTED':
+
         return 'status-submitted';
 
+
       case 'FAILED':
-        return 'status-failed';
+
+        return 'status-rejected';
+
 
       default:
-        return 'status-default';
+
+        return 'status-submitted';
 
     }
 
   }
 
-  formatDate(
-    value: string | Date,
-  ): string {
 
-    if (!value) {
+  /* =========================================================
+     VIEW INSPECTION
+     
+     IMPORTANT:
+     This is deliberately the same pattern as Reports.
+     One click -> router.navigate()
+  ========================================================= */
 
-      return '-';
+  viewInspection(
+    inspection: Inspection
+  ): void {
+
+    if (!inspection?.id) {
+
+      console.error(
+        'Cannot open inspection. Inspection ID is missing:',
+        inspection
+      );
+
+      return;
 
     }
 
-    return new Date(value)
-      .toLocaleString();
+
+    console.log(
+      'Opening inspection:',
+      inspection.id
+    );
+
+
+    void this.router.navigate([
+      '/inspection-details',
+      inspection.id
+    ]);
 
   }
 
-  private loadInspections(): void {
 
-    this.isLoading = true;
+  /* =========================================================
+     CREATE INSPECTION
+  ========================================================= */
 
-    this.errorMessage = '';
+  createInspection(): void {
 
-    this.inspectionService
-      .getInspections()
-      .subscribe({
+    void this.router.navigateByUrl(
+      '/create-inspection-request'
+    );
 
-       next: inspections => {
+  }
 
-  this.inspections.set(
-    Array.isArray(inspections)
-      ? inspections
-      : [],
-  );
 
-  this.isLoading = false;
+  /* =========================================================
+     TRACKING
+  ========================================================= */
 
-},
+  trackByInspection(
+    index: number,
+    inspection: Inspection
+  ): string | number {
 
-        error: error => {
-
-          console.error(
-            error,
-          );
-
-          this.errorMessage =
-            'Unable to load inspection history.';
-
-          this.inspections.set([]);
-
-          this.isLoading = false;
-
-        },
-
-      });
+    return (
+      inspection.id
+      || index
+    );
 
   }
 

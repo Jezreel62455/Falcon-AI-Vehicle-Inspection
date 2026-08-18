@@ -1,0 +1,208 @@
+<div class="vehicle-page">
+
+  <div class="vehicle-card">
+
+    <!-- Progress -->
+
+    <div class="progress-section">
+
+      <span class="progress-label">
+        Step 3 of 6
+      </span>
+
+      <div class="progress-bar">
+        <div class="progress-fill"></div>
+      </div>
+
+    </div>
+
+    <!-- Header -->
+
+    <div class="page-header">
+
+      <div class="logo-circle">
+        F
+      </div>
+
+      <h1>
+        Vehicle Information
+      </h1>
+
+      <p>
+        Please provide your vehicle details. This information helps us identify
+        the vehicle correctly before the inspection begins.
+      </p>
+
+    </div>
+
+    <!-- Form -->
+
+    <form
+      class="vehicle-form"
+      [formGroup]="vehicleForm"
+      (ngSubmit)="continue()"
+    >
+
+      <div class="form-grid">
+
+        <div class="form-group">
+
+          <label for="registration">
+            Registration Number
+          </label>
+
+          <input
+            id="registration"
+            type="text"
+            formControlName="registration"
+            placeholder="e.g. CA 123-456"
+          >
+
+          @if (
+            vehicleForm.controls.registration.invalid &&
+            vehicleForm.controls.registration.touched
+          ) {
+
+            <small class="error">
+              Registration number is required.
+            </small>
+
+          }
+
+        </div>
+
+        <div class="form-group">
+
+          <label for="vin">
+            VIN Number
+          </label>
+
+          <input
+            id="vin"
+            type="text"
+            formControlName="vin"
+            placeholder="Vehicle Identification Number"
+          >
+
+          @if (
+            vehicleForm.controls.vin.invalid &&
+            vehicleForm.controls.vin.touched
+          ) {
+
+            <small class="error">
+              VIN is required.
+            </small>
+
+          }
+
+        </div>
+
+      </div>
+
+      <div class="form-grid">
+
+        <div class="form-group">
+
+          <label for="make">
+            Vehicle Make
+          </label>
+
+          <input
+            id="make"
+            type="text"
+            formControlName="make"
+            placeholder="Toyota"
+          >
+
+        </div>
+
+        <div class="form-group">
+
+          <label for="model">
+            Vehicle Model
+          </label>
+
+          <input
+            id="model"
+            type="text"
+            formControlName="model"
+            placeholder="Corolla"
+          >
+
+        </div>
+
+      </div>
+
+      <div class="form-grid">
+
+        <div class="form-group">
+
+          <label for="year">
+            Year
+          </label>
+
+          <input
+            id="year"
+            type="number"
+            formControlName="year"
+            placeholder="2024"
+          >
+
+        </div>
+
+        <div class="form-group">
+
+          <label for="colour">
+            Colour
+          </label>
+
+          <input
+            id="colour"
+            type="text"
+            formControlName="colour"
+            placeholder="White"
+          >
+
+        </div>
+
+      </div>
+
+      <div class="form-group">
+
+        <label for="mileage">
+          Current Mileage (km)
+        </label>
+
+        <input
+          id="mileage"
+          type="number"
+          formControlName="mileage"
+          placeholder="45000"
+        >
+
+      </div>
+
+      <div class="actions">
+
+        <button
+          type="button"
+          class="secondary-button"
+          (click)="back()"
+        >
+          Back
+        </button>
+
+        <button
+          type="submit"
+          class="primary-button"
+        >
+          Continue →
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
