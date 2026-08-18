@@ -50,10 +50,8 @@ export class CreateInspectionRequestPage {
   private readonly fb =
     inject(FormBuilder);
 
-
   private readonly router =
     inject(Router);
-
 
   private readonly inspectionService =
     inject(InspectionService);
@@ -61,28 +59,23 @@ export class CreateInspectionRequestPage {
 
   /* =========================================================
      STATE
-     ========================================================= */
+  ========================================================= */
 
   inspectionType:
     InspectionType =
     'pre-cover';
 
-
   isSubmitting =
     false;
-
 
   requestCreated =
     false;
 
-
   generatedReference =
     '';
 
-
   customerLink =
     '';
-
 
   errorMessage =
     '';
@@ -90,7 +83,7 @@ export class CreateInspectionRequestPage {
 
   /* =========================================================
      FORM
-     ========================================================= */
+  ========================================================= */
 
   requestForm =
     this.fb.nonNullable.group({
@@ -103,7 +96,6 @@ export class CreateInspectionRequestPage {
         ]
       ],
 
-
       surname: [
         '',
         [
@@ -111,7 +103,6 @@ export class CreateInspectionRequestPage {
           Validators.minLength(2)
         ]
       ],
-
 
       email: [
         '',
@@ -121,7 +112,6 @@ export class CreateInspectionRequestPage {
         ]
       ],
 
-
       phone: [
         '',
         [
@@ -130,14 +120,12 @@ export class CreateInspectionRequestPage {
         ]
       ],
 
-
       policyNumber: [
         '',
         [
           Validators.required
         ]
       ],
-
 
       insuranceCompany: [
         '',
@@ -151,7 +139,7 @@ export class CreateInspectionRequestPage {
 
   /* =========================================================
      LABEL
-     ========================================================= */
+  ========================================================= */
 
   get inspectionTypeLabel(): string {
 
@@ -172,21 +160,18 @@ export class CreateInspectionRequestPage {
      
      IMPORTANT:
      Selecting a type does NOT create anything.
-     ========================================================= */
+  ========================================================= */
 
   selectInspectionType(
     type: InspectionType
   ): void {
 
     if (this.isSubmitting) {
-
       return;
     }
 
-
     this.inspectionType =
       type;
-
 
     this.errorMessage =
       '';
@@ -197,7 +182,7 @@ export class CreateInspectionRequestPage {
      SUBMIT
      
      THIS IS THE ONLY PLACE THAT CREATES THE REQUEST.
-     ========================================================= */
+  ========================================================= */
 
   submitRequest(
     event?: Event
@@ -206,12 +191,17 @@ export class CreateInspectionRequestPage {
     event?.preventDefault();
 
 
+    /*
+     * Prevent accidental double submission.
+     */
     if (this.isSubmitting) {
-
       return;
     }
 
 
+    /*
+     * Validate form before sending anything.
+     */
     if (this.requestForm.invalid) {
 
       this.requestForm.markAllAsTouched();
@@ -220,6 +210,9 @@ export class CreateInspectionRequestPage {
     }
 
 
+    /*
+     * Lock the submit button.
+     */
     this.isSubmitting =
       true;
 
@@ -227,14 +220,11 @@ export class CreateInspectionRequestPage {
     this.errorMessage =
       '';
 
-
     this.requestCreated =
       false;
 
-
     this.generatedReference =
       '';
-
 
     this.customerLink =
       '';
@@ -245,8 +235,8 @@ export class CreateInspectionRequestPage {
 
 
     /*
-     * Generate the reference ONLY when
-     * the user actually submits.
+     * Generate reference only when
+     * the request is actually submitted.
      */
     const reference =
       this.generateReference();
@@ -260,14 +250,13 @@ export class CreateInspectionRequestPage {
       status:
         'pending',
 
-
       inspectionType:
         this.inspectionType,
 
 
       /* -----------------------------------------------------
-         NESTED CUSTOMER
-         ----------------------------------------------------- */
+         CUSTOMER
+      ----------------------------------------------------- */
 
       customer: {
 
@@ -287,8 +276,8 @@ export class CreateInspectionRequestPage {
 
 
       /* -----------------------------------------------------
-         NESTED POLICY
-         ----------------------------------------------------- */
+         POLICY
+      ----------------------------------------------------- */
 
       policy: {
 
@@ -302,8 +291,8 @@ export class CreateInspectionRequestPage {
 
 
       /* -----------------------------------------------------
-         FLAT CUSTOMER
-         ----------------------------------------------------- */
+         FLAT CUSTOMER FIELDS
+      ----------------------------------------------------- */
 
       customerFirstName:
         form.firstName.trim(),
@@ -319,8 +308,8 @@ export class CreateInspectionRequestPage {
 
 
       /* -----------------------------------------------------
-         FLAT POLICY
-         ----------------------------------------------------- */
+         FLAT POLICY FIELDS
+      ----------------------------------------------------- */
 
       policyNumber:
         form.policyNumber.trim(),
@@ -331,7 +320,7 @@ export class CreateInspectionRequestPage {
 
       /* -----------------------------------------------------
          EMPTY VEHICLE
-         ----------------------------------------------------- */
+      ----------------------------------------------------- */
 
       vehicle: {
 
@@ -354,7 +343,7 @@ export class CreateInspectionRequestPage {
 
       /* -----------------------------------------------------
          LEGACY FLAT VEHICLE FIELDS
-         ----------------------------------------------------- */
+      ----------------------------------------------------- */
 
       make: '',
 
@@ -373,7 +362,7 @@ export class CreateInspectionRequestPage {
 
       /* -----------------------------------------------------
          PHOTOS
-         ----------------------------------------------------- */
+      ----------------------------------------------------- */
 
       photos: [],
 
@@ -390,12 +379,19 @@ export class CreateInspectionRequestPage {
     );
 
 
+    /*
+     * CREATE REQUEST
+     */
     this.inspectionService
       .createInspection(
         inspectionData
       )
       .pipe(
 
+        /*
+         * Always unlock the button when
+         * the HTTP request finishes.
+         */
         finalize(() => {
 
           this.isSubmitting =
@@ -406,45 +402,129 @@ export class CreateInspectionRequestPage {
       )
       .subscribe({
 
-        next: inspection => {
+        /* ===================================================
+           SUCCESS
+        =================================================== */
+
+        next: response => {
 
           console.log(
-            'INSPECTION REQUEST CREATED:',
-            inspection
+            'CREATE REQUEST RESPONSE:',
+            response
           );
 
 
           /*
-           * Always use the reference returned
-           * by the backend.
+           * -------------------------------------------------
+           * IMPORTANT FIX
+           *
+           * The backend may return the created inspection
+           * directly OR inside response.inspection.
+           *
+           * We support both.
+           * -------------------------------------------------
            */
-          this.generatedReference =
-            inspection.reference;
+
+          const createdInspection =
+            response?.inspection;
 
 
           /*
-           * Always use the inspection type
-           * returned by the backend too.
+           * Use the backend reference when available.
+           *
+           * If the backend does not return it directly,
+           * use the reference that we submitted.
            */
-          const type =
+
+          const returnedReference =
+            response?.reference ??
+            createdInspection?.reference ??
+            reference;
+
+
+          /*
+           * Use the backend inspection type when available.
+           *
+           * Otherwise use the type selected on this page.
+           */
+
+          const returnedType =
             this.inspectionService
               .normalizeInspectionType(
-                inspection.inspectionType
+
+                response?.inspectionType ??
+                createdInspection?.inspectionType ??
+                this.inspectionType
+
               );
 
 
+          /*
+           * Store the final reference.
+           */
+
+          this.generatedReference =
+            returnedReference;
+
+
+          /*
+           * Build the customer inspection link.
+           *
+           * IMPORTANT:
+           * This uses the actual generated reference.
+           * Nothing is hardcoded.
+           */
+
           this.customerLink =
             this.buildCustomerLink(
-              type,
-              inspection.reference
+              returnedType,
+              returnedReference
             );
 
+
+          /*
+           * -------------------------------------------------
+           * THIS IS THE IMPORTANT FIX.
+           *
+           * The backend has successfully created the request.
+           *
+           * Now immediately switch the page from:
+           *
+           *     Create Request
+           *
+           * to:
+           *
+           *     Request Created Successfully
+           *
+           * We deliberately do this AFTER all response
+           * values have safe fallbacks.
+           * -------------------------------------------------
+           */
 
           this.requestCreated =
             true;
 
+
+          console.log(
+            'REQUEST CREATED SUCCESSFULLY:',
+            {
+              reference:
+                this.generatedReference,
+
+              inspectionType:
+                returnedType,
+
+              customerLink:
+                this.customerLink
+            }
+          );
+
         },
 
+
+        /* ===================================================
+           ERROR
+        =================================================== */
 
         error: error => {
 
@@ -453,6 +533,11 @@ export class CreateInspectionRequestPage {
             error
           );
 
+
+          /*
+           * Only show an error when the actual HTTP
+           * request failed.
+           */
 
           this.errorMessage =
             error?.error?.message ??
@@ -467,7 +552,7 @@ export class CreateInspectionRequestPage {
 
   /* =========================================================
      GENERATE REFERENCE
-     ========================================================= */
+  ========================================================= */
 
   private generateReference(): string {
 
@@ -490,7 +575,7 @@ export class CreateInspectionRequestPage {
 
   /* =========================================================
      CUSTOMER LINK
-     ========================================================= */
+  ========================================================= */
 
   private buildCustomerLink(
     type: InspectionType,
@@ -507,12 +592,11 @@ export class CreateInspectionRequestPage {
 
   /* =========================================================
      COPY LINK
-     ========================================================= */
+  ========================================================= */
 
   copyLink(): void {
 
     if (!this.customerLink) {
-
       return;
     }
 
@@ -541,12 +625,11 @@ export class CreateInspectionRequestPage {
 
   /* =========================================================
      CREATE ANOTHER
-     ========================================================= */
+  ========================================================= */
 
   createAnotherRequest(): void {
 
     if (this.isSubmitting) {
-
       return;
     }
 
@@ -554,18 +637,14 @@ export class CreateInspectionRequestPage {
     this.requestCreated =
       false;
 
-
     this.generatedReference =
       '';
-
 
     this.customerLink =
       '';
 
-
     this.errorMessage =
       '';
-
 
     this.inspectionType =
       'pre-cover';
@@ -577,12 +656,11 @@ export class CreateInspectionRequestPage {
 
   /* =========================================================
      BACK
-     ========================================================= */
+  ========================================================= */
 
   cancel(): void {
 
     if (this.isSubmitting) {
-
       return;
     }
 
@@ -595,7 +673,7 @@ export class CreateInspectionRequestPage {
 
   /* =========================================================
      FORM ERROR
-     ========================================================= */
+  ========================================================= */
 
   hasError(
     controlName: string

@@ -1,7 +1,8 @@
 import {
   Component,
   OnInit,
-  inject
+  inject,
+  ChangeDetectorRef
 } from '@angular/core';
 
 import {
@@ -20,7 +21,6 @@ import {
 
 
 @Component({
-
   selector: 'app-inspection-details',
 
   standalone: true,
@@ -35,38 +35,41 @@ import {
   styleUrls: [
     './inspection-details.css'
   ]
-
 })
-
-
-export class InspectionDetails
-  implements OnInit {
-
+export class InspectionDetails implements OnInit {
 
   private readonly route =
     inject(ActivatedRoute);
 
-
   private readonly router =
     inject(Router);
 
-
   private readonly inspectionService =
     inject(InspectionService);
+
+  /*
+   * IMPORTANT:
+   * Forces Angular to refresh the view after the
+   * inspection has been loaded from the API.
+   */
+  private readonly cdr =
+    inject(ChangeDetectorRef);
 
 
   inspection:
     Inspection | null =
     null;
 
-
   isLoading =
     false;
-
 
   errorMessage =
     '';
 
+
+  /* =========================================================
+     INIT
+     ========================================================= */
 
   ngOnInit(): void {
 
@@ -75,112 +78,199 @@ export class InspectionDetails
   }
 
 
+  /* =========================================================
+     LOAD INSPECTION
+     ========================================================= */
+
   loadInspection(): void {
 
     const routeId =
-      this.route.snapshot.paramMap.get(
-        'id'
-      );
-
+      this.route.snapshot.paramMap.get('id');
 
     if (!routeId) {
+
+      this.isLoading = false;
 
       this.errorMessage =
         'No inspection reference was provided.';
 
-      return;
+      this.cdr.detectChanges();
 
+      return;
     }
 
 
-    this.isLoading =
-      true;
+    this.isLoading = true;
+
+    this.errorMessage = '';
+
+    this.inspection = null;
+
+    this.cdr.detectChanges();
 
 
-    this.errorMessage =
-      '';
-
-
+    /*
+     * First try the database ID endpoint.
+     */
     this.inspectionService
-
-      .getInspectionById(
-        routeId
-      )
-
+      .getInspectionById(routeId)
       .subscribe({
 
-        next:
-          (inspection) => {
+        next: inspection => {
 
-            this.inspection =
-              inspection;
+          console.log(
+            'INSPECTION DETAILS LOADED BY ID:',
+            inspection
+          );
 
-            this.isLoading =
-              false;
+          this.setInspection(
+            inspection
+          );
 
-          },
+        },
 
-        error:
-          (error: any) => {
+        error: idError => {
 
-            console.error(
-              'INSPECTION DETAILS ERROR:',
-              error
-            );
+          console.warn(
+            'ID lookup failed. Trying reference lookup:',
+            idError
+          );
 
+          /*
+           * History may have passed the inspection
+           * reference instead of the database ID.
+           */
+          this.loadByReference(
+            routeId
+          );
 
-            this.inspectionService
-
-              .getInspectionByReference(
-                routeId
-              )
-
-              .subscribe({
-
-                next:
-                  (inspection) => {
-
-                    this.inspection =
-                      inspection;
-
-                    this.isLoading =
-                      false;
-
-                    this.errorMessage =
-                      '';
-
-                  },
-
-                error:
-                  (referenceError: any) => {
-
-                    console.error(
-                      'REFERENCE LOOKUP ERROR:',
-                      referenceError
-                    );
-
-
-                    this.inspection =
-                      null;
-
-
-                    this.isLoading =
-                      false;
-
-
-                    this.errorMessage =
-                      'Unable to load this inspection.';
-
-                  }
-
-              });
-
-          }
+        }
 
       });
 
   }
 
+
+  /* =========================================================
+     LOAD BY REFERENCE
+     ========================================================= */
+
+  private loadByReference(
+    reference: string
+  ): void {
+
+    this.inspectionService
+      .getInspectionByReference(reference)
+      .subscribe({
+
+        next: inspection => {
+
+          console.log(
+            'INSPECTION DETAILS LOADED BY REFERENCE:',
+            inspection
+          );
+
+          this.setInspection(
+            inspection
+          );
+
+        },
+
+        error: error => {
+
+          console.error(
+            'INSPECTION DETAILS LOOKUP FAILED:',
+            error
+          );
+
+          this.inspection =
+            null;
+
+          this.isLoading =
+            false;
+
+          this.errorMessage =
+            'Unable to load this inspection.';
+
+          this.cdr.detectChanges();
+
+        }
+
+      });
+
+  }
+
+
+  /* =========================================================
+     SET / NORMALISE INSPECTION
+     ========================================================= */
+
+  private setInspection(
+    inspection: Inspection
+  ): void {
+
+    if (!inspection) {
+
+      this.inspection =
+        null;
+
+      this.isLoading =
+        false;
+
+      this.errorMessage =
+        'Inspection information was not returned.';
+
+      this.cdr.detectChanges();
+
+      return;
+    }
+
+
+    /*
+     * IMPORTANT:
+     *
+     * The backend can return customer / vehicle / policy
+     * information in different structures.
+     *
+     * Always normalize before displaying it.
+     */
+    this.inspection =
+      this.inspectionService
+        .normalizeInspection(
+          inspection
+        );
+
+
+    console.log(
+      'NORMALISED INSPECTION DETAILS:',
+      this.inspection
+    );
+
+
+    /*
+     * Stop the loading state.
+     */
+    this.isLoading =
+      false;
+
+    this.errorMessage =
+      '';
+
+
+    /*
+     * IMPORTANT FIX:
+     *
+     * Explicitly tell Angular that the API response has
+     * arrived and the template must be rendered again.
+     */
+    this.cdr.detectChanges();
+
+  }
+
+
+  /* =========================================================
+     STATUS
+     ========================================================= */
 
   getStatus(): string {
 
@@ -230,7 +320,8 @@ export class InspectionDetails
 
 
   private normaliseStatus(
-    status: string | undefined
+    status:
+      string | undefined
   ): string {
 
     return (
@@ -245,7 +336,8 @@ export class InspectionDetails
 
 
   private formatStatus(
-    status: string | undefined
+    status:
+      string | undefined
   ): string {
 
     const value =
@@ -292,6 +384,10 @@ export class InspectionDetails
   }
 
 
+  /* =========================================================
+     INSPECTION TYPE
+     ========================================================= */
+
   getInspectionType(): string {
 
     const type =
@@ -332,6 +428,10 @@ export class InspectionDetails
   }
 
 
+  /* =========================================================
+     CUSTOMER
+     ========================================================= */
+
   getCustomerFirstName(): string {
 
     return (
@@ -349,6 +449,7 @@ export class InspectionDetails
       this.inspection?.customer?.surname ||
       this.inspection?.customer?.lastName ||
       this.inspection?.customerSurname ||
+      this.inspection?.customerLastName ||
       'Not provided'
     );
 
@@ -377,6 +478,10 @@ export class InspectionDetails
   }
 
 
+  /* =========================================================
+     POLICY
+     ========================================================= */
+
   getPolicyNumber(): string {
 
     return (
@@ -398,6 +503,10 @@ export class InspectionDetails
 
   }
 
+
+  /* =========================================================
+     VEHICLE
+     ========================================================= */
 
   getRegistration(): string {
 
@@ -461,7 +570,7 @@ export class InspectionDetails
   getVehicleYear(): string {
 
     const year =
-      this.inspection?.vehicle?.year ||
+      this.inspection?.vehicle?.year ??
       this.inspection?.year;
 
 
@@ -495,7 +604,7 @@ export class InspectionDetails
   getVehicleMileage(): string {
 
     const mileage =
-      this.inspection?.vehicle?.mileage ||
+      this.inspection?.vehicle?.mileage ??
       this.inspection?.mileage;
 
 
@@ -527,6 +636,10 @@ export class InspectionDetails
   }
 
 
+  /* =========================================================
+     DATES
+     ========================================================= */
+
   getCreatedDate(): string | null {
 
     return (
@@ -538,7 +651,8 @@ export class InspectionDetails
 
 
   formatDate(
-    value: string | null | undefined
+    value:
+      string | null | undefined
   ): string {
 
     if (!value) {
@@ -577,13 +691,17 @@ export class InspectionDetails
   }
 
 
+  /* =========================================================
+     PHOTOS
+     ========================================================= */
+
   getPhotoCount(): number {
 
     const vehiclePhotos =
       Array.isArray(
         this.inspection?.photos
       )
-        ? this.inspection?.photos?.length || 0
+        ? this.inspection.photos.length
         : 0;
 
 
@@ -591,22 +709,19 @@ export class InspectionDetails
       Array.isArray(
         this.inspection?.accidentPhotos
       )
-        ? this.inspection?.accidentPhotos?.length || 0
+        ? this.inspection.accidentPhotos.length
         : 0;
 
 
-    const damagePhotos =
-      Array.isArray(
-        this.inspection?.damagePhotos
-      )
-        ? this.inspection?.damagePhotos?.length || 0
-        : 0;
-
-
+    /*
+     * Do NOT add damagePhotos separately.
+     *
+     * normalizeInspection() already maps damagePhotos
+     * into accidentPhotos.
+     */
     return (
       vehiclePhotos +
-      accidentPhotos +
-      damagePhotos
+      accidentPhotos
     );
 
   }
@@ -617,7 +732,7 @@ export class InspectionDetails
     return Array.isArray(
       this.inspection?.photos
     )
-      ? this.inspection?.photos || []
+      ? this.inspection.photos
       : [];
 
   }
@@ -628,7 +743,7 @@ export class InspectionDetails
     return Array.isArray(
       this.inspection?.accidentPhotos
     )
-      ? this.inspection?.accidentPhotos || []
+      ? this.inspection.accidentPhotos
       : [];
 
   }
@@ -636,11 +751,13 @@ export class InspectionDetails
 
   getDamagePhotos(): any[] {
 
-    return Array.isArray(
-      this.inspection?.damagePhotos
-    )
-      ? this.inspection?.damagePhotos || []
-      : [];
+    /*
+     * Kept for template compatibility.
+     *
+     * Do not duplicate photos already normalized into
+     * accidentPhotos.
+     */
+    return [];
 
   }
 
@@ -674,6 +791,10 @@ export class InspectionDetails
   }
 
 
+  /* =========================================================
+     REFERENCE
+     ========================================================= */
+
   getReference(): string {
 
     return (
@@ -684,6 +805,10 @@ export class InspectionDetails
 
   }
 
+
+  /* =========================================================
+     NAVIGATION
+     ========================================================= */
 
   backToHistory(): void {
 

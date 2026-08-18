@@ -1,93 +1,145 @@
 <div class="welcome-page">
 
-  <div class="welcome-card">
+  <!-- BACKGROUND DECORATION -->
+  <div class="background-glow glow-one"></div>
+  <div class="background-glow glow-two"></div>
 
-    <!-- HEADER -->
 
-    <div class="welcome-header">
+  <main class="welcome-container">
 
-      <div class="logo-circle">
+    <!-- =====================================================
+         BRAND HEADER
+    ====================================================== -->
+
+    <header class="brand-header">
+
+      <div class="brand-mark">
         F
       </div>
 
-      <div class="brand">
+      <div class="brand-text">
 
-        <span class="brand-name">
+        <strong>
           FALCON
-        </span>
+        </strong>
 
-        <span class="brand-subtitle">
+        <span>
           VEHICLE INSPECTION
         </span>
 
       </div>
 
-    </div>
+    </header>
 
 
-    <!-- TITLE -->
+    <!-- =====================================================
+         MAIN CARD
+    ====================================================== -->
 
-    <div class="welcome-content">
+    <section class="welcome-card">
+
+
+      <!-- TOP LABEL -->
 
       @if (isCustomerLink) {
 
         <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
           INSPECTION REQUEST
         </div>
-
-        <h1>
-          Complete Your Vehicle Inspection
-        </h1>
-
-        <p>
-          Your insurance inspection request is ready.
-          Please select Continue to begin.
-        </p>
 
       }
 
       @else {
 
         <div class="eyebrow">
-          WELCOME
+          <span class="eyebrow-dot"></span>
+          SECURE INSPECTION PORTAL
         </div>
-
-        <h1>
-          Start Your Vehicle Inspection
-        </h1>
-
-        <p>
-          Choose the type of inspection you need
-          to complete.
-        </p>
 
       }
 
 
-      <!-- ERROR -->
+      <!-- ===================================================
+           HERO
+      ==================================================== -->
+
+      <div class="hero-content">
+
+        @if (isCustomerLink) {
+
+          <h1>
+            Your Vehicle Inspection
+            <span>is Ready</span>
+          </h1>
+
+          <p>
+            Your insurance inspection request has been
+            prepared for you. Continue below to begin
+            your guided vehicle inspection.
+          </p>
+
+        }
+
+        @else {
+
+          <h1>
+            Start Your Vehicle
+            <span>Inspection</span>
+          </h1>
+
+          <p>
+            Complete a secure, guided inspection of your
+            vehicle for your insurance requirements.
+          </p>
+
+        }
+
+      </div>
+
+
+      <!-- ===================================================
+           ERROR
+      ==================================================== -->
 
       @if (errorMessage) {
 
         <div class="error-message">
 
-          <span class="error-icon">
+          <div class="error-icon">
             !
-          </span>
+          </div>
 
-          <span>
-            {{ errorMessage }}
-          </span>
+          <div>
+
+            <strong>
+              Unable to continue
+            </strong>
+
+            <span>
+              {{ errorMessage }}
+            </span>
+
+          </div>
 
         </div>
 
       }
 
 
-      <!-- INSPECTION TYPE -->
+      <!-- ===================================================
+           NORMAL CUSTOMER TYPE SELECTION
+      ==================================================== -->
 
       @if (!isCustomerLink) {
 
+        <div class="section-label">
+          SELECT INSPECTION TYPE
+        </div>
+
+
         <div class="inspection-options">
+
 
           <!-- PRE-COVER -->
 
@@ -96,32 +148,54 @@
             class="inspection-option"
             [class.selected]="isPreCover()"
             [disabled]="isStarting"
-            (click)="selectInspectionType('pre-cover')">
+            (click)="selectInspectionType('pre-cover')"
+          >
 
-            <div class="option-icon">
-              🛡️
+            <div class="option-icon pre-cover-icon">
+              <span>✓</span>
             </div>
+
 
             <div class="option-content">
 
-              <h2>
-                Pre-Cover Inspection
-              </h2>
+              <div class="option-title-row">
+
+                <h2>
+                  Pre-Cover Inspection
+                </h2>
+
+                @if (isPreCover()) {
+
+                  <span class="selected-badge">
+                    SELECTED
+                  </span>
+
+                }
+
+              </div>
 
               <p>
-                Capture your vehicle's current
-                condition before insurance cover.
+                Capture your vehicle's current condition
+                before insurance cover begins.
               </p>
 
             </div>
 
-            <div class="option-radio">
+
+            <div class="option-check">
 
               @if (isPreCover()) {
-                <span class="radio-selected"></span>
+
+                <span class="check-active">
+                  ✓
+                </span>
+
               }
+
               @else {
-                <span class="radio-empty"></span>
+
+                <span class="check-empty"></span>
+
               }
 
             </div>
@@ -136,17 +210,31 @@
             class="inspection-option"
             [class.selected]="isAccident()"
             [disabled]="isStarting"
-            (click)="selectInspectionType('accident')">
+            (click)="selectInspectionType('accident')"
+          >
 
             <div class="option-icon accident-icon">
-              ⚠️
+              <span>!</span>
             </div>
+
 
             <div class="option-content">
 
-              <h2>
-                Accident Claim Inspection
-              </h2>
+              <div class="option-title-row">
+
+                <h2>
+                  Accident Claim Inspection
+                </h2>
+
+                @if (isAccident()) {
+
+                  <span class="selected-badge">
+                    SELECTED
+                  </span>
+
+                }
+
+              </div>
 
               <p>
                 Capture vehicle damage and accident
@@ -155,13 +243,21 @@
 
             </div>
 
-            <div class="option-radio">
+
+            <div class="option-check">
 
               @if (isAccident()) {
-                <span class="radio-selected"></span>
+
+                <span class="check-active">
+                  ✓
+                </span>
+
               }
+
               @else {
-                <span class="radio-empty"></span>
+
+                <span class="check-empty"></span>
+
               }
 
             </div>
@@ -173,79 +269,152 @@
       }
 
 
-      <!-- LINKED INSPECTION -->
+      <!-- ===================================================
+           ADMIN GENERATED REQUEST
+      ==================================================== -->
 
       @if (isCustomerLink) {
 
-        <div class="linked-inspection">
+        <div class="request-details">
 
-          <div class="linked-icon">
-            ✓
-          </div>
+          <div class="request-reference">
 
-          <div>
-
-            <span class="linked-label">
-              Inspection Reference
-            </span>
-
-            <strong>
-              {{ reference }}
-            </strong>
-
-          </div>
-
-        </div>
-
-
-        <div class="inspection-type-display">
-
-          @if (isAccident()) {
-
-            <span class="type-display-icon">
-              ⚠️
-            </span>
+            <div class="reference-icon">
+              ✓
+            </div>
 
             <div>
 
-              <strong>
-                Accident Claim Inspection
-              </strong>
-
               <span>
-                Vehicle damage assessment
+                INSPECTION REFERENCE
               </span>
+
+              <strong>
+                {{ reference }}
+              </strong>
 
             </div>
 
-          }
+          </div>
 
-          @else {
 
-            <span class="type-display-icon">
-              🛡️
-            </span>
+          <div class="request-type">
+
+            <div
+              class="request-type-icon"
+              [class.accident-type]="isAccident()"
+            >
+
+              @if (isAccident()) {
+                !
+              }
+              @else {
+                ✓
+              }
+
+            </div>
+
 
             <div>
 
-              <strong>
-                Pre-Cover Inspection
-              </strong>
-
               <span>
-                Vehicle condition assessment
+                INSPECTION TYPE
               </span>
+
+              <strong>
+
+                @if (isAccident()) {
+                  Accident Claim Inspection
+                }
+                @else {
+                  Pre-Cover Inspection
+                }
+
+              </strong>
 
             </div>
 
-          }
+          </div>
 
         </div>
 
       }
 
 
-      <!-- CONTINUE -->
+      <!-- ===================================================
+           TRUST / INFO
+      ==================================================== -->
+
+      <div class="inspection-info">
+
+        <div class="info-item">
+
+          <div class="info-icon">
+            ✓
+          </div>
+
+          <div>
+
+            <strong>
+              Guided process
+            </strong>
+
+            <span>
+              We'll guide you through every step.
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div class="info-item">
+
+          <div class="info-icon">
+            ⏱
+          </div>
+
+          <div>
+
+            <strong>
+              Quick and simple
+            </strong>
+
+            <span>
+              Complete your inspection from your phone.
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div class="info-item">
+
+          <div class="info-icon">
+            🔒
+          </div>
+
+          <div>
+
+            <strong>
+              Secure
+            </strong>
+
+            <span>
+              Your inspection information is protected.
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ===================================================
+           CONTINUE
+      ==================================================== -->
 
       <button
         type="button"
@@ -254,7 +423,8 @@
           !selectedInspectionType ||
           isStarting
         "
-        (click)="continueInspection()">
+        (click)="continueInspection()"
+      >
 
         @if (isStarting) {
 
@@ -269,7 +439,7 @@
         @else {
 
           <span>
-            Continue
+            Continue to Inspection
           </span>
 
           <span class="button-arrow">
@@ -289,7 +459,8 @@
           type="button"
           class="back-button"
           [disabled]="isStarting"
-          (click)="goBack()">
+          (click)="goBack()"
+        >
 
           ← Back
 
@@ -298,18 +469,28 @@
       }
 
 
-    </div>
+    </section>
 
 
-    <!-- FOOTER -->
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
 
-    <div class="welcome-footer">
+    <footer class="welcome-footer">
 
-      <span>
-        Secure vehicle inspection
-      </span>
+      <div class="footer-security">
 
-      <span class="footer-dot">
+        <span class="footer-lock">
+          🔒
+        </span>
+
+        <span>
+          Secure vehicle inspection
+        </span>
+
+      </div>
+
+      <span class="footer-divider">
         •
       </span>
 
@@ -317,8 +498,8 @@
         Falcon AI
       </span>
 
-    </div>
+    </footer>
 
-  </div>
+  </main>
 
 </div>
