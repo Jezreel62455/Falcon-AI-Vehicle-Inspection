@@ -53,6 +53,7 @@ if (
       recursive: true
     }
   );
+
 }
 
 
@@ -93,6 +94,11 @@ export class InspectionsController {
 
     try {
 
+      /*
+       * The service is responsible for generating the
+       * official secure inspection reference.
+       */
+
       const result =
         await this.inspectionsService
           .createInspection(
@@ -101,11 +107,25 @@ export class InspectionsController {
 
 
       console.log(
+        '======================================'
+      );
+
+      console.log(
         'POST /inspections SUCCESS'
       );
 
       console.log(
-        result
+        'REFERENCE:',
+        result?.reference
+      );
+
+      console.log(
+        'SECURE LINK:',
+        result?.secureLink
+      );
+
+      console.log(
+        '======================================'
       );
 
 
@@ -143,7 +163,9 @@ export class InspectionsController {
 
         HttpStatus.INTERNAL_SERVER_ERROR
       );
+
     }
+
   }
 
 
@@ -159,6 +181,7 @@ export class InspectionsController {
       'files',
       20,
       {
+
         storage:
 
           diskStorage({
@@ -185,10 +208,15 @@ export class InspectionsController {
                   null,
                   uniqueName
                 );
+
               }
+
           })
+
       }
+
     )
+
   )
 
   uploadPhotos(
@@ -199,6 +227,7 @@ export class InspectionsController {
 
     @Body()
     body: any
+
   ) {
 
     return {
@@ -226,7 +255,9 @@ export class InspectionsController {
 
             })
           )
+
     };
+
   }
 
 
@@ -239,6 +270,7 @@ export class InspectionsController {
 
     return this.inspectionsService
       .getInspections();
+
   }
 
 
@@ -266,10 +298,12 @@ export class InspectionsController {
       throw new NotFoundException(
         'Inspection request not found'
       );
+
     }
 
 
     return inspection;
+
   }
 
 
@@ -303,6 +337,7 @@ export class InspectionsController {
         throw new NotFoundException(
           'Inspection not found'
         );
+
       }
 
 
@@ -321,6 +356,7 @@ export class InspectionsController {
       ) {
 
         throw error;
+
       }
 
 
@@ -337,7 +373,9 @@ export class InspectionsController {
 
         HttpStatus.INTERNAL_SERVER_ERROR
       );
+
     }
+
   }
 
 
@@ -367,6 +405,7 @@ export class InspectionsController {
         throw new NotFoundException(
           'Inspection not found'
         );
+
       }
 
 
@@ -378,6 +417,15 @@ export class InspectionsController {
         'DELETE INSPECTION ERROR:',
         error
       );
+
+
+      if (
+        error instanceof NotFoundException
+      ) {
+
+        throw error;
+
+      }
 
 
       throw new HttpException(
@@ -393,7 +441,9 @@ export class InspectionsController {
 
         HttpStatus.INTERNAL_SERVER_ERROR
       );
+
     }
+
   }
 
 
@@ -421,9 +471,12 @@ export class InspectionsController {
       throw new NotFoundException(
         'Inspection not found'
       );
+
     }
 
 
     return inspection;
+
   }
+
 }

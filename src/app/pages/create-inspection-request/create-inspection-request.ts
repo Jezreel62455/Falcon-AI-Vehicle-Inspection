@@ -1,5 +1,6 @@
 import {
   Component,
+  ChangeDetectorRef,
   inject
 } from '@angular/core';
 
@@ -9,8 +10,7 @@ import {
 
 import {
   FormBuilder,
-  ReactiveFormsModule,
-  Validators
+  ReactiveFormsModule
 } from '@angular/forms';
 
 import {
@@ -56,10 +56,22 @@ export class CreateInspectionRequestPage {
   private readonly inspectionService =
     inject(InspectionService);
 
+  /*
+   * IMPORTANT
+   *
+   * Angular 21 can use newer change-detection behaviour.
+   *
+   * Explicitly requesting a view refresh after the HTTP
+   * response prevents the "created but only appears after
+   * clicking something else" behaviour.
+   */
+  private readonly changeDetector =
+    inject(ChangeDetectorRef);
 
-  /* =========================================================
-     STATE
-  ========================================================= */
+
+  // =========================================================
+  // STATE
+  // =========================================================
 
   inspectionType:
     InspectionType =
@@ -80,87 +92,60 @@ export class CreateInspectionRequestPage {
   errorMessage =
     '';
 
+  copied =
+    false;
 
-  /* =========================================================
-     FORM
-  ========================================================= */
+
+  // =========================================================
+  // FORM
+  // =========================================================
 
   requestForm =
     this.fb.nonNullable.group({
 
       firstName: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(2)
-        ]
+        ''
       ],
 
       surname: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(2)
-        ]
+        ''
       ],
 
       email: [
-        '',
-        [
-          Validators.required,
-          Validators.email
-        ]
+        ''
       ],
 
       phone: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(7)
-        ]
+        ''
       ],
 
       policyNumber: [
-        '',
-        [
-          Validators.required
-        ]
+        ''
       ],
 
       insuranceCompany: [
-        '',
-        [
-          Validators.required
-        ]
+        ''
       ]
 
     });
 
 
-  /* =========================================================
-     LABEL
-  ========================================================= */
+  // =========================================================
+  // INSPECTION TYPE LABEL
+  // =========================================================
 
   get inspectionTypeLabel(): string {
 
     return this.inspectionType === 'accident'
       ? 'Accident Claim'
       : 'Pre-Cover Inspection';
+
   }
 
 
-  get selectedInspectionTypeLabel(): string {
-
-    return this.inspectionTypeLabel;
-  }
-
-
-  /* =========================================================
-     SELECT TYPE
-     
-     IMPORTANT:
-     Selecting a type does NOT create anything.
-  ========================================================= */
+  // =========================================================
+  // SELECT INSPECTION TYPE
+  // =========================================================
 
   selectInspectionType(
     type: InspectionType
@@ -170,24 +155,32 @@ export class CreateInspectionRequestPage {
       return;
     }
 
+
     this.inspectionType =
       type;
 
     this.errorMessage =
       '';
+
+    /*
+     * Immediately refresh the selected inspection type.
+     */
+    this.changeDetector.detectChanges();
+
   }
 
 
-  /* =========================================================
-     SUBMIT
-     
-     THIS IS THE ONLY PLACE THAT CREATES THE REQUEST.
-  ========================================================= */
+  // =========================================================
+  // SUBMIT REQUEST
+  // =========================================================
 
   submitRequest(
     event?: Event
   ): void {
 
+    /*
+     * Prevent the browser's native form submission.
+     */
     event?.preventDefault();
 
 
@@ -200,25 +193,10 @@ export class CreateInspectionRequestPage {
 
 
     /*
-     * Validate form before sending anything.
-     */
-    if (this.requestForm.invalid) {
-
-      this.requestForm.markAllAsTouched();
-
-      return;
-    }
-
-
-    /*
-     * Lock the submit button.
+     * Reset the previous state.
      */
     this.isSubmitting =
       true;
-
-
-    this.errorMessage =
-      '';
 
     this.requestCreated =
       false;
@@ -229,23 +207,39 @@ export class CreateInspectionRequestPage {
     this.customerLink =
       '';
 
+    this.errorMessage =
+      '';
+
+    this.copied =
+      false;
+
+
+    /*
+     * Force the button to immediately change from:
+     *
+     * Create Inspection Request
+     *
+     * to:
+     *
+     * Creating Request...
+     */
+    this.changeDetector.detectChanges();
+
 
     const form =
       this.requestForm.getRawValue();
 
 
     /*
-     * Generate reference only when
-     * the request is actually submitted.
+     * IMPORTANT:
+     *
+     * The frontend does NOT generate the reference.
+     *
+     * The NestJS backend generates the secure reference.
      */
-    const reference =
-      this.generateReference();
-
 
     const inspectionData:
       CreateInspectionRequestPayload = {
-
-      reference,
 
       status:
         'pending',
@@ -254,9 +248,9 @@ export class CreateInspectionRequestPage {
         this.inspectionType,
 
 
-      /* -----------------------------------------------------
-         CUSTOMER
-      ----------------------------------------------------- */
+      // -----------------------------------------------------
+      // CUSTOMER
+      // -----------------------------------------------------
 
       customer: {
 
@@ -275,25 +269,6 @@ export class CreateInspectionRequestPage {
       },
 
 
-      /* -----------------------------------------------------
-         POLICY
-      ----------------------------------------------------- */
-
-      policy: {
-
-        policyNumber:
-          form.policyNumber.trim(),
-
-        insuranceCompany:
-          form.insuranceCompany.trim()
-
-      },
-
-
-      /* -----------------------------------------------------
-         FLAT CUSTOMER FIELDS
-      ----------------------------------------------------- */
-
       customerFirstName:
         form.firstName.trim(),
 
@@ -307,9 +282,19 @@ export class CreateInspectionRequestPage {
         form.phone.trim(),
 
 
-      /* -----------------------------------------------------
-         FLAT POLICY FIELDS
-      ----------------------------------------------------- */
+      // -----------------------------------------------------
+      // POLICY
+      // -----------------------------------------------------
+
+      policy: {
+
+        policyNumber:
+          form.policyNumber.trim(),
+
+        insuranceCompany:
+          form.insuranceCompany.trim()
+
+      },
 
       policyNumber:
         form.policyNumber.trim(),
@@ -318,134 +303,204 @@ export class CreateInspectionRequestPage {
         form.insuranceCompany.trim(),
 
 
-      /* -----------------------------------------------------
-         EMPTY VEHICLE
-      ----------------------------------------------------- */
+      // -----------------------------------------------------
+      // VEHICLE
+      // -----------------------------------------------------
 
       vehicle: {
 
-        make: '',
+        make:
+          '',
 
-        model: '',
+        model:
+          '',
 
-        year: '',
+        year:
+          '',
 
-        registration: '',
+        registration:
+          '',
 
-        colour: '',
+        colour:
+          '',
 
-        mileage: '',
+        mileage:
+          '',
 
-        vin: ''
+        vin:
+          ''
 
       },
 
 
-      /* -----------------------------------------------------
-         LEGACY FLAT VEHICLE FIELDS
-      ----------------------------------------------------- */
+      make:
+        '',
 
-      make: '',
+      model:
+        '',
 
-      model: '',
+      year:
+        '',
 
-      year: '',
+      registration:
+        '',
 
-      registration: '',
+      colour:
+        '',
 
-      colour: '',
+      mileage:
+        '',
 
-      mileage: '',
+      vin:
+        '',
 
-      vin: '',
 
+      // -----------------------------------------------------
+      // PHOTOS
+      // -----------------------------------------------------
 
-      /* -----------------------------------------------------
-         PHOTOS
-      ----------------------------------------------------- */
+      photos:
+        [],
 
-      photos: [],
+      accidentPhotos:
+        [],
 
-      accidentPhotos: [],
-
-      damagePhotos: []
+      damagePhotos:
+        []
 
     };
 
 
     console.log(
-      'CREATING INSPECTION REQUEST:',
+      '======================================'
+    );
+
+    console.log(
+      'CREATING INSPECTION REQUEST'
+    );
+
+    console.log(
+      'TYPE:',
+      this.inspectionType
+    );
+
+    console.log(
+      'REQUEST DATA:',
       inspectionData
     );
 
+    console.log(
+      '======================================'
+    );
 
-    /*
-     * CREATE REQUEST
-     */
+
     this.inspectionService
       .createInspection(
         inspectionData
       )
       .pipe(
 
-        /*
-         * Always unlock the button when
-         * the HTTP request finishes.
-         */
         finalize(() => {
+
+          /*
+           * The HTTP request has finished regardless of
+           * success or failure.
+           */
 
           this.isSubmitting =
             false;
+
+          /*
+           * Make sure the button immediately returns to
+           * its normal state.
+           */
+          this.changeDetector.detectChanges();
 
         })
 
       )
       .subscribe({
 
-        /* ===================================================
-           SUCCESS
-        =================================================== */
+        // ===================================================
+        // SUCCESS
+        // ===================================================
 
         next: response => {
 
           console.log(
-            'CREATE REQUEST RESPONSE:',
+            '======================================'
+          );
+
+          console.log(
+            'CREATE REQUEST RESPONSE'
+          );
+
+          console.log(
             response
+          );
+
+          console.log(
+            '======================================'
           );
 
 
           /*
-           * -------------------------------------------------
-           * IMPORTANT FIX
+           * Support both:
            *
-           * The backend may return the created inspection
-           * directly OR inside response.inspection.
+           * {
+           *   id,
+           *   reference,
+           *   secureLink
+           * }
            *
-           * We support both.
-           * -------------------------------------------------
+           * and:
+           *
+           * {
+           *   inspection: {
+           *     ...
+           *   }
+           * }
            */
 
           const createdInspection =
-            response?.inspection;
+            response?.inspection ??
+            response;
 
 
           /*
-           * Use the backend reference when available.
-           *
-           * If the backend does not return it directly,
-           * use the reference that we submitted.
+           * The reference MUST come from NestJS.
            */
 
           const returnedReference =
             response?.reference ??
             createdInspection?.reference ??
-            reference;
+            '';
+
+
+          if (!returnedReference) {
+
+            console.error(
+              'Inspection was created but no reference was returned.',
+              response
+            );
+
+
+            this.errorMessage =
+              'The inspection was created, but the server did not return a secure reference. Please check the backend response.';
+
+
+            /*
+             * Explicitly refresh the screen so the error
+             * appears immediately.
+             */
+            this.changeDetector.detectChanges();
+
+            return;
+          }
 
 
           /*
-           * Use the backend inspection type when available.
-           *
-           * Otherwise use the type selected on this page.
+           * Normalise inspection type.
            */
 
           const returnedType =
@@ -460,7 +515,7 @@ export class CreateInspectionRequestPage {
 
 
           /*
-           * Store the final reference.
+           * Store backend reference.
            */
 
           this.generatedReference =
@@ -468,37 +523,46 @@ export class CreateInspectionRequestPage {
 
 
           /*
-           * Build the customer inspection link.
-           *
-           * IMPORTANT:
-           * This uses the actual generated reference.
-           * Nothing is hardcoded.
+           * Prefer the secure link generated by NestJS.
            */
 
-          this.customerLink =
-            this.buildCustomerLink(
-              returnedType,
-              returnedReference
-            );
+          const backendLink =
+            response?.secureLink ??
+            response?.inspectionUrl ??
+            response?.url ??
+            createdInspection?.secureLink ??
+            createdInspection?.inspectionUrl ??
+            '';
+
+
+          if (backendLink) {
+
+            this.customerLink =
+              backendLink;
+
+          } else {
+
+            /*
+             * Only use this fallback if the backend didn't
+             * provide a link.
+             */
+
+            this.customerLink =
+              this.buildCustomerLink(
+                returnedType,
+                returnedReference
+              );
+
+          }
 
 
           /*
-           * -------------------------------------------------
-           * THIS IS THE IMPORTANT FIX.
+           * THIS IS THE IMPORTANT PART.
            *
-           * The backend has successfully created the request.
+           * The request is already created in the database.
            *
-           * Now immediately switch the page from:
-           *
-           *     Create Request
-           *
-           * to:
-           *
-           *     Request Created Successfully
-           *
-           * We deliberately do this AFTER all response
-           * values have safe fallbacks.
-           * -------------------------------------------------
+           * Now immediately switch the page from the form
+           * to the success screen.
            */
 
           this.requestCreated =
@@ -506,76 +570,84 @@ export class CreateInspectionRequestPage {
 
 
           console.log(
-            'REQUEST CREATED SUCCESSFULLY:',
-            {
-              reference:
-                this.generatedReference,
-
-              inspectionType:
-                returnedType,
-
-              customerLink:
-                this.customerLink
-            }
+            '======================================'
           );
 
-        },
+          console.log(
+            'REQUEST CREATED SUCCESSFULLY'
+          );
 
+          console.log(
+            'REFERENCE:',
+            this.generatedReference
+          );
 
-        /* ===================================================
-           ERROR
-        =================================================== */
+          console.log(
+            'CUSTOMER LINK:',
+            this.customerLink
+          );
 
-        error: error => {
-
-          console.error(
-            'CREATE INSPECTION REQUEST FAILED:',
-            error
+          console.log(
+            '======================================'
           );
 
 
           /*
-           * Only show an error when the actual HTTP
-           * request failed.
+           * Force Angular to render the success state NOW.
+           *
+           * This prevents the user having to click Accident
+           * Claim, Dashboard, or anywhere else before the
+           * success panel appears.
            */
+          this.changeDetector.detectChanges();
+
+        },
+
+
+        // ===================================================
+        // ERROR
+        // ===================================================
+
+        error: error => {
+
+          console.error(
+            '======================================'
+          );
+
+          console.error(
+            'CREATE INSPECTION REQUEST FAILED'
+          );
+
+          console.error(
+            error
+          );
+
+          console.error(
+            '======================================'
+          );
+
 
           this.errorMessage =
             error?.error?.message ??
             error?.message ??
             'Unable to create the inspection request. Please try again.';
 
+
+          /*
+           * Make the error state visible immediately.
+           */
+          this.changeDetector.detectChanges();
+
         }
 
       });
+
   }
 
 
-  /* =========================================================
-     GENERATE REFERENCE
-  ========================================================= */
-
-  private generateReference(): string {
-
-    const timestamp =
-      Date.now()
-        .toString(36)
-        .toUpperCase();
-
-
-    const random =
-      Math.random()
-        .toString(36)
-        .substring(2, 7)
-        .toUpperCase();
-
-
-    return `FAL-${timestamp}-${random}`;
-  }
-
-
-  /* =========================================================
-     CUSTOMER LINK
-  ========================================================= */
+  // =========================================================
+  // BUILD CUSTOMER LINK
+  // =========================================================
 
   private buildCustomerLink(
     type: InspectionType,
@@ -587,12 +659,13 @@ export class CreateInspectionRequestPage {
       `/customer/start/${type}/` +
       `${encodeURIComponent(reference)}`
     );
+
   }
 
 
-  /* =========================================================
-     COPY LINK
-  ========================================================= */
+  // =========================================================
+  // COPY LINK
+  // =========================================================
 
   copyLink(): void {
 
@@ -601,31 +674,138 @@ export class CreateInspectionRequestPage {
     }
 
 
-    navigator.clipboard
-      .writeText(
-        this.customerLink
-      )
-      .then(() => {
+    if (
+      navigator.clipboard &&
+      typeof navigator.clipboard.writeText === 'function'
+    ) {
 
-        console.log(
-          'Customer inspection link copied.'
-        );
+      navigator.clipboard
+        .writeText(
+          this.customerLink
+        )
+        .then(() => {
 
-      })
-      .catch(error => {
+          this.showCopiedState();
 
-        console.error(
-          'Unable to copy link:',
-          error
-        );
+        })
+        .catch(error => {
 
-      });
+          console.error(
+            'Unable to copy link:',
+            error
+          );
+
+          this.copyLinkFallback();
+
+        });
+
+      return;
+    }
+
+
+    this.copyLinkFallback();
+
   }
 
 
-  /* =========================================================
-     CREATE ANOTHER
-  ========================================================= */
+  // =========================================================
+  // COPY FALLBACK
+  // =========================================================
+
+  private copyLinkFallback(): void {
+
+    try {
+
+      const textarea =
+        document.createElement(
+          'textarea'
+        );
+
+
+      textarea.value =
+        this.customerLink;
+
+
+      textarea.style.position =
+        'fixed';
+
+      textarea.style.opacity =
+        '0';
+
+
+      document.body.appendChild(
+        textarea
+      );
+
+
+      textarea.focus();
+
+      textarea.select();
+
+
+      const successful =
+        document.execCommand(
+          'copy'
+        );
+
+
+      document.body.removeChild(
+        textarea
+      );
+
+
+      if (successful) {
+
+        this.showCopiedState();
+
+      } else {
+
+        console.error(
+          'Fallback copy failed.'
+        );
+
+      }
+
+    } catch (error) {
+
+      console.error(
+        'Unable to copy customer link:',
+        error
+      );
+
+    }
+
+  }
+
+
+  // =========================================================
+  // COPIED STATE
+  // =========================================================
+
+  private showCopiedState(): void {
+
+    this.copied =
+      true;
+
+
+    this.changeDetector.detectChanges();
+
+
+    setTimeout(() => {
+
+      this.copied =
+        false;
+
+      this.changeDetector.detectChanges();
+
+    }, 2500);
+
+  }
+
+
+  // =========================================================
+  // CREATE ANOTHER REQUEST
+  // =========================================================
 
   createAnotherRequest(): void {
 
@@ -646,17 +826,24 @@ export class CreateInspectionRequestPage {
     this.errorMessage =
       '';
 
+    this.copied =
+      false;
+
     this.inspectionType =
       'pre-cover';
 
 
     this.requestForm.reset();
+
+
+    this.changeDetector.detectChanges();
+
   }
 
 
-  /* =========================================================
-     BACK
-  ========================================================= */
+  // =========================================================
+  // BACK TO DASHBOARD
+  // =========================================================
 
   cancel(): void {
 
@@ -668,12 +855,13 @@ export class CreateInspectionRequestPage {
     this.router.navigate([
       '/dashboard'
     ]);
+
   }
 
 
-  /* =========================================================
-     FORM ERROR
-  ========================================================= */
+  // =========================================================
+  // FORM ERROR
+  // =========================================================
 
   hasError(
     controlName: string
@@ -690,6 +878,7 @@ export class CreateInspectionRequestPage {
       control.touched &&
       control.invalid
     );
+
   }
 
 }

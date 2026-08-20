@@ -196,31 +196,13 @@ export interface Inspection {
   reference: string;
 
 
-  /* ---------------------------------------------------------
-     INSPECTION TYPE
-     --------------------------------------------------------- */
-
   inspectionType: InspectionType;
 
-  /**
-   * Legacy compatibility.
-   *
-   * Older pages were using inspection.type.
-   * Keep this optional so those pages compile.
-   */
   type?: InspectionType;
 
 
-  /* ---------------------------------------------------------
-     STATUS
-     --------------------------------------------------------- */
-
   status: InspectionStatus;
 
-
-  /* ---------------------------------------------------------
-     DATES
-     --------------------------------------------------------- */
 
   createdAt: string;
 
@@ -228,10 +210,6 @@ export interface Inspection {
 
   submittedAt?: string;
 
-
-  /* ---------------------------------------------------------
-     CUSTOMER
-     --------------------------------------------------------- */
 
   customer: Customer;
 
@@ -247,10 +225,6 @@ export interface Inspection {
 
   customerName?: string;
 
-
-  /* ---------------------------------------------------------
-     VEHICLE
-     --------------------------------------------------------- */
 
   vehicle: Vehicle;
 
@@ -269,20 +243,12 @@ export interface Inspection {
   vin?: string;
 
 
-  /* ---------------------------------------------------------
-     PHOTOS
-     --------------------------------------------------------- */
-
   photos: InspectionPhoto[];
 
   accidentPhotos: AccidentPhoto[];
 
   damagePhotos?: AccidentPhoto[];
 
-
-  /* ---------------------------------------------------------
-     POLICY
-     --------------------------------------------------------- */
 
   policy?: Policy;
 
@@ -293,16 +259,8 @@ export interface Inspection {
   insuranceCompany?: string;
 
 
-  /* ---------------------------------------------------------
-     AI
-     --------------------------------------------------------- */
-
   ai?: InspectionAI;
 
-
-  /* ---------------------------------------------------------
-     LINKS
-     --------------------------------------------------------- */
 
   inspectionUrl?: string;
 
@@ -318,24 +276,17 @@ export interface CreateInspectionRequestPayload {
 
   inspectionType: InspectionInputType;
 
-
-  /* ---------------------------------------------------------
-     STATUS
-     --------------------------------------------------------- */
-
   status?: InspectionStatus | string | null;
 
-
-  /* ---------------------------------------------------------
-     REFERENCE
-     --------------------------------------------------------- */
-
+  /*
+   * Reference is optional.
+   *
+   * The Create Inspection Request page deliberately does
+   * not provide one anymore because the backend generates
+   * the secure reference.
+   */
   reference?: string | null;
 
-
-  /* ---------------------------------------------------------
-     NESTED CUSTOMER / VEHICLE / POLICY
-     --------------------------------------------------------- */
 
   customer?: Customer | null;
 
@@ -344,20 +295,12 @@ export interface CreateInspectionRequestPayload {
   policy?: Policy | null;
 
 
-  /* ---------------------------------------------------------
-     POLICY
-     --------------------------------------------------------- */
-
   policyNumber?: string | null;
 
   claimNumber?: string | null;
 
   insuranceCompany?: string | null;
 
-
-  /* ---------------------------------------------------------
-     CUSTOMER
-     --------------------------------------------------------- */
 
   customerFirstName?: string | null;
 
@@ -369,10 +312,6 @@ export interface CreateInspectionRequestPayload {
 
   customerPhone?: string | null;
 
-
-  /* ---------------------------------------------------------
-     VEHICLE - NESTED STYLE
-     --------------------------------------------------------- */
 
   vehicleMake?: string | null;
 
@@ -389,10 +328,6 @@ export interface CreateInspectionRequestPayload {
   vehicleVin?: string | null;
 
 
-  /* ---------------------------------------------------------
-     VEHICLE - LEGACY FLAT STYLE
-     --------------------------------------------------------- */
-
   make?: string | null;
 
   model?: string | null;
@@ -407,10 +342,6 @@ export interface CreateInspectionRequestPayload {
 
   vin?: string | null;
 
-
-  /* ---------------------------------------------------------
-     PHOTOS
-     --------------------------------------------------------- */
 
   photos?: unknown[];
 
@@ -694,17 +625,14 @@ export class InspectionService {
       '';
 
 
-    /* -------------------------------------------------------
-       RETURN NORMALISED INSPECTION
-       ------------------------------------------------------- */
-
     return {
 
       ...inspection,
 
       inspectionType,
 
-      type: inspectionType,
+      type:
+        inspectionType,
 
       status,
 
@@ -712,8 +640,6 @@ export class InspectionService {
         inspection.updatedAt ??
         inspection.createdAt,
 
-
-      /* CUSTOMER */
 
       customer: {
 
@@ -732,6 +658,7 @@ export class InspectionService {
 
         phone:
           phone || undefined
+
       },
 
 
@@ -751,8 +678,6 @@ export class InspectionService {
         phone || undefined,
 
 
-      /* VEHICLE */
-
       vehicle: {
 
         ...vehicle,
@@ -770,6 +695,7 @@ export class InspectionService {
         mileage,
 
         vin
+
       },
 
 
@@ -788,8 +714,6 @@ export class InspectionService {
       vin,
 
 
-      /* POLICY */
-
       policy: {
 
         ...(inspection.policy ?? {}),
@@ -805,6 +729,7 @@ export class InspectionService {
         insuranceCompany:
           inspection.policy?.insuranceCompany ??
           inspection.insuranceCompany
+
       },
 
 
@@ -821,8 +746,6 @@ export class InspectionService {
         inspection.policy?.insuranceCompany,
 
 
-      /* PHOTOS */
-
       photos,
 
       accidentPhotos,
@@ -831,10 +754,10 @@ export class InspectionService {
         accidentPhotos,
 
 
-      /* AI */
-
       ai:
-        inspection.ai ?? undefined
+        inspection.ai ??
+        undefined
+
     };
   }
 
@@ -860,9 +783,11 @@ export class InspectionService {
           );
 
           return of([]);
+
         })
 
       );
+
   }
 
 
@@ -890,9 +815,11 @@ export class InspectionService {
           return throwError(
             () => error
           );
+
         })
 
       );
+
   }
 
 
@@ -905,6 +832,7 @@ export class InspectionService {
   ): Observable<Inspection> {
 
     return this.getInspection(id);
+
   }
 
 
@@ -932,9 +860,11 @@ export class InspectionService {
           return throwError(
             () => error
           );
+
         })
 
       );
+
   }
 
 
@@ -952,6 +882,12 @@ export class InspectionService {
       );
 
 
+    /*
+     * Do not generate or invent the reference here.
+     *
+     * The NestJS backend owns the official secure reference.
+     */
+
     const requestPayload = {
 
       ...payload,
@@ -959,15 +895,21 @@ export class InspectionService {
       inspectionType,
 
       /*
-       * The backend can receive the status if supplied.
-       * If omitted, backend controls the initial status.
+       * Explicitly remove any reference that may have been
+       * supplied by an older page/version.
        */
+
+      reference:
+        undefined,
+
       ...(payload.status !== undefined
         ? {
+
             status:
               this.normalizeInspectionStatus(
                 payload.status
               )
+
           }
         : {})
 
@@ -991,9 +933,11 @@ export class InspectionService {
           return throwError(
             () => error
           );
+
         })
 
       );
+
   }
 
 
@@ -1008,6 +952,7 @@ export class InspectionService {
     return this.createInspection(
       payload
     );
+
   }
 
 
@@ -1040,9 +985,11 @@ export class InspectionService {
           return throwError(
             () => error
           );
+
         })
 
       );
+
   }
 
 
@@ -1070,22 +1017,16 @@ export class InspectionService {
           return throwError(
             () => error
           );
+
         })
 
       );
+
   }
 
 
   /* =======================================================
      UPLOAD PHOTOS
-     
-     Supports BOTH:
-     
-       uploadPhotos(files, inspectionId)
-
-     AND:
-
-       uploadPhotos(inspectionId, files)
      ======================================================= */
 
   uploadPhotos(
@@ -1110,7 +1051,8 @@ export class InspectionService {
 
     if (Array.isArray(first)) {
 
-      files = first;
+      files =
+        first;
 
       inspectionId =
         second as string;
@@ -1130,11 +1072,12 @@ export class InspectionService {
       files,
       inspectionId
     );
+
   }
 
 
   /* =======================================================
-     LEGACY UPLOAD METHOD
+     LEGACY UPLOAD
      ======================================================= */
 
   uploadPhotosLegacy(
@@ -1146,6 +1089,7 @@ export class InspectionService {
       files,
       inspectionId
     );
+
   }
 
 
@@ -1196,9 +1140,11 @@ export class InspectionService {
           return throwError(
             () => error
           );
+
         })
 
       );
+
   }
 
 
@@ -1215,6 +1161,7 @@ export class InspectionService {
       [file],
       inspectionId
     );
+
   }
 
 
@@ -1227,7 +1174,6 @@ export class InspectionService {
   ): string {
 
     if (!path) {
-
       return '';
     }
 
@@ -1239,16 +1185,19 @@ export class InspectionService {
     ) {
 
       return path;
+
     }
 
 
     if (path.startsWith('/')) {
 
       return `http://localhost:3000${path}`;
+
     }
 
 
     return `http://localhost:3000/${path}`;
+
   }
 
 
@@ -1277,9 +1226,11 @@ export class InspectionService {
           return throwError(
             () => error
           );
+
         })
 
       );
+
   }
 
 
@@ -1308,9 +1259,11 @@ export class InspectionService {
           return throwError(
             () => error
           );
+
         })
 
       );
+
   }
 
 
@@ -1328,6 +1281,7 @@ export class InspectionService {
           inspection
         )
     );
+
   }
 
 }

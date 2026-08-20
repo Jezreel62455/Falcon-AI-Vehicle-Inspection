@@ -1,15 +1,16 @@
 <div class="request-page">
 
-  <!-- ===================================================== -->
-  <!-- HEADER -->
-  <!-- ===================================================== -->
+
+  <!-- =====================================================
+       PAGE HEADER
+  ====================================================== -->
 
   <section class="page-header">
 
     <div>
 
       <span class="eyebrow">
-        FALCON AI PLATFORM
+        FALCON VEHICLE INSPECTION
       </span>
 
       <h1>
@@ -17,8 +18,7 @@
       </h1>
 
       <p>
-        Create a secure vehicle inspection link
-        for your customer.
+        Generate a secure inspection link for your customer.
       </p>
 
     </div>
@@ -30,15 +30,51 @@
       [disabled]="isSubmitting"
       (click)="cancel()"
     >
-      ← Back
+
+      <span>
+        ←
+      </span>
+
+      Dashboard
+
     </button>
 
   </section>
 
 
-  <!-- ===================================================== -->
-  <!-- SUCCESS -->
-  <!-- ===================================================== -->
+
+  <!-- =====================================================
+       ERROR
+  ====================================================== -->
+
+  <div
+    class="error-banner"
+    *ngIf="errorMessage"
+  >
+
+    <div class="error-icon">
+      !
+    </div>
+
+    <div>
+
+      <strong>
+        Request could not be created
+      </strong>
+
+      <p>
+        {{ errorMessage }}
+      </p>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       SUCCESS STATE
+  ====================================================== -->
 
   <section
     class="success-card"
@@ -49,63 +85,253 @@
       ✓
     </div>
 
+
     <div class="success-content">
 
       <span class="success-eyebrow">
-        REQUEST CREATED
+        REQUEST CREATED SUCCESSFULLY
       </span>
 
       <h2>
         Inspection request created successfully
       </h2>
 
-      <p>
-        Send the secure inspection link below
-        to the customer.
+      <p class="success-description">
+        Your inspection request has been created and is ready
+        for the customer. Copy the secure link below and send
+        it to the customer.
       </p>
 
 
-      <div class="reference-box">
+      <!-- ===============================================
+           REFERENCE
+      ================================================ -->
+
+      <div class="reference-card">
 
         <span>
-          Reference
+          INSPECTION REFERENCE
         </span>
 
         <strong>
           {{ generatedReference }}
         </strong>
 
+        <small>
+          Keep this reference for tracking this inspection.
+        </small>
+
       </div>
 
 
-      <div class="link-box">
+      <!-- ===============================================
+           CUSTOMER LINK
+      ================================================ -->
 
-        <label>
-          Customer Inspection Link
+      <div class="link-section">
+
+        <label for="customerInspectionLink">
+          SECURE CUSTOMER INSPECTION LINK
         </label>
 
-        <div class="link-row">
+
+        <div class="link-box">
 
           <input
+            id="customerInspectionLink"
             type="text"
-            readonly
             [value]="customerLink"
+            readonly
+            aria-label="Secure customer inspection link"
           />
+
 
           <button
             type="button"
             class="copy-button"
             (click)="copyLink()"
           >
-            Copy Link
+
+            <span *ngIf="!copied">
+              Copy Link
+            </span>
+
+            <span *ngIf="copied">
+              ✓ Copied
+            </span>
+
           </button>
+
+        </div>
+
+
+        <p>
+          Send this link directly to the customer. They can
+          open it on their phone, tablet or computer.
+        </p>
+
+      </div>
+
+
+
+      <!-- ===============================================
+           SECURITY NOTICE
+      ================================================ -->
+
+      <div class="security-notice">
+
+        <div class="security-icon">
+          🔒
+        </div>
+
+        <div>
+
+          <strong>
+            Secure inspection access
+          </strong>
+
+          <p>
+            This link is associated with the inspection
+            reference shown above. The customer's inspection
+            activity remains linked to this specific request.
+          </p>
 
         </div>
 
       </div>
 
 
+
+      <!-- ===============================================
+           WHAT HAPPENS NEXT
+      ================================================ -->
+
+      <div class="next-steps">
+
+        <div class="next-steps-header">
+
+          <span class="next-number">
+            01
+          </span>
+
+          <div>
+
+            <strong>
+              Send the secure link
+            </strong>
+
+            <p>
+              Copy the customer link and send it to the
+              customer using your normal communication channel.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="next-steps-header">
+
+          <span class="next-number">
+            02
+          </span>
+
+          <div>
+
+            <strong>
+              Customer completes inspection
+            </strong>
+
+            <p>
+              The customer provides their details, vehicle
+              information and required photographs.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="next-steps-header">
+
+          <span class="next-number">
+            03
+          </span>
+
+          <div>
+
+            <strong>
+              Inspection is submitted
+            </strong>
+
+            <p>
+              Their completed inspection remains linked to
+              {{ generatedReference }}.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="next-steps-header">
+
+          <span class="next-number">
+            04
+          </span>
+
+          <div>
+
+            <strong>
+              Review in Falcon
+            </strong>
+
+            <p>
+              The completed inspection becomes available in
+              your inspection history.
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- ===============================================
+           ACTIONS
+      ================================================ -->
+
       <div class="success-actions">
+
+        <button
+          type="button"
+          class="primary-button"
+          (click)="copyLink()"
+        >
+
+          <span *ngIf="!copied">
+            Copy Customer Link
+          </span>
+
+          <span *ngIf="copied">
+            ✓ Link Copied
+          </span>
+
+        </button>
+
+
+        <a
+          class="secondary-button open-link-button"
+          [href]="customerLink"
+          target="_blank"
+          rel="noopener noreferrer"
+          *ngIf="customerLink"
+        >
+          Open Customer Link
+        </a>
+
 
         <button
           type="button"
@@ -115,12 +341,13 @@
           Create Another Request
         </button>
 
+
         <button
           type="button"
-          class="primary-button"
+          class="text-button"
           (click)="cancel()"
         >
-          Back to Dashboard
+          Return to Dashboard
         </button>
 
       </div>
@@ -130,25 +357,26 @@
   </section>
 
 
-  <!-- ===================================================== -->
-  <!-- FORM -->
-  <!-- ===================================================== -->
+
+  <!-- =====================================================
+       CREATE FORM
+  ====================================================== -->
 
   <form
+    class="request-form"
     *ngIf="!requestCreated"
     [formGroup]="requestForm"
     (ngSubmit)="submitRequest($event)"
-    novalidate
   >
 
 
-    <!-- =================================================== -->
-    <!-- STEP 1 -->
-    <!-- =================================================== -->
+    <!-- ===================================================
+         INSPECTION TYPE
+    ==================================================== -->
 
     <section class="form-card">
 
-      <div class="step-header">
+      <div class="section-heading">
 
         <div class="step-number">
           01
@@ -161,8 +389,7 @@
           </h2>
 
           <p>
-            Select the type of inspection
-            the customer needs to complete.
+            Select the type of inspection the customer needs.
           </p>
 
         </div>
@@ -170,22 +397,24 @@
       </div>
 
 
-      <div class="inspection-types">
-
-
-        <!-- PRE-COVER -->
+      <div class="type-grid">
 
         <button
           type="button"
-          class="inspection-type"
+          class="type-option"
           [class.selected]="inspectionType === 'pre-cover'"
           [disabled]="isSubmitting"
           (click)="selectInspectionType('pre-cover')"
         >
 
-          <div class="type-icon">
-            🚗
+          <div class="type-radio">
+
+            <span
+              *ngIf="inspectionType === 'pre-cover'"
+            ></span>
+
           </div>
+
 
           <div class="type-content">
 
@@ -194,35 +423,35 @@
             </strong>
 
             <span>
-              Verify vehicle condition before
-              insurance cover begins.
+              Vehicle assessment before insurance cover begins.
             </span>
 
           </div>
 
-          <div
-            class="selected-indicator"
-            *ngIf="inspectionType === 'pre-cover'"
-          >
-            ✓
+
+          <div class="type-arrow">
+            →
           </div>
 
         </button>
 
 
-        <!-- ACCIDENT -->
-
         <button
           type="button"
-          class="inspection-type"
+          class="type-option"
           [class.selected]="inspectionType === 'accident'"
           [disabled]="isSubmitting"
           (click)="selectInspectionType('accident')"
         >
 
-          <div class="type-icon">
-            🚨
+          <div class="type-radio">
+
+            <span
+              *ngIf="inspectionType === 'accident'"
+            ></span>
+
           </div>
+
 
           <div class="type-content">
 
@@ -231,17 +460,14 @@
             </strong>
 
             <span>
-              Capture vehicle damage
-              after an accident.
+              Capture vehicle damage for an accident claim.
             </span>
 
           </div>
 
-          <div
-            class="selected-indicator"
-            *ngIf="inspectionType === 'accident'"
-          >
-            ✓
+
+          <div class="type-arrow">
+            →
           </div>
 
         </button>
@@ -251,13 +477,14 @@
     </section>
 
 
-    <!-- =================================================== -->
-    <!-- STEP 2 -->
-    <!-- =================================================== -->
+
+    <!-- ===================================================
+         CUSTOMER DETAILS
+    ==================================================== -->
 
     <section class="form-card">
 
-      <div class="step-header">
+      <div class="section-heading">
 
         <div class="step-number">
           02
@@ -270,7 +497,8 @@
           </h2>
 
           <p>
-            Enter the customer's contact information.
+            Optional. Add the customer's information now,
+            or let them complete it from the secure link.
           </p>
 
         </div>
@@ -278,10 +506,22 @@
       </div>
 
 
-      <div class="form-grid">
+      <div class="optional-note">
+
+        <span>
+          OPTIONAL
+        </span>
+
+        <p>
+          You can create the inspection without customer
+          details. The customer can provide their own
+          information when they open the link.
+        </p>
+
+      </div>
 
 
-        <!-- FIRST NAME -->
+      <div class="field-grid">
 
         <div class="field">
 
@@ -294,19 +534,11 @@
             type="text"
             formControlName="firstName"
             placeholder="Enter first name"
+            autocomplete="given-name"
           />
-
-          <small
-            class="field-error"
-            *ngIf="hasError('firstName')"
-          >
-            First name is required.
-          </small>
 
         </div>
 
-
-        <!-- SURNAME -->
 
         <div class="field">
 
@@ -319,19 +551,11 @@
             type="text"
             formControlName="surname"
             placeholder="Enter surname"
+            autocomplete="family-name"
           />
-
-          <small
-            class="field-error"
-            *ngIf="hasError('surname')"
-          >
-            Surname is required.
-          </small>
 
         </div>
 
-
-        <!-- EMAIL -->
 
         <div class="field">
 
@@ -344,19 +568,11 @@
             type="email"
             formControlName="email"
             placeholder="customer@example.com"
+            autocomplete="email"
           />
-
-          <small
-            class="field-error"
-            *ngIf="hasError('email')"
-          >
-            Enter a valid email address.
-          </small>
 
         </div>
 
-
-        <!-- PHONE -->
 
         <div class="field">
 
@@ -369,14 +585,8 @@
             type="tel"
             formControlName="phone"
             placeholder="Enter phone number"
+            autocomplete="tel"
           />
-
-          <small
-            class="field-error"
-            *ngIf="hasError('phone')"
-          >
-            Phone number is required.
-          </small>
 
         </div>
 
@@ -385,13 +595,14 @@
     </section>
 
 
-    <!-- =================================================== -->
-    <!-- STEP 3 -->
-    <!-- =================================================== -->
+
+    <!-- ===================================================
+         INSURANCE DETAILS
+    ==================================================== -->
 
     <section class="form-card">
 
-      <div class="step-header">
+      <div class="section-heading">
 
         <div class="step-number">
           03
@@ -404,7 +615,8 @@
           </h2>
 
           <p>
-            Enter the customer's policy information.
+            Optional. Add policy information if it is already
+            available.
           </p>
 
         </div>
@@ -412,10 +624,7 @@
       </div>
 
 
-      <div class="form-grid">
-
-
-        <!-- POLICY -->
+      <div class="field-grid">
 
         <div class="field">
 
@@ -430,17 +639,8 @@
             placeholder="Enter policy number"
           />
 
-          <small
-            class="field-error"
-            *ngIf="hasError('policyNumber')"
-          >
-            Policy number is required.
-          </small>
-
         </div>
 
-
-        <!-- INSURANCE COMPANY -->
 
         <div class="field">
 
@@ -455,26 +655,47 @@
             placeholder="Enter insurance company"
           />
 
-          <small
-            class="field-error"
-            *ngIf="hasError('insuranceCompany')"
-          >
-            Insurance company is required.
-          </small>
+        </div>
 
+      </div>
+
+    </section>
+
+
+
+    <!-- ===================================================
+         REQUEST SUMMARY
+    ==================================================== -->
+
+    <section class="summary-card">
+
+      <div class="summary-header">
+
+        <div>
+
+          <span>
+            REQUEST SUMMARY
+          </span>
+
+          <h2>
+            Ready to create
+          </h2>
+
+        </div>
+
+        <div class="summary-status">
+          READY
         </div>
 
       </div>
 
 
-      <!-- PREVIEW -->
-
-      <div class="request-preview">
+      <div class="summary-grid">
 
         <div>
 
           <span>
-            Inspection Type
+            INSPECTION TYPE
           </span>
 
           <strong>
@@ -487,11 +708,35 @@
         <div>
 
           <span>
-            Reference
+            REFERENCE
           </span>
 
           <strong>
-            Generated when request is created
+            Generated securely by server
+          </strong>
+
+        </div>
+
+
+        <div>
+
+          <span>
+            CUSTOMER
+          </span>
+
+          <strong>
+            {{
+              requestForm.controls.firstName.value ||
+              requestForm.controls.surname.value
+                ?
+                  (
+                    requestForm.controls.firstName.value +
+                    ' ' +
+                    requestForm.controls.surname.value
+                  ).trim()
+                :
+                  'Customer completes later'
+            }}
           </strong>
 
         </div>
@@ -501,31 +746,12 @@
     </section>
 
 
-    <!-- =================================================== -->
-    <!-- ERROR -->
-    <!-- =================================================== -->
 
-    <div
-      class="error-card"
-      *ngIf="errorMessage"
-    >
+    <!-- ===================================================
+         ACTIONS
+    ==================================================== -->
 
-      <strong>
-        Unable to create request
-      </strong>
-
-      <span>
-        {{ errorMessage }}
-      </span>
-
-    </div>
-
-
-    <!-- =================================================== -->
-    <!-- ACTIONS -->
-    <!-- =================================================== -->
-
-    <section class="form-actions">
+    <div class="form-actions">
 
       <button
         type="button"
@@ -539,13 +765,20 @@
 
       <button
         type="submit"
-        class="primary-button"
+        class="primary-button create-button"
         [disabled]="isSubmitting"
       >
 
+        <span
+          class="spinner"
+          *ngIf="isSubmitting"
+        ></span>
+
+
         <span *ngIf="!isSubmitting">
-          Create Request
+          Create Inspection Request
         </span>
+
 
         <span *ngIf="isSubmitting">
           Creating Request...
@@ -553,7 +786,7 @@
 
       </button>
 
-    </section>
+    </div>
 
   </form>
 
