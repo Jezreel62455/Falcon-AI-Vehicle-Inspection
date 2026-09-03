@@ -1,22 +1,32 @@
 import {
   Injectable,
-  NotFoundException
+  NotFoundException,
+  Logger,
 } from '@nestjs/common';
 
 import {
-  randomBytes
+  randomBytes,
 } from 'crypto';
 
 import {
-  PrismaService
+  PrismaService,
 } from '../../prisma/prisma.service';
+
+import {
+  BedrockService,
+} from './bedrock.service';
 
 
 @Injectable()
 export class InspectionsService {
 
+  private readonly logger =
+    new Logger(InspectionsService.name);
+
+
   constructor(
-    private readonly prisma: PrismaService
+    private readonly prisma: PrismaService,
+    private readonly bedrockService: BedrockService,
   ) {}
 
 
@@ -25,30 +35,21 @@ export class InspectionsService {
   // =========================================================
 
   async createInspection(
-    inspectionData: any
+    inspectionData: any,
   ) {
 
-    console.log('');
-    console.log(
-      '======================================'
-    );
-    console.log(
-      'CREATE INSPECTION REQUEST'
-    );
-    console.log(
-      '======================================'
-    );
-    console.log(
-      'Incoming data:',
-      inspectionData
+    this.logger.log(
+      '======================================',
     );
 
+    this.logger.log(
+      'CREATE INSPECTION REQUEST',
+    );
 
-    /*
-     * -------------------------------------------------------
-     * INSPECTION TYPE
-     * -------------------------------------------------------
-     */
+    this.logger.log(
+      'Incoming inspection data received',
+    );
+
 
     const inspectionType =
       inspectionData?.inspectionType === 'accident'
@@ -56,39 +57,25 @@ export class InspectionsService {
         : 'pre-cover';
 
 
-    /*
-     * -------------------------------------------------------
-     * STATUS
-     * -------------------------------------------------------
-     */
-
     const status =
       String(
-        inspectionData?.status ?? 'pending'
+        inspectionData?.status ?? 'pending',
       );
 
-
-    /*
-     * -------------------------------------------------------
-     * SECURE REFERENCE
-     * -------------------------------------------------------
-     */
 
     const reference =
       await this.generateUniqueReference();
 
 
-    /*
-     * -------------------------------------------------------
-     * CUSTOMER
-     * -------------------------------------------------------
-     */
+    // =======================================================
+    // CUSTOMER
+    // =======================================================
 
     const customerFirstName =
       String(
         inspectionData?.customerFirstName ??
         inspectionData?.customer?.firstName ??
-        ''
+        '',
       ).trim();
 
 
@@ -97,7 +84,7 @@ export class InspectionsService {
         inspectionData?.customerSurname ??
         inspectionData?.customer?.surname ??
         inspectionData?.customer?.lastName ??
-        ''
+        '',
       ).trim();
 
 
@@ -105,7 +92,7 @@ export class InspectionsService {
       String(
         inspectionData?.customerEmail ??
         inspectionData?.customer?.email ??
-        ''
+        '',
       ).trim();
 
 
@@ -113,21 +100,16 @@ export class InspectionsService {
       String(
         inspectionData?.customerPhone ??
         inspectionData?.customer?.phone ??
-        ''
+        '',
       ).trim();
 
 
-    /*
-     * -------------------------------------------------------
-     * POLICY
-     * -------------------------------------------------------
-     */
+    // =======================================================
+    // POLICY
+    // =======================================================
 
-    let policyNumber =
-      '';
-
-    let insuranceCompany =
-      '';
+    let policyNumber = '';
+    let insuranceCompany = '';
 
 
     if (
@@ -139,7 +121,7 @@ export class InspectionsService {
         String(
           inspectionData.policyNumber.policy ??
           inspectionData.policyNumber.policyNumber ??
-          ''
+          '',
         ).trim();
 
 
@@ -148,7 +130,7 @@ export class InspectionsService {
           inspectionData.policyNumber.company ??
           inspectionData.policyNumber.insuranceCompany ??
           inspectionData?.insuranceCompany ??
-          ''
+          '',
         ).trim();
 
     } else {
@@ -157,7 +139,7 @@ export class InspectionsService {
         String(
           inspectionData?.policyNumber ??
           inspectionData?.policy?.policyNumber ??
-          ''
+          '',
         ).trim();
 
 
@@ -165,23 +147,20 @@ export class InspectionsService {
         String(
           inspectionData?.insuranceCompany ??
           inspectionData?.policy?.insuranceCompany ??
-          ''
+          '',
         ).trim();
-
     }
 
 
-    /*
-     * -------------------------------------------------------
-     * VEHICLE
-     * -------------------------------------------------------
-     */
+    // =======================================================
+    // VEHICLE
+    // =======================================================
 
     const registration =
       String(
         inspectionData?.registration ??
         inspectionData?.vehicle?.registration ??
-        ''
+        '',
       ).trim();
 
 
@@ -189,7 +168,7 @@ export class InspectionsService {
       String(
         inspectionData?.make ??
         inspectionData?.vehicle?.make ??
-        ''
+        '',
       ).trim();
 
 
@@ -197,7 +176,7 @@ export class InspectionsService {
       String(
         inspectionData?.model ??
         inspectionData?.vehicle?.model ??
-        ''
+        '',
       ).trim();
 
 
@@ -211,7 +190,7 @@ export class InspectionsService {
       String(
         inspectionData?.colour ??
         inspectionData?.vehicle?.colour ??
-        ''
+        '',
       ).trim();
 
 
@@ -221,15 +200,13 @@ export class InspectionsService {
       '';
 
 
-    /*
-     * -------------------------------------------------------
-     * PHOTOS
-     * -------------------------------------------------------
-     */
+    // =======================================================
+    // PHOTOS
+    // =======================================================
 
     const photos =
       Array.isArray(
-        inspectionData?.photos
+        inspectionData?.photos,
       )
         ? inspectionData.photos
         : [];
@@ -237,67 +214,19 @@ export class InspectionsService {
 
     const damagePhotos =
       Array.isArray(
-        inspectionData?.damagePhotos
+        inspectionData?.damagePhotos,
       )
         ? inspectionData.damagePhotos
         : Array.isArray(
-            inspectionData?.accidentPhotos
+            inspectionData?.accidentPhotos,
           )
           ? inspectionData.accidentPhotos
           : [];
 
 
-    console.log('');
-    console.log(
-      'NORMALIZED DATA'
-    );
-
-    console.log({
-
-      reference,
-
-      inspectionType,
-
-      status,
-
-      customerFirstName,
-
-      customerSurname,
-
-      customerEmail,
-
-      customerPhone,
-
-      policyNumber,
-
-      insuranceCompany,
-
-      registration,
-
-      make,
-
-      model,
-
-      year,
-
-      colour,
-
-      mileage,
-
-      photosCount:
-        photos.length,
-
-      damagePhotosCount:
-        damagePhotos.length
-
-    });
-
-
-    /*
-     * -------------------------------------------------------
-     * CREATE DATABASE RECORD
-     * -------------------------------------------------------
-     */
+    // =======================================================
+    // CREATE DATABASE RECORD
+    // =======================================================
 
     const inspection =
       await this.prisma.inspection.create({
@@ -371,18 +300,14 @@ export class InspectionsService {
             null,
 
           processedAt:
-            null
-
-        }
-
+            null,
+        },
       });
 
 
-    /*
-     * -------------------------------------------------------
-     * SECURE CUSTOMER LINK
-     * -------------------------------------------------------
-     */
+    // =======================================================
+    // SECURE CUSTOMER LINK
+    // =======================================================
 
     const frontendUrl =
       (
@@ -390,66 +315,41 @@ export class InspectionsService {
         'http://localhost:4200'
       ).replace(
         /\/+$/,
-        ''
+        '',
       );
 
 
     const secureLink =
       `${frontendUrl}` +
       `/customer/start/` +
-      `${inspection.inspectionType}/` +
+      `${inspectionType}/` +
       `${encodeURIComponent(
         String(
-          inspection.reference ?? ''
-        )
+          inspection.reference ?? '',
+        ),
       )}`;
 
 
-    console.log('');
-    console.log(
-      '======================================'
+    this.logger.log(
+      `Inspection created successfully: ${inspection.id}`,
     );
 
-    console.log(
-      'INSPECTION REQUEST CREATED'
+    this.logger.log(
+      `Reference: ${inspection.reference}`,
     );
-
-    console.log(
-      '======================================'
-    );
-
-    console.log({
-
-      id:
-        inspection.id,
-
-      reference:
-        inspection.reference,
-
-      inspectionType:
-        inspection.inspectionType,
-
-      status:
-        inspection.status,
-
-      secureLink
-
-    });
 
 
     return {
 
       ...this.formatInspection(
-        inspection
+        inspection,
       ),
 
       secureLink,
 
       inspectionUrl:
-        secureLink
-
+        secureLink,
     };
-
   }
 
 
@@ -479,25 +379,21 @@ export class InspectionsService {
         await this.prisma.inspection.findUnique({
 
           where: {
-            reference
-          }
+            reference,
+          },
 
         });
 
 
       if (!existing) {
-
         return reference;
-
       }
-
     }
 
 
     throw new Error(
-      'Unable to generate a unique inspection reference. Please try again.'
+      'Unable to generate a unique inspection reference. Please try again.',
     );
-
   }
 
 
@@ -511,8 +407,8 @@ export class InspectionsService {
       await this.prisma.inspection.findMany({
 
         orderBy: {
-          createdAt: 'desc'
-        }
+          createdAt: 'desc',
+        },
 
       });
 
@@ -520,10 +416,9 @@ export class InspectionsService {
     return inspections.map(
       inspection =>
         this.formatInspection(
-          inspection
-        )
+          inspection,
+        ),
     );
-
   }
 
 
@@ -532,30 +427,27 @@ export class InspectionsService {
   // =========================================================
 
   async getInspectionById(
-    id: string
+    id: string,
   ) {
 
     const inspection =
       await this.prisma.inspection.findUnique({
 
         where: {
-          id
-        }
+          id,
+        },
 
       });
 
 
     if (!inspection) {
-
       return null;
-
     }
 
 
     return this.formatInspection(
-      inspection
+      inspection,
     );
-
   }
 
 
@@ -564,19 +456,17 @@ export class InspectionsService {
   // =========================================================
 
   async getInspectionByReference(
-    reference: string
+    reference: string,
   ) {
 
     const cleanReference =
       String(
-        reference ?? ''
+        reference ?? '',
       ).trim();
 
 
     if (!cleanReference) {
-
       return null;
-
     }
 
 
@@ -584,24 +474,541 @@ export class InspectionsService {
       await this.prisma.inspection.findUnique({
 
         where: {
-          reference:
-            cleanReference
-        }
+          reference: cleanReference,
+        },
+
+      });
+
+
+    if (!inspection) {
+      return null;
+    }
+
+
+    return this.formatInspection(
+      inspection,
+    );
+  }
+
+
+  // =========================================================
+  // ANALYSE INSPECTION WITH AMAZON BEDROCK
+  // =========================================================
+
+  async analyseInspection(
+    id: string,
+  ) {
+
+    this.logger.log(
+      '======================================',
+    );
+
+    this.logger.log(
+      'STARTING AI INSPECTION ANALYSIS',
+    );
+
+    this.logger.log(
+      `Inspection ID: ${id}`,
+    );
+
+
+    // =======================================================
+    // FIND INSPECTION
+    // =======================================================
+
+    const inspection =
+      await this.prisma.inspection.findUnique({
+
+        where: {
+          id,
+        },
 
       });
 
 
     if (!inspection) {
 
-      return null;
-
+      throw new NotFoundException(
+        'Inspection not found',
+      );
     }
 
 
-    return this.formatInspection(
-      inspection
-    );
+    // =======================================================
+    // MARK AS PROCESSING
+    // =======================================================
 
+    await this.prisma.inspection.update({
+
+      where: {
+        id,
+      },
+
+      data: {
+
+        aiStatus:
+          'PROCESSING',
+
+        aiProvider:
+          'Amazon Bedrock',
+      },
+
+    });
+
+
+    try {
+
+      // =====================================================
+      // PREPARE DATA FOR BEDROCK
+      // =====================================================
+
+      const inspectionData = {
+
+        inspectionId:
+          inspection.id,
+
+        reference:
+          inspection.reference,
+
+        inspectionType:
+          inspection.inspectionType,
+
+        status:
+          inspection.status,
+
+
+        customer: {
+
+          firstName:
+            inspection.customerFirstName,
+
+          surname:
+            inspection.customerSurname,
+
+          email:
+            inspection.customerEmail,
+
+          phone:
+            inspection.customerPhone,
+        },
+
+
+        policy: {
+
+          policyNumber:
+            inspection.policyNumber,
+
+          insuranceCompany:
+            inspection.insuranceCompany,
+        },
+
+
+        vehicle: {
+
+          registration:
+            inspection.registration,
+
+          make:
+            inspection.make,
+
+          model:
+            inspection.model,
+
+          year:
+            inspection.year,
+
+          colour:
+            inspection.colour,
+
+          mileage:
+            inspection.mileage,
+        },
+
+
+        photos:
+          Array.isArray(
+            inspection.photos,
+          )
+            ? inspection.photos
+            : [],
+
+
+        damagePhotos:
+          Array.isArray(
+            inspection.damagePhotos,
+          )
+            ? inspection.damagePhotos
+            : [],
+      };
+
+
+      // =====================================================
+      // CALL AMAZON BEDROCK
+      // =====================================================
+
+      const aiResponse =
+        await this.bedrockService
+          .analyseInspection(
+            inspectionData,
+          );
+
+
+      this.logger.log(
+        'Bedrock returned successfully',
+      );
+
+
+      this.logger.log(
+        `AI response length: ${aiResponse.length}`,
+      );
+
+
+      // =====================================================
+      // PARSE AI RESPONSE
+      // =====================================================
+
+      const parsed =
+        this.parseAiResponse(
+          aiResponse,
+        );
+
+
+      // =====================================================
+      // SAVE AI RESULT
+      // =====================================================
+
+      const updatedInspection =
+        await this.prisma.inspection.update({
+
+          where: {
+            id,
+          },
+
+          data: {
+
+            aiStatus:
+              'COMPLETED',
+
+            aiScore:
+              parsed.aiScore,
+
+            damageDetected:
+              parsed.damageDetected,
+
+            damageSummary:
+              parsed.damageSummary,
+
+            vinExtracted:
+              parsed.vinExtracted,
+
+            odometerReading:
+              parsed.odometerReading,
+
+            aiProvider:
+              'Amazon Bedrock',
+
+            processedAt:
+              new Date(),
+          },
+
+        });
+
+
+      this.logger.log(
+        '======================================',
+      );
+
+      this.logger.log(
+        'AI INSPECTION ANALYSIS COMPLETED',
+      );
+
+      this.logger.log(
+        `Inspection ID: ${id}`,
+      );
+
+      this.logger.log(
+        `AI Score: ${parsed.aiScore}`,
+      );
+
+      this.logger.log(
+        `Damage detected: ${parsed.damageDetected}`,
+      );
+
+      this.logger.log(
+        '======================================',
+      );
+
+
+      return {
+
+        ...this.formatInspection(
+          updatedInspection,
+        ),
+
+        aiAnalysis:
+          parsed.rawResponse,
+      };
+
+    } catch (error) {
+
+      this.logger.error(
+        '======================================',
+      );
+
+      this.logger.error(
+        'AI INSPECTION ANALYSIS FAILED',
+      );
+
+      this.logger.error(
+        error,
+      );
+
+      this.logger.error(
+        '======================================',
+      );
+
+
+      await this.prisma.inspection.update({
+
+        where: {
+          id,
+        },
+
+        data: {
+
+          aiStatus:
+            'FAILED',
+
+          aiProvider:
+            'Amazon Bedrock',
+
+          processedAt:
+            new Date(),
+        },
+
+      });
+
+
+      throw error;
+    }
+  }
+
+
+  // =========================================================
+  // PARSE AI RESPONSE
+  // =========================================================
+
+  private parseAiResponse(
+    response: string,
+  ) {
+
+    const rawResponse =
+      String(
+        response ?? '',
+      ).trim();
+
+
+    let parsed: any = null;
+
+
+    // =======================================================
+    // TRY DIRECT JSON
+    // =======================================================
+
+    try {
+
+      parsed =
+        JSON.parse(
+          rawResponse,
+        );
+
+    } catch {
+
+      parsed = null;
+    }
+
+
+    // =======================================================
+    // TRY JSON INSIDE MARKDOWN CODE BLOCK
+    // =======================================================
+
+    if (!parsed) {
+
+      const jsonMatch =
+        rawResponse.match(
+          /\{[\s\S]*\}/,
+        );
+
+
+      if (jsonMatch) {
+
+        try {
+
+          parsed =
+            JSON.parse(
+              jsonMatch[0],
+            );
+
+        } catch {
+
+          parsed = null;
+        }
+      }
+    }
+
+
+    // =======================================================
+    // FALLBACK
+    // =======================================================
+
+    if (!parsed) {
+
+      return {
+
+        aiScore:
+          null,
+
+        damageDetected:
+          false,
+
+        damageSummary:
+          rawResponse,
+
+        vinExtracted:
+          null,
+
+        odometerReading:
+          null,
+
+        rawResponse,
+      };
+    }
+
+
+    // =======================================================
+    // NORMALISE SCORE
+    // =======================================================
+
+    let aiScore:
+      number | null =
+        null;
+
+
+    if (
+      typeof parsed.aiScore === 'number'
+    ) {
+
+      aiScore =
+        Math.max(
+          0,
+          Math.min(
+            100,
+            parsed.aiScore,
+          ),
+        );
+
+    } else if (
+      typeof parsed.score === 'number'
+    ) {
+
+      aiScore =
+        Math.max(
+          0,
+          Math.min(
+            100,
+            parsed.score,
+          ),
+        );
+    }
+
+
+    // =======================================================
+    // NORMALISE DAMAGE
+    // =======================================================
+
+    let damageDetected =
+      false;
+
+
+    if (
+      typeof parsed.damageDetected ===
+      'boolean'
+    ) {
+
+      damageDetected =
+        parsed.damageDetected;
+
+    } else if (
+      typeof parsed.damageDetected ===
+      'string'
+    ) {
+
+      damageDetected =
+        parsed.damageDetected
+          .toLowerCase()
+          .trim() === 'true';
+    }
+
+
+    // =======================================================
+    // DAMAGE SUMMARY
+    // =======================================================
+
+    const damageSummary =
+      String(
+        parsed.damageSummary ??
+        parsed.summary ??
+        parsed.overallCondition ??
+        '',
+      ).trim();
+
+
+    // =======================================================
+    // VIN
+    // =======================================================
+
+    const vinExtracted =
+      parsed.vinExtracted ??
+      parsed.vin ??
+      null;
+
+
+    // =======================================================
+    // ODOMETER
+    // =======================================================
+
+    const odometerReading =
+      parsed.odometerReading ??
+      parsed.odometer ??
+      null;
+
+
+    return {
+
+      aiScore,
+
+      damageDetected,
+
+      damageSummary:
+        damageSummary ||
+        rawResponse,
+
+      vinExtracted:
+        vinExtracted
+          ? String(
+              vinExtracted,
+            )
+          : null,
+
+      odometerReading:
+        odometerReading
+          ? String(
+              odometerReading,
+            )
+          : null,
+
+      rawResponse,
+    };
   }
 
 
@@ -611,26 +1018,11 @@ export class InspectionsService {
 
   async updateInspection(
     id: string,
-    inspectionData: any
+    inspectionData: any,
   ) {
 
-    console.log('');
-    console.log(
-      '======================================'
-    );
-    console.log(
-      'UPDATE INSPECTION'
-    );
-    console.log(
-      '======================================'
-    );
-    console.log(
-      'ID:',
-      id
-    );
-    console.log(
-      'Data:',
-      inspectionData
+    this.logger.log(
+      `Updating inspection: ${id}`,
     );
 
 
@@ -638,8 +1030,8 @@ export class InspectionsService {
       await this.prisma.inspection.findUnique({
 
         where: {
-          id
-        }
+          id,
+        },
 
       });
 
@@ -647,9 +1039,8 @@ export class InspectionsService {
     if (!existing) {
 
       throw new NotFoundException(
-        'Inspection not found'
+        'Inspection not found',
       );
-
     }
 
 
@@ -657,11 +1048,9 @@ export class InspectionsService {
       {};
 
 
-    /*
-     * -------------------------------------------------------
-     * BASIC
-     * -------------------------------------------------------
-     */
+    // =======================================================
+    // BASIC
+    // =======================================================
 
     if (
       inspectionData?.reference !==
@@ -670,9 +1059,8 @@ export class InspectionsService {
 
       updateData.reference =
         String(
-          inspectionData.reference
+          inspectionData.reference,
         ).trim();
-
     }
 
 
@@ -683,9 +1071,8 @@ export class InspectionsService {
 
       updateData.status =
         String(
-          inspectionData.status
+          inspectionData.status,
         );
-
     }
 
 
@@ -699,15 +1086,12 @@ export class InspectionsService {
         'accident'
           ? 'accident'
           : 'pre-cover';
-
     }
 
 
-    /*
-     * -------------------------------------------------------
-     * CUSTOMER
-     * -------------------------------------------------------
-     */
+    // =======================================================
+    // CUSTOMER OBJECT
+    // =======================================================
 
     if (
       inspectionData?.customer
@@ -720,9 +1104,8 @@ export class InspectionsService {
 
         updateData.customerFirstName =
           String(
-            inspectionData.customer.firstName
+            inspectionData.customer.firstName,
           ).trim();
-
       }
 
 
@@ -737,9 +1120,8 @@ export class InspectionsService {
           String(
             inspectionData.customer.lastName ??
             inspectionData.customer.surname ??
-            ''
+            '',
           ).trim();
-
       }
 
 
@@ -750,9 +1132,8 @@ export class InspectionsService {
 
         updateData.customerEmail =
           String(
-            inspectionData.customer.email
+            inspectionData.customer.email,
           ).trim();
-
       }
 
 
@@ -763,13 +1144,15 @@ export class InspectionsService {
 
         updateData.customerPhone =
           String(
-            inspectionData.customer.phone
+            inspectionData.customer.phone,
           ).trim();
-
       }
-
     }
 
+
+    // =======================================================
+    // DIRECT CUSTOMER FIELDS
+    // =======================================================
 
     if (
       inspectionData?.customerFirstName !==
@@ -778,9 +1161,8 @@ export class InspectionsService {
 
       updateData.customerFirstName =
         String(
-          inspectionData.customerFirstName
+          inspectionData.customerFirstName,
         ).trim();
-
     }
 
 
@@ -791,9 +1173,8 @@ export class InspectionsService {
 
       updateData.customerSurname =
         String(
-          inspectionData.customerSurname
+          inspectionData.customerSurname,
         ).trim();
-
     }
 
 
@@ -804,9 +1185,8 @@ export class InspectionsService {
 
       updateData.customerEmail =
         String(
-          inspectionData.customerEmail
+          inspectionData.customerEmail,
         ).trim();
-
     }
 
 
@@ -817,17 +1197,14 @@ export class InspectionsService {
 
       updateData.customerPhone =
         String(
-          inspectionData.customerPhone
+          inspectionData.customerPhone,
         ).trim();
-
     }
 
 
-    /*
-     * -------------------------------------------------------
-     * POLICY
-     * -------------------------------------------------------
-     */
+    // =======================================================
+    // POLICY OBJECT
+    // =======================================================
 
     if (
       inspectionData?.policy
@@ -840,9 +1217,8 @@ export class InspectionsService {
 
         updateData.policyNumber =
           String(
-            inspectionData.policy.policyNumber
+            inspectionData.policy.policyNumber,
           ).trim();
-
       }
 
 
@@ -853,13 +1229,15 @@ export class InspectionsService {
 
         updateData.insuranceCompany =
           String(
-            inspectionData.policy.insuranceCompany
+            inspectionData.policy.insuranceCompany,
           ).trim();
-
       }
-
     }
 
+
+    // =======================================================
+    // DIRECT POLICY FIELDS
+    // =======================================================
 
     if (
       inspectionData?.policyNumber !==
@@ -873,13 +1251,12 @@ export class InspectionsService {
           ? String(
               inspectionData.policyNumber.policy ??
               inspectionData.policyNumber.policyNumber ??
-              ''
+              '',
             ).trim()
 
           : String(
-              inspectionData.policyNumber
+              inspectionData.policyNumber,
             ).trim();
-
     }
 
 
@@ -890,17 +1267,14 @@ export class InspectionsService {
 
       updateData.insuranceCompany =
         String(
-          inspectionData.insuranceCompany
+          inspectionData.insuranceCompany,
         ).trim();
-
     }
 
 
-    /*
-     * -------------------------------------------------------
-     * VEHICLE
-     * -------------------------------------------------------
-     */
+    // =======================================================
+    // VEHICLE OBJECT
+    // =======================================================
 
     if (
       inspectionData?.vehicle
@@ -913,9 +1287,8 @@ export class InspectionsService {
 
         updateData.registration =
           String(
-            inspectionData.vehicle.registration
+            inspectionData.vehicle.registration,
           ).trim();
-
       }
 
 
@@ -926,9 +1299,8 @@ export class InspectionsService {
 
         updateData.make =
           String(
-            inspectionData.vehicle.make
+            inspectionData.vehicle.make,
           ).trim();
-
       }
 
 
@@ -939,9 +1311,8 @@ export class InspectionsService {
 
         updateData.model =
           String(
-            inspectionData.vehicle.model
+            inspectionData.vehicle.model,
           ).trim();
-
       }
 
 
@@ -953,10 +1324,9 @@ export class InspectionsService {
         updateData.year =
           inspectionData.vehicle.year
             ? String(
-                inspectionData.vehicle.year
+                inspectionData.vehicle.year,
               )
             : '';
-
       }
 
 
@@ -967,9 +1337,8 @@ export class InspectionsService {
 
         updateData.colour =
           String(
-            inspectionData.vehicle.colour
+            inspectionData.vehicle.colour,
           ).trim();
-
       }
 
 
@@ -983,19 +1352,19 @@ export class InspectionsService {
             null &&
           inspectionData.vehicle.mileage !==
             ''
+
             ? String(
-                inspectionData.vehicle.mileage
+                inspectionData.vehicle.mileage,
               )
+
             : '';
-
       }
-
     }
 
 
-    /*
-     * Direct vehicle fields.
-     */
+    // =======================================================
+    // DIRECT VEHICLE FIELDS
+    // =======================================================
 
     if (
       inspectionData?.registration !==
@@ -1004,9 +1373,8 @@ export class InspectionsService {
 
       updateData.registration =
         String(
-          inspectionData.registration
+          inspectionData.registration,
         ).trim();
-
     }
 
 
@@ -1017,9 +1385,8 @@ export class InspectionsService {
 
       updateData.make =
         String(
-          inspectionData.make
+          inspectionData.make,
         ).trim();
-
     }
 
 
@@ -1030,9 +1397,8 @@ export class InspectionsService {
 
       updateData.model =
         String(
-          inspectionData.model
+          inspectionData.model,
         ).trim();
-
     }
 
 
@@ -1044,10 +1410,9 @@ export class InspectionsService {
       updateData.year =
         inspectionData.year
           ? String(
-              inspectionData.year
+              inspectionData.year,
             )
           : '';
-
     }
 
 
@@ -1058,9 +1423,8 @@ export class InspectionsService {
 
       updateData.colour =
         String(
-          inspectionData.colour
+          inspectionData.colour,
         ).trim();
-
     }
 
 
@@ -1074,19 +1438,18 @@ export class InspectionsService {
           null &&
         inspectionData.mileage !==
           ''
-          ? String(
-              inspectionData.mileage
-            )
-          : '';
 
+          ? String(
+              inspectionData.mileage,
+            )
+
+          : '';
     }
 
 
-    /*
-     * -------------------------------------------------------
-     * PHOTOS
-     * -------------------------------------------------------
-     */
+    // =======================================================
+    // PHOTOS
+    // =======================================================
 
     if (
       inspectionData?.photos !==
@@ -1095,11 +1458,10 @@ export class InspectionsService {
 
       updateData.photos =
         Array.isArray(
-          inspectionData.photos
+          inspectionData.photos,
         )
           ? inspectionData.photos
           : [];
-
     }
 
 
@@ -1110,11 +1472,10 @@ export class InspectionsService {
 
       updateData.damagePhotos =
         Array.isArray(
-          inspectionData.accidentPhotos
+          inspectionData.accidentPhotos,
         )
           ? inspectionData.accidentPhotos
           : [];
-
     }
 
 
@@ -1125,64 +1486,237 @@ export class InspectionsService {
 
       updateData.damagePhotos =
         Array.isArray(
-          inspectionData.damagePhotos
+          inspectionData.damagePhotos,
         )
           ? inspectionData.damagePhotos
           : [];
-
     }
 
 
-    /*
-     * -------------------------------------------------------
-     * SUBMITTED DATE
-     * -------------------------------------------------------
-     */
+    // =======================================================
+    // AI FIELDS
+    // =======================================================
 
     if (
-      inspectionData?.submittedAt !==
+      inspectionData?.aiStatus !==
       undefined
     ) {
 
-      updateData.submittedAt =
-        inspectionData.submittedAt
-          ? new Date(
-              inspectionData.submittedAt
-            )
-          : null;
-
+      updateData.aiStatus =
+        String(
+          inspectionData.aiStatus,
+        );
     }
 
 
-    /*
-     * -------------------------------------------------------
-     * UPDATE DATABASE
-     * -------------------------------------------------------
-     */
+    if (
+      inspectionData?.aiScore !==
+      undefined
+    ) {
+
+      updateData.aiScore =
+        inspectionData.aiScore ===
+        null
+
+          ? null
+
+          : Number(
+              inspectionData.aiScore,
+            );
+    }
+
+
+    if (
+      inspectionData?.damageDetected !==
+      undefined
+    ) {
+
+      updateData.damageDetected =
+        Boolean(
+          inspectionData.damageDetected,
+        );
+    }
+
+
+    if (
+      inspectionData?.damageSummary !==
+      undefined
+    ) {
+
+      updateData.damageSummary =
+        inspectionData.damageSummary
+          ? String(
+              inspectionData.damageSummary,
+            )
+          : null;
+    }
+
+
+    if (
+      inspectionData?.vinExtracted !==
+      undefined
+    ) {
+
+      updateData.vinExtracted =
+        inspectionData.vinExtracted
+          ? String(
+              inspectionData.vinExtracted,
+            )
+          : null;
+    }
+
+
+    if (
+      inspectionData?.odometerReading !==
+      undefined
+    ) {
+
+      updateData.odometerReading =
+        inspectionData.odometerReading
+          ? String(
+              inspectionData.odometerReading,
+            )
+          : null;
+    }
+
+
+    if (
+      inspectionData?.aiProvider !==
+      undefined
+    ) {
+
+      updateData.aiProvider =
+        inspectionData.aiProvider
+          ? String(
+              inspectionData.aiProvider,
+            )
+          : null;
+    }
+
+
+    if (
+      inspectionData?.processedAt !==
+      undefined
+    ) {
+
+      updateData.processedAt =
+        inspectionData.processedAt
+          ? new Date(
+              inspectionData.processedAt,
+            )
+          : null;
+    }
+
+
+    // =======================================================
+    // DATABASE UPDATE
+    // =======================================================
 
     const inspection =
       await this.prisma.inspection.update({
 
         where: {
-          id
+          id,
         },
 
         data:
-          updateData
+          updateData,
 
       });
 
 
-    console.log(
-      'INSPECTION UPDATED:',
-      inspection.id
+    this.logger.log(
+      `Inspection updated: ${inspection.id}`,
     );
 
 
     return this.formatInspection(
-      inspection
+      inspection,
+    );
+  }
+
+
+  // =========================================================
+  // SUBMIT INSPECTION
+  // =========================================================
+
+  async submitInspection(
+    reference: string,
+  ) {
+
+    const cleanReference =
+      String(
+        reference ?? '',
+      ).trim();
+
+
+    if (!cleanReference) {
+
+      throw new NotFoundException(
+        'Inspection reference is required',
+      );
+    }
+
+
+    const existing =
+      await this.prisma.inspection.findUnique({
+
+        where: {
+          reference:
+            cleanReference,
+        },
+
+      });
+
+
+    if (!existing) {
+
+      throw new NotFoundException(
+        'Inspection not found',
+      );
+    }
+
+
+    this.logger.log(
+      `Submitting inspection: ${existing.id}`,
     );
 
+
+    this.logger.log(
+      `Reference: ${existing.reference}`,
+    );
+
+
+    const inspection =
+      await this.prisma.inspection.update({
+
+        where: {
+
+          id:
+            existing.id,
+
+        },
+
+        data: {
+
+          status:
+            'submitted',
+
+          submittedAt:
+            new Date(),
+        },
+
+      });
+
+
+    this.logger.log(
+      `Inspection submitted successfully: ${inspection.id}`,
+    );
+
+
+    return this.formatInspection(
+      inspection,
+    );
   }
 
 
@@ -1191,15 +1725,15 @@ export class InspectionsService {
   // =========================================================
 
   async deleteInspection(
-    id: string
+    id: string,
   ) {
 
     const existing =
       await this.prisma.inspection.findUnique({
 
         where: {
-          id
-        }
+          id,
+        },
 
       });
 
@@ -1207,17 +1741,16 @@ export class InspectionsService {
     if (!existing) {
 
       throw new NotFoundException(
-        'Inspection not found'
+        'Inspection not found',
       );
-
     }
 
 
     await this.prisma.inspection.delete({
 
       where: {
-        id
-      }
+        id,
+      },
 
     });
 
@@ -1227,10 +1760,8 @@ export class InspectionsService {
       message:
         'Inspection deleted successfully',
 
-      id
-
+      id,
     };
-
   }
 
 
@@ -1239,14 +1770,8 @@ export class InspectionsService {
   // =========================================================
 
   private formatInspection(
-    inspection: any
+    inspection: any,
   ) {
-
-    /*
-     * -------------------------------------------------------
-     * FRONTEND URL
-     * -------------------------------------------------------
-     */
 
     const frontendUrl =
       (
@@ -1254,15 +1779,9 @@ export class InspectionsService {
         'http://localhost:4200'
       ).replace(
         /\/+$/,
-        ''
+        '',
       );
 
-
-    /*
-     * -------------------------------------------------------
-     * INSPECTION TYPE
-     * -------------------------------------------------------
-     */
 
     const inspectionType =
       inspection.inspectionType ===
@@ -1271,27 +1790,14 @@ export class InspectionsService {
         : 'pre-cover';
 
 
-    /*
-     * -------------------------------------------------------
-     * SECURE CUSTOMER LINK
-     *
-     * IMPORTANT:
-     *
-     * Prisma allows reference to be nullable.
-     *
-     * String(reference ?? '') guarantees that
-     * encodeURIComponent always receives a string.
-     * -------------------------------------------------------
-     */
-
     const secureLink =
       `${frontendUrl}` +
       `/customer/start/` +
       `${inspectionType}/` +
       `${encodeURIComponent(
         String(
-          inspection.reference ?? ''
-        )
+          inspection.reference ?? '',
+        ),
       )}`;
 
 
@@ -1302,7 +1808,8 @@ export class InspectionsService {
 
 
       reference:
-        inspection.reference ?? '',
+        inspection.reference ??
+        '',
 
 
       status:
@@ -1324,16 +1831,18 @@ export class InspectionsService {
         inspection.updatedAt,
 
 
+      // =====================================================
+      // FIX: RETURN THE REAL SUBMISSION TIME
+      // =====================================================
+
       submittedAt:
         inspection.submittedAt ??
         null,
 
 
-      /*
-       * -----------------------------------------------------
-       * CUSTOMER
-       * -----------------------------------------------------
-       */
+      // =====================================================
+      // CUSTOMER
+      // =====================================================
 
       customer: {
 
@@ -1355,8 +1864,7 @@ export class InspectionsService {
 
         phone:
           inspection.customerPhone ??
-          ''
-
+          '',
       },
 
 
@@ -1380,11 +1888,9 @@ export class InspectionsService {
         '',
 
 
-      /*
-       * -----------------------------------------------------
-       * POLICY
-       * -----------------------------------------------------
-       */
+      // =====================================================
+      // POLICY
+      // =====================================================
 
       policy: {
 
@@ -1394,8 +1900,7 @@ export class InspectionsService {
 
         insuranceCompany:
           inspection.insuranceCompany ??
-          ''
-
+          '',
       },
 
 
@@ -1409,11 +1914,9 @@ export class InspectionsService {
         '',
 
 
-      /*
-       * -----------------------------------------------------
-       * VEHICLE
-       * -----------------------------------------------------
-       */
+      // =====================================================
+      // VEHICLE
+      // =====================================================
 
       vehicle: {
 
@@ -1443,8 +1946,7 @@ export class InspectionsService {
 
         vin:
           inspection.vinExtracted ??
-          ''
-
+          '',
       },
 
 
@@ -1453,15 +1955,13 @@ export class InspectionsService {
         '',
 
 
-      /*
-       * -----------------------------------------------------
-       * PHOTOS
-       * -----------------------------------------------------
-       */
+      // =====================================================
+      // PHOTOS
+      // =====================================================
 
       photos:
         Array.isArray(
-          inspection.photos
+          inspection.photos,
         )
           ? inspection.photos
           : [],
@@ -1469,7 +1969,7 @@ export class InspectionsService {
 
       accidentPhotos:
         Array.isArray(
-          inspection.damagePhotos
+          inspection.damagePhotos,
         )
           ? inspection.damagePhotos
           : [],
@@ -1477,17 +1977,15 @@ export class InspectionsService {
 
       damagePhotos:
         Array.isArray(
-          inspection.damagePhotos
+          inspection.damagePhotos,
         )
           ? inspection.damagePhotos
           : [],
 
 
-      /*
-       * -----------------------------------------------------
-       * AI
-       * -----------------------------------------------------
-       */
+      // =====================================================
+      // AI
+      // =====================================================
 
       ai: {
 
@@ -1521,24 +2019,19 @@ export class InspectionsService {
 
         processedAt:
           inspection.processedAt ??
-          null
-
+          null,
       },
 
 
-      /*
-       * -----------------------------------------------------
-       * CUSTOMER ACCESS LINK
-       * -----------------------------------------------------
-       */
+      // =====================================================
+      // CUSTOMER ACCESS LINK
+      // =====================================================
 
       secureLink,
 
+
       inspectionUrl:
-        secureLink
-
+        secureLink,
     };
-
   }
-
 }

@@ -1,4 +1,4 @@
-import {
+﻿import {
   Module,
 } from '@nestjs/common';
 
@@ -10,7 +10,10 @@ import {
   InspectionsService,
 } from './inspections.service';
 
-// Prisma lives outside src
+import {
+  BedrockService,
+} from './bedrock.service';
+
 import {
   PrismaModule,
 } from '../../prisma/prisma.module';
@@ -33,6 +36,8 @@ import {
   providers: [
 
     InspectionsService,
+
+    BedrockService,
 
   ],
 

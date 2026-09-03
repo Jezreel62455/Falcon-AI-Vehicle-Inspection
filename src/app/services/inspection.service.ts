@@ -19,341 +19,160 @@ import {
 
 
 /* =========================================================
-   INSPECTION TYPES
+   TYPES
    ========================================================= */
+
+export type InspectionInputType =
+  | 'pre-cover'
+  | 'pre_cover'
+  | 'accident'
+  | 'accident-claim'
+  | string;
+
 
 export type InspectionType =
   | 'pre-cover'
   | 'accident';
 
 
-export type InspectionInputType =
-  | 'pre-cover'
-  | 'accident'
-  | 'pre_cover'
-  | 'accident-claim';
-
-
-/* =========================================================
-   INSPECTION STATUS
-   ========================================================= */
-
 export type InspectionStatus =
-  | 'pending'
   | 'draft'
+  | 'pending'
   | 'in-progress'
   | 'review'
   | 'submitted'
   | 'completed';
 
 
-/* =========================================================
-   CUSTOMER
-   ========================================================= */
-
 export interface Customer {
-
-  firstName: string;
-
+  firstName?: string;
   surname?: string;
-
   lastName?: string;
-
   email?: string;
-
   phone?: string;
 }
 
 
-/* =========================================================
-   VEHICLE
-   ========================================================= */
-
 export interface Vehicle {
-
   make?: string;
-
   model?: string;
-
   year?: string | number;
-
   registration?: string;
-
   colour?: string;
-
   mileage?: string | number;
-
   vin?: string;
 }
 
-
-/* =========================================================
-   POLICY
-   ========================================================= */
 
 export interface Policy {
-
   policyNumber?: string;
-
-  insuranceCompany?: string;
-
   claimNumber?: string;
+  insuranceCompany?: string;
 }
 
-
-/* =========================================================
-   AI
-   ========================================================= */
-
-export interface InspectionAI {
-
-  status?: string;
-
-  score?: number | null;
-
-  vin?: string;
-
-  damageDetected?: boolean;
-
-  provider?: string;
-
-  damageSummary?: string;
-}
-
-
-/* =========================================================
-   VEHICLE PHOTO
-   ========================================================= */
-
-export interface InspectionPhoto {
-
-  id: string;
-
-  label?: string;
-
-  name?: string;
-
-  title?: string;
-
-  imageUrl?: string;
-
-  url?: string;
-
-  path?: string;
-
-  fileName?: string;
-
-  fileType?: string;
-
-  fileSize?: number;
-
-  uploaded?: boolean;
-
-  required?: boolean;
-}
-
-
-/* =========================================================
-   ACCIDENT PHOTO
-   ========================================================= */
-
-export interface AccidentPhoto {
-
-  id: string;
-
-  label?: string;
-
-  name?: string;
-
-  title?: string;
-
-  imageUrl?: string;
-
-  url?: string;
-
-  path?: string;
-
-  fileName?: string;
-
-  fileType?: string;
-
-  fileSize?: number;
-
-  uploaded?: boolean;
-
-  required?: boolean;
-}
-
-
-/* =========================================================
-   MAIN INSPECTION
-   ========================================================= */
 
 export interface Inspection {
-
   id?: string;
+  reference?: string;
 
-  reference: string;
+  status?: InspectionStatus | string;
+  inspectionType?: InspectionType | string;
+  type?: InspectionType | string;
 
-
-  inspectionType: InspectionType;
-
-  type?: InspectionType;
-
-
-  status: InspectionStatus;
-
-
-  createdAt: string;
-
+  createdAt?: string;
   updatedAt?: string;
+  submittedAt?: string | null;
 
-  submittedAt?: string;
+  inspectionUrl?: string;
+  secureLink?: string;
+  url?: string;
 
-
-  customer: Customer;
+  customer?: Customer;
 
   customerFirstName?: string;
-
   customerSurname?: string;
-
   customerLastName?: string;
-
   customerEmail?: string;
-
   customerPhone?: string;
-
-  customerName?: string;
-
-
-  vehicle: Vehicle;
-
-  make?: string;
-
-  model?: string;
-
-  year?: string | number;
-
-  registration?: string;
-
-  colour?: string;
-
-  mileage?: string | number;
-
-  vin?: string;
-
-
-  photos: InspectionPhoto[];
-
-  accidentPhotos: AccidentPhoto[];
-
-  damagePhotos?: AccidentPhoto[];
-
 
   policy?: Policy;
 
   policyNumber?: string;
-
   claimNumber?: string;
-
   insuranceCompany?: string;
 
+  vehicle?: Vehicle;
 
-  ai?: InspectionAI;
+  make?: string;
+  model?: string;
+  year?: string | number;
+  registration?: string;
+  colour?: string;
+  mileage?: string | number;
+  vin?: string;
 
+  photos?: unknown[];
+  accidentPhotos?: unknown[];
+  damagePhotos?: unknown[];
 
-  inspectionUrl?: string;
-
-  secureLink?: string;
+  ai?: {
+    status?: string;
+    score?: number | null;
+    damageDetected?: boolean;
+    damageSummary?: string | null;
+    vin?: string | null;
+    odometer?: string | number | null;
+    provider?: string | null;
+    processedAt?: string | null;
+  };
 }
 
 
 /* =========================================================
-   CREATE REQUEST PAYLOAD
+   CREATE REQUEST
    ========================================================= */
 
 export interface CreateInspectionRequestPayload {
-
   inspectionType: InspectionInputType;
 
   status?: InspectionStatus | string | null;
-
-  /*
-   * Reference is optional.
-   *
-   * The Create Inspection Request page deliberately does
-   * not provide one anymore because the backend generates
-   * the secure reference.
-   */
   reference?: string | null;
 
-
   customer?: Customer | null;
-
   vehicle?: Vehicle | null;
-
   policy?: Policy | null;
 
-
   policyNumber?: string | null;
-
   claimNumber?: string | null;
-
   insuranceCompany?: string | null;
 
-
   customerFirstName?: string | null;
-
   customerSurname?: string | null;
-
   customerLastName?: string | null;
-
   customerEmail?: string | null;
-
   customerPhone?: string | null;
 
-
   vehicleMake?: string | null;
-
   vehicleModel?: string | null;
-
   vehicleYear?: string | number | null;
-
   vehicleRegistration?: string | null;
-
   vehicleColour?: string | null;
-
   vehicleMileage?: string | number | null;
-
   vehicleVin?: string | null;
 
-
   make?: string | null;
-
   model?: string | null;
-
   year?: string | number | null;
-
   registration?: string | null;
-
   colour?: string | null;
-
   mileage?: string | number | null;
-
   vin?: string | null;
 
-
   photos?: unknown[];
-
   accidentPhotos?: unknown[];
-
   damagePhotos?: unknown[];
 }
 
-
-/* =========================================================
-   BACKWARDS COMPATIBILITY
-   ========================================================= */
 
 export type CreateInspectionRequest =
   CreateInspectionRequestPayload;
@@ -364,21 +183,14 @@ export type CreateInspectionRequest =
    ========================================================= */
 
 export interface CreateInspectionResponse {
-
   id?: string;
-
   reference: string;
-
   inspectionType: InspectionType;
-
   status?: InspectionStatus | string;
-
   createdAt?: string;
 
   inspectionUrl?: string;
-
   secureLink?: string;
-
   url?: string;
 
   inspection?: Inspection;
@@ -390,23 +202,14 @@ export interface CreateInspectionResponse {
    ========================================================= */
 
 export interface UploadPhotoResponse {
-
   files?: Array<{
-
     id?: string;
-
     path?: string;
-
     url?: string;
-
     imageUrl?: string;
-
     fileName?: string;
-
     fileType?: string;
-
     fileSize?: number;
-
   }>;
 
   [key: string]: unknown;
@@ -426,8 +229,194 @@ export class InspectionService {
     inject(HttpClient);
 
 
+  /* =======================================================
+     API CONFIGURATION
+     ======================================================= */
+
   private readonly apiUrl =
-    'http://localhost:3000/inspections';
+    this.resolveApiUrl();
+
+
+  /* =======================================================
+     RESOLVE API URL
+     ======================================================= */
+
+  private resolveApiUrl(): string {
+
+    const runtimeApiUrl =
+      (
+        globalThis as typeof globalThis & {
+          __FALCON_API_URL__?: string;
+        }
+      ).__FALCON_API_URL__;
+
+
+    /*
+     * Production/runtime API configuration.
+     */
+    if (
+      runtimeApiUrl &&
+      runtimeApiUrl.trim()
+    ) {
+
+      return this.normalizeApiUrl(
+        runtimeApiUrl
+      );
+    }
+
+
+    /*
+     * Local browser development.
+     */
+    if (
+      typeof window !== 'undefined'
+    ) {
+
+      const hostname =
+        window.location.hostname;
+
+
+      /*
+       * Local computer.
+       */
+      if (
+        hostname === 'localhost' ||
+        hostname === '127.0.0.1'
+      ) {
+
+        return 'http://localhost:3000/inspections';
+      }
+
+
+      /*
+       * LAN testing.
+       */
+      if (
+        this.isPrivateNetworkAddress(
+          hostname
+        )
+      ) {
+
+        return `http://${hostname}:3000/inspections`;
+      }
+    }
+
+
+    /*
+     * No production API configured yet.
+     */
+    console.warn(
+      'Falcon API URL is not configured. ' +
+      'Set globalThis.__FALCON_API_URL__ to the deployed API URL.'
+    );
+
+
+    return '/inspections';
+  }
+
+
+  /* =======================================================
+     NORMALIZE API URL
+     ======================================================= */
+
+  private normalizeApiUrl(
+    apiUrl: string
+  ): string {
+
+    let normalized =
+      apiUrl.trim();
+
+
+    normalized =
+      normalized.replace(
+        /\/+$/,
+        ''
+      );
+
+
+    if (
+      !normalized.endsWith('/inspections')
+    ) {
+
+      normalized =
+        `${normalized}/inspections`;
+    }
+
+
+    return normalized;
+  }
+
+
+  /* =======================================================
+     PRIVATE NETWORK CHECK
+     ======================================================= */
+
+  private isPrivateNetworkAddress(
+    hostname: string
+  ): boolean {
+
+    /*
+     * 10.0.0.0/8
+     */
+    if (
+      /^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/
+        .test(hostname)
+    ) {
+
+      return true;
+    }
+
+
+    /*
+     * 192.168.0.0/16
+     */
+    if (
+      /^192\.168\.\d{1,3}\.\d{1,3}$/
+        .test(hostname)
+    ) {
+
+      return true;
+    }
+
+
+    /*
+     * 172.16.0.0 - 172.31.255.255
+     */
+    const parts =
+      hostname.split('.');
+
+
+    if (
+      parts.length === 4 &&
+      parts[0] === '172'
+    ) {
+
+      const second =
+        Number(parts[1]);
+
+
+      if (
+        second >= 16 &&
+        second <= 31
+      ) {
+
+        return true;
+      }
+    }
+
+
+    return false;
+  }
+
+
+  /* =======================================================
+     PUBLIC API URL
+     ======================================================= */
+
+  getApiBaseUrl(): string {
+
+    return this.apiUrl;
+  }
 
 
   /* =======================================================
@@ -446,18 +435,13 @@ export class InspectionService {
 
       case 'accident':
       case 'accident-claim':
-
         return 'accident';
-
 
       case 'pre-cover':
       case 'pre_cover':
-
         return 'pre-cover';
 
-
       default:
-
         return 'pre-cover';
     }
   }
@@ -550,10 +534,6 @@ export class InspectionService {
       [];
 
 
-    /* -------------------------------------------------------
-       CUSTOMER
-       ------------------------------------------------------- */
-
     const firstName =
       inspection.customerFirstName ??
       customer.firstName ??
@@ -578,10 +558,6 @@ export class InspectionService {
       customer.phone ??
       '';
 
-
-    /* -------------------------------------------------------
-       VEHICLE
-       ------------------------------------------------------- */
 
     const make =
       inspection.make ??
@@ -626,7 +602,6 @@ export class InspectionService {
 
 
     return {
-
       ...inspection,
 
       inspectionType,
@@ -642,7 +617,6 @@ export class InspectionService {
 
 
       customer: {
-
         ...customer,
 
         firstName,
@@ -658,7 +632,6 @@ export class InspectionService {
 
         phone:
           phone || undefined
-
       },
 
 
@@ -679,43 +652,28 @@ export class InspectionService {
 
 
       vehicle: {
-
         ...vehicle,
 
         make,
-
         model,
-
         year,
-
         registration,
-
         colour,
-
         mileage,
-
         vin
-
       },
 
 
       make,
-
       model,
-
       year,
-
       registration,
-
       colour,
-
       mileage,
-
       vin,
 
 
       policy: {
-
         ...(inspection.policy ?? {}),
 
         policyNumber:
@@ -729,7 +687,6 @@ export class InspectionService {
         insuranceCompany:
           inspection.policy?.insuranceCompany ??
           inspection.insuranceCompany
-
       },
 
 
@@ -757,7 +714,6 @@ export class InspectionService {
       ai:
         inspection.ai ??
         undefined
-
     };
   }
 
@@ -770,9 +726,11 @@ export class InspectionService {
     Observable<Inspection[]> {
 
     return this.http
+
       .get<Inspection[]>(
         this.apiUrl
       )
+
       .pipe(
 
         catchError(error => {
@@ -783,11 +741,8 @@ export class InspectionService {
           );
 
           return of([]);
-
         })
-
       );
-
   }
 
 
@@ -800,9 +755,11 @@ export class InspectionService {
   ): Observable<Inspection> {
 
     return this.http
+
       .get<Inspection>(
         `${this.apiUrl}/${encodeURIComponent(idOrReference)}`
       )
+
       .pipe(
 
         catchError(error => {
@@ -815,11 +772,8 @@ export class InspectionService {
           return throwError(
             () => error
           );
-
         })
-
       );
-
   }
 
 
@@ -832,7 +786,6 @@ export class InspectionService {
   ): Observable<Inspection> {
 
     return this.getInspection(id);
-
   }
 
 
@@ -845,9 +798,11 @@ export class InspectionService {
   ): Observable<Inspection> {
 
     return this.http
+
       .get<Inspection>(
         `${this.apiUrl}/reference/${encodeURIComponent(reference)}`
       )
+
       .pipe(
 
         catchError(error => {
@@ -860,11 +815,8 @@ export class InspectionService {
           return throwError(
             () => error
           );
-
         })
-
       );
-
   }
 
 
@@ -883,44 +835,37 @@ export class InspectionService {
 
 
     /*
-     * Do not generate or invent the reference here.
+     * The backend owns the official reference.
      *
-     * The NestJS backend owns the official secure reference.
+     * Do not generate a reference in Angular.
      */
-
     const requestPayload = {
 
       ...payload,
 
       inspectionType,
 
-      /*
-       * Explicitly remove any reference that may have been
-       * supplied by an older page/version.
-       */
-
       reference:
         undefined,
 
       ...(payload.status !== undefined
         ? {
-
             status:
               this.normalizeInspectionStatus(
                 payload.status
               )
-
           }
         : {})
-
     };
 
 
     return this.http
+
       .post<CreateInspectionResponse>(
         this.apiUrl,
         requestPayload
       )
+
       .pipe(
 
         catchError(error => {
@@ -933,11 +878,8 @@ export class InspectionService {
           return throwError(
             () => error
           );
-
         })
-
       );
-
   }
 
 
@@ -952,7 +894,6 @@ export class InspectionService {
     return this.createInspection(
       payload
     );
-
   }
 
 
@@ -969,10 +910,12 @@ export class InspectionService {
   ): Observable<Inspection> {
 
     return this.http
+
       .patch<Inspection>(
         `${this.apiUrl}/${encodeURIComponent(id)}`,
         data
       )
+
       .pipe(
 
         catchError(error => {
@@ -985,11 +928,8 @@ export class InspectionService {
           return throwError(
             () => error
           );
-
         })
-
       );
-
   }
 
 
@@ -1002,9 +942,11 @@ export class InspectionService {
   ): Observable<void> {
 
     return this.http
+
       .delete<void>(
         `${this.apiUrl}/${encodeURIComponent(id)}`
       )
+
       .pipe(
 
         catchError(error => {
@@ -1017,11 +959,8 @@ export class InspectionService {
           return throwError(
             () => error
           );
-
         })
-
       );
-
   }
 
 
@@ -1045,7 +984,6 @@ export class InspectionService {
   ): Observable<UploadPhotoResponse> {
 
     let files: File[];
-
     let inspectionId: string;
 
 
@@ -1064,7 +1002,6 @@ export class InspectionService {
 
       files =
         second as File[];
-
     }
 
 
@@ -1072,7 +1009,6 @@ export class InspectionService {
       files,
       inspectionId
     );
-
   }
 
 
@@ -1089,7 +1025,6 @@ export class InspectionService {
       files,
       inspectionId
     );
-
   }
 
 
@@ -1113,7 +1048,6 @@ export class InspectionService {
         file,
         file.name
       );
-
     }
 
 
@@ -1124,10 +1058,12 @@ export class InspectionService {
 
 
     return this.http
+
       .post<UploadPhotoResponse>(
         `${this.apiUrl}/upload`,
         formData
       )
+
       .pipe(
 
         catchError(error => {
@@ -1140,11 +1076,8 @@ export class InspectionService {
           return throwError(
             () => error
           );
-
         })
-
       );
-
   }
 
 
@@ -1161,7 +1094,6 @@ export class InspectionService {
       [file],
       inspectionId
     );
-
   }
 
 
@@ -1185,19 +1117,39 @@ export class InspectionService {
     ) {
 
       return path;
-
     }
 
 
-    if (path.startsWith('/')) {
+    try {
 
-      return `http://localhost:3000${path}`;
+      const apiOrigin =
+        new URL(
+          this.apiUrl
+        ).origin;
 
+
+      if (
+        path.startsWith('/')
+      ) {
+
+        return `${apiOrigin}${path}`;
+      }
+
+
+      return `${apiOrigin}/${path}`;
+
+    } catch {
+
+      if (
+        path.startsWith('/')
+      ) {
+
+        return path;
+      }
+
+
+      return `/${path}`;
     }
-
-
-    return `http://localhost:3000/${path}`;
-
   }
 
 
@@ -1210,10 +1162,12 @@ export class InspectionService {
   ): Observable<Inspection> {
 
     return this.http
+
       .post<Inspection>(
         `${this.apiUrl}/${encodeURIComponent(id)}/submit`,
         {}
       )
+
       .pipe(
 
         catchError(error => {
@@ -1226,11 +1180,8 @@ export class InspectionService {
           return throwError(
             () => error
           );
-
         })
-
       );
-
   }
 
 
@@ -1243,10 +1194,12 @@ export class InspectionService {
   ): Observable<Inspection> {
 
     return this.http
+
       .post<Inspection>(
         `${this.apiUrl}/${encodeURIComponent(id)}/complete`,
         {}
       )
+
       .pipe(
 
         catchError(error => {
@@ -1259,11 +1212,8 @@ export class InspectionService {
           return throwError(
             () => error
           );
-
         })
-
       );
-
   }
 
 
@@ -1281,7 +1231,5 @@ export class InspectionService {
           inspection
         )
     );
-
   }
-
 }

@@ -5,31 +5,56 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   /*
-   * Allow the Angular application to communicate
-   * with the NestJS API from the local network.
+   * =========================================================
+   * CORS
+   * =========================================================
+   *
+   * Locally, allow the Angular development server.
+   *
+   * In AWS, FRONTEND_URL will contain the public HTTPS
+   * address of the Angular application.
    */
+  const frontendUrl =
+    process.env.FRONTEND_URL?.trim();
+
   app.enableCors({
-    origin: true,
+    origin: frontendUrl
+      ? [frontendUrl]
+      : true,
     credentials: true,
   });
 
   /*
-   * IMPORTANT:
+   * =========================================================
+   * PORT
+   * =========================================================
    *
-   * 0.0.0.0 means NestJS listens on all network
-   * interfaces, including:
+   * AWS App Runner provides the PORT environment variable.
    *
-   * http://10.92.72.45:3000
+   * Locally, Falcon continues to use port 3000.
    */
-  await app.listen(3000, '0.0.0.0');
+  const port =
+    Number(process.env.PORT) || 3000;
+
+  /*
+   * =========================================================
+   * START SERVER
+   * =========================================================
+   *
+   * 0.0.0.0 allows the application to listen on all
+   * available network interfaces.
+   */
+  await app.listen(port, '0.0.0.0');
 
   console.log(
-    'Falcon API running on http://localhost:3000'
+    `Falcon API running on port ${port}`,
   );
 
-  console.log(
-    'Falcon API available on local network at http://10.92.72.45:3000'
-  );
+  if (frontendUrl) {
+    console.log(
+      `Falcon frontend configured as ${frontendUrl}`,
+    );
+  }
 }
 
 bootstrap();
