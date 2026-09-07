@@ -1,1 +1,441 @@
-<p>reports works!</p>
+<div class="reports-page">
+
+  <!-- ==========================================
+       PAGE HEADER
+  =========================================== -->
+
+  <section class="page-header">
+
+    <div>
+
+      <span class="page-eyebrow">
+
+        EXECUTIVE REPORTING
+
+      </span>
+
+      <h1>
+
+        Falcon AI Reports
+
+      </h1>
+
+      <p>
+
+        View inspection performance, fleet statistics and AI insights from one dashboard.
+
+      </p>
+
+    </div>
+
+  </section>
+
+
+  @if (isLoading) {
+
+    <div class="state-card">
+
+      <div class="loading-spinner"></div>
+
+      <p>
+
+        Loading inspection reports...
+
+      </p>
+
+    </div>
+
+  }
+
+  @else if (errorMessage) {
+
+    <div class="state-card error-state">
+
+      <h3>
+
+        Unable to load reports
+
+      </h3>
+
+      <p>
+
+        {{ errorMessage }}
+
+      </p>
+
+    </div>
+
+  }
+
+  @else {
+
+    <!-- ==========================================
+         TOP STATISTICS
+    =========================================== -->
+
+    <section class="statistics-grid">
+
+      <article class="stat-card">
+
+        <div>
+
+          <span class="stat-label">
+
+            TOTAL INSPECTIONS
+
+          </span>
+
+          <strong class="stat-value">
+
+            {{ totalInspections }}
+
+          </strong>
+
+        </div>
+
+      </article>
+
+      <article class="stat-card">
+
+        <div>
+
+          <span class="stat-label">
+
+            COMPLETED
+
+          </span>
+
+          <strong class="stat-value">
+
+            {{ completedInspections }}
+
+          </strong>
+
+        </div>
+
+      </article>
+
+      <article class="stat-card">
+
+        <div>
+
+          <span class="stat-label">
+
+            ACCIDENT CLAIMS
+
+          </span>
+
+          <strong class="stat-value">
+
+            {{ accidentInspections }}
+
+          </strong>
+
+        </div>
+
+      </article>
+
+      <article class="stat-card">
+
+        <div>
+
+          <span class="stat-label">
+
+            AI CONFIDENCE
+
+          </span>
+
+          <strong class="stat-value">
+
+            {{ averageAiConfidence }}%
+
+          </strong>
+
+        </div>
+
+      </article>
+
+    </section>
+
+
+    <!-- ==========================================
+         EXECUTIVE SUMMARY
+    =========================================== -->
+
+    <section class="reports-overview">
+
+      <article class="summary-card">
+
+        <h2>
+
+          Inspection Types
+
+        </h2>
+
+        <div class="progress-row">
+
+          <span>
+
+            Pre-Cover
+
+          </span>
+
+          <strong>
+
+            {{ getPreCoverPercentage() }}%
+
+          </strong>
+
+        </div>
+
+        <div class="progress-bar">
+
+          <div
+            class="progress-fill blue"
+            [style.width.%]="getPreCoverPercentage()"
+          ></div>
+
+        </div>
+
+        <div class="progress-row">
+
+          <span>
+
+            Accident
+
+          </span>
+
+          <strong>
+
+            {{ getAccidentPercentage() }}%
+
+          </strong>
+
+        </div>
+
+        <div class="progress-bar">
+
+          <div
+            class="progress-fill orange"
+            [style.width.%]="getAccidentPercentage()"
+          ></div>
+
+        </div>
+
+      </article>
+            
+
+      <div class="reports-toolbar">
+
+        <div class="search-box">
+
+          <span class="search-icon">🔍</span>
+
+          <input
+            type="text"
+            placeholder="Search customer, registration or status..."
+            [(ngModel)]="searchTerm"
+            (input)="applyFilters()"
+          />
+
+        </div>
+
+        <div class="toolbar-filters">
+
+          <select
+            [(ngModel)]="selectedType"
+            (change)="applyFilters()"
+          >
+
+            <option value="all">
+              All Types
+            </option>
+
+            <option value="pre">
+              Pre-Cover
+            </option>
+
+            <option value="accident">
+              Accident
+            </option>
+
+          </select>
+
+          <select
+            [(ngModel)]="selectedStatus"
+            (change)="applyFilters()"
+          >
+
+            <option value="all">
+              All Statuses
+            </option>
+
+            <option value="submitted">
+              Submitted
+            </option>
+
+            <option value="processing">
+              Processing
+            </option>
+
+            <option value="completed">
+              Completed
+            </option>
+
+          </select>
+
+        </div>
+
+      </div>
+
+      @if (filteredInspections.length === 0) {
+
+        <div class="empty-state">
+
+          <div class="empty-icon">
+            📄
+          </div>
+
+          <h3>
+            No inspection reports found
+          </h3>
+
+          <p>
+            Try changing the search filters or create a new inspection request.
+          </p>
+
+        </div>
+
+      }
+
+      @else {
+
+        <div class="table-wrapper">
+
+          <table>
+
+            <thead>
+
+              <tr>
+
+                <th>Customer</th>
+
+                <th>Registration</th>
+
+                <th>Type</th>
+
+                <th>Status</th>
+
+                <th>Date</th>
+
+                <th></th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              @for (
+                inspection of filteredInspections;
+                track trackByInspection($index, inspection)
+              ) {
+
+                <tr>
+
+                  <td>
+
+                    <div class="customer-cell">
+
+                      <div class="customer-avatar">
+
+                        {{ getCustomerName(inspection).charAt(0) }}
+
+                      </div>
+
+                      <div>
+
+                        <strong>
+
+                          {{ getCustomerName(inspection) }}
+
+                        </strong>
+
+                        <span>
+
+                          {{ getVehicleRegistration(inspection) }}
+
+                        </span>
+
+                      </div>
+
+                    </div>
+
+                  </td>
+
+                  <td>
+
+                    <strong class="registration">
+
+                      {{ getVehicleRegistration(inspection) }}
+
+                    </strong>
+
+                  </td>
+
+                  <td>
+
+                    {{ getInspectionType(inspection) }}
+
+                  </td>
+
+                  <td>
+
+                    <span
+                      class="status"
+                      [ngClass]="getStatusClass(inspection)"
+                    >
+
+                      {{ getStatus(inspection) }}
+
+                    </span>
+
+                  </td>
+
+                  <td>
+
+                    {{ inspection.createdAt | date:'dd MMM yyyy' }}
+
+                  </td>
+
+                  <td>
+
+                    <button
+                      type="button"
+                      class="view-button"
+                      (click)="viewInspection(inspection)"
+                    >
+
+                      View Details
+
+                    </button>
+
+                  </td>
+
+                </tr>
+
+              }
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      }
+
+    </section>
+
+  }
+
+</div>

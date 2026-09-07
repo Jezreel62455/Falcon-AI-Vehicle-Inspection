@@ -1,0 +1,70 @@
+# compiled output
+/dist
+/build
+/out-tsc
+
+# Generated Prisma / TypeScript files
+/prisma/*.js
+/prisma/*.js.map
+/prisma/*.d.ts
+*.tsbuildinfo
+
+# Node
+/node_modules
+
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Tests
+/coverage
+/.nyc_output
+
+# IDE - IntelliJ
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Environment / secrets
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# Temporary files
+.temp
+.tmp
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Diagnostic reports
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Local Prisma database
+/prisma/dev.db
+/prisma/dev.db-journal

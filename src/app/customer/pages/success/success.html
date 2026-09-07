@@ -1,0 +1,249 @@
+<div class="status-page">
+
+
+  <div class="header">
+
+    <div class="logo">
+      FALCON AI
+    </div>
+
+
+    <h1>
+      Inspection Submitted Successfully
+    </h1>
+
+
+    <p>
+      Your vehicle inspection has been received and is being processed.
+    </p>
+
+  </div>
+
+
+
+
+  <div class="card">
+
+
+    <h2>
+      Inspection Reference
+    </h2>
+
+
+    <div class="reference">
+
+      {{ inspectionReference }}
+
+    </div>
+
+
+
+    <div class="details">
+
+
+      <div class="detail">
+
+        <span>
+          Vehicle
+        </span>
+
+        <strong>
+          {{ getVehicleName() }}
+        </strong>
+
+      </div>
+
+
+
+
+      <div class="detail">
+
+        <span>
+          Registration
+        </span>
+
+        <strong>
+          {{ getRegistration() }}
+        </strong>
+
+      </div>
+
+
+
+
+      <div class="detail">
+
+        <span>
+          Inspection Type
+        </span>
+
+        <strong>
+          {{ getInspectionType() }}
+        </strong>
+
+      </div>
+
+
+
+
+      <div class="detail">
+
+        <span>
+          Submitted
+        </span>
+
+        <strong>
+          {{ getSubmissionDate() }}
+        </strong>
+
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+
+
+
+  <div class="card">
+
+
+    <h2>
+      Inspection Status
+    </h2>
+
+
+
+    <div class="timeline">
+
+
+      <div class="step completed">
+
+        <div class="circle">
+          ✓
+        </div>
+
+        <div>
+          Submitted
+        </div>
+
+      </div>
+
+
+
+
+
+      <div class="step active">
+
+        <div class="circle">
+          ●
+        </div>
+
+        <div>
+          AI Analysis Pending
+        </div>
+
+      </div>
+
+
+
+
+
+      <div class="step">
+
+        <div class="circle">
+          ○
+        </div>
+
+        <div>
+          Insurance Review
+        </div>
+
+      </div>
+
+
+
+
+
+      <div class="step">
+
+        <div class="circle">
+          ○
+        </div>
+
+        <div>
+          Completed
+        </div>
+
+      </div>
+
+
+
+    </div>
+
+
+  </div>
+
+
+
+
+
+  <div class="card information">
+
+
+    <h2>
+      What happens next?
+    </h2>
+
+
+    <ng-container
+      *ngIf="getInspectionType() === 'Pre-Cover Inspection'; else claim">
+
+
+      <p>
+
+        Falcon AI will analyse your vehicle images
+        and prepare a vehicle assessment report
+        for your insurer.
+
+      </p>
+
+
+    </ng-container>
+
+
+
+    <ng-template #claim>
+
+      <p>
+
+        Your accident claim inspection has been submitted.
+        The assessment team will review the damage images
+        and continue with the claims process.
+
+      </p>
+
+
+    </ng-template>
+
+
+  </div>
+
+
+
+
+
+  <button
+    class="home-button"
+    (click)="returnHome()">
+
+    Return Home
+
+  </button>
+
+
+
+</div>

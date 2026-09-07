@@ -1,31 +1,563 @@
-<div class="dashboard">
+<div class="dashboard-page">
 
-  <h1>Falcon AI Vehicle Inspection Platform</h1>
+  <!-- ============================= -->
+  <!-- PAGE HEADER -->
+  <!-- ============================= -->
 
-  <p>Welcome back!</p>
+  <div class="dashboard-header">
 
-  <div class="cards">
+    <div>
 
-    <div class="card">
-      <h2>Today's Inspections</h2>
-      <h1>18</h1>
+      <span class="page-kicker">
+        FALCON AI
+      </span>
+
+      <h1>
+        Vehicle Inspection Dashboard
+      </h1>
+
+      <p class="page-subtitle">
+        Monitor inspection activity, review recent submissions and manage customer inspection requests.
+      </p>
+
     </div>
 
-    <div class="card">
-      <h2>Pending Reviews</h2>
-      <h1>5</h1>
-    </div>
+    <div class="header-actions">
 
-    <div class="card">
-      <h2>Completed</h2>
-      <h1>13</h1>
-    </div>
+      <a
+        routerLink="/create-inspection-request"
+        class="primary-button">
 
-    <div class="card">
-      <h2>AI Alerts</h2>
-      <h1>2</h1>
+        + Create Inspection Request
+
+      </a>
+
     </div>
 
   </div>
+
+
+  <!-- ============================= -->
+  <!-- LOADING -->
+  <!-- ============================= -->
+
+  @if (isLoading) {
+
+    <div class="state-card">
+
+      <div class="loading-spinner"></div>
+
+      <h2>
+        Loading dashboard...
+      </h2>
+
+      <p>
+        Please wait while inspection activity is loaded.
+      </p>
+
+    </div>
+
+  }
+
+
+  <!-- ============================= -->
+  <!-- ERROR -->
+  <!-- ============================= -->
+
+  @else if (errorMessage) {
+
+    <div class="state-card error-state">
+
+      <div class="error-icon">
+        !
+      </div>
+
+      <h2>
+        Unable to load dashboard
+      </h2>
+
+      <p>
+        {{ errorMessage }}
+      </p>
+
+    </div>
+
+  }
+
+
+  <!-- ============================= -->
+  <!-- DASHBOARD -->
+  <!-- ============================= -->
+
+  @else {
+
+    <!-- ============================= -->
+    <!-- STATISTICS -->
+    <!-- ============================= -->
+
+    <div class="stats-grid">
+
+      <div class="stat-card">
+
+        <span class="stat-label">
+          TOTAL INSPECTIONS
+        </span>
+
+        <div class="stat-value">
+          {{ totalInspections }}
+        </div>
+
+      </div>
+
+
+      <div class="stat-card">
+
+        <span class="stat-label">
+          SUBMITTED
+        </span>
+
+        <div class="stat-value">
+          {{ submittedInspections }}
+        </div>
+
+      </div>
+
+
+      <div class="stat-card">
+
+        <span class="stat-label">
+          COMPLETED
+        </span>
+
+        <div class="stat-value">
+          {{ completedInspections }}
+        </div>
+
+      </div>
+
+
+      <div class="stat-card">
+
+        <span class="stat-label">
+          UNDER REVIEW
+        </span>
+
+        <div class="stat-value">
+          {{ underReviewInspections }}
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ============================= -->
+    <!-- CREATE REQUEST / ACTIVITY -->
+    <!-- ============================= -->
+
+    <div class="hero-grid">
+
+      <div class="hero-card">
+
+        <span class="hero-kicker">
+          CUSTOMER INSPECTION REQUEST
+        </span>
+
+        <h2>
+          Create a new inspection request
+        </h2>
+
+        <p>
+          Generate a secure inspection link for a customer. You can select the appropriate inspection type when creating the request.
+        </p>
+
+        <div class="hero-actions">
+
+          <a
+            routerLink="/create-inspection-request"
+            class="hero-button">
+
+            Create Inspection Request
+
+          </a>
+
+        </div>
+
+      </div>
+
+
+      <div class="activity-card">
+
+        <span class="hero-kicker">
+          ACTIVITY
+        </span>
+
+        <h2>
+          Inspection Summary
+        </h2>
+
+        <p>
+          The dashboard automatically updates with the latest inspections submitted by customers.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <!-- ========================================= -->
+    <!-- RECENT INSPECTIONS -->
+    <!-- ========================================= -->
+
+    <section class="dashboard-card">
+
+      <div class="card-header">
+
+        <div>
+
+          <span class="section-kicker">
+            RECENT ACTIVITY
+          </span>
+
+          <h2>
+            Recent Inspections
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      @if (getRecentInspections().length === 0) {
+
+        <div class="empty-state">
+
+          <div class="empty-icon">
+            🚗
+          </div>
+
+          <h3>
+            No inspections found
+          </h3>
+
+          <p>
+            Once customers submit inspections they will appear here.
+          </p>
+
+        </div>
+
+      }
+
+      @else {
+
+        <div class="table-wrapper">
+
+          <table>
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  Customer
+                </th>
+
+                <th>
+                  Registration
+                </th>
+
+                <th>
+                  Inspection Type
+                </th>
+
+                <th>
+                  Status
+                </th>
+
+                <th>
+                  Created
+                </th>
+
+                <th>
+                  Action
+                </th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody>
+
+              @for (
+                inspection of getRecentInspections();
+                track inspection.id
+              ) {
+
+                <tr>
+
+                  <td>
+                    {{ getCustomerName(inspection) }}
+                  </td>
+
+
+                  <td>
+                    {{ getVehicleRegistration(inspection) }}
+                  </td>
+
+
+                  <td>
+                    {{ getInspectionType(inspection) }}
+                  </td>
+
+
+                  <td>
+
+                    <span
+                      class="status-pill"
+                      [class.status-submitted]="getStatusClass(inspection) === 'submitted'"
+                      [class.status-completed]="getStatusClass(inspection) === 'completed'"
+                      [class.status-approved]="getStatusClass(inspection) === 'approved'"
+                      [class.status-under-review]="getStatusClass(inspection) === 'under-review'"
+                      [class.status-pending]="getStatusClass(inspection) === 'pending'">
+
+                      {{ getStatus(inspection) }}
+
+                    </span>
+
+                  </td>
+
+
+                  <td>
+
+                    {{ getDate(inspection) | date:'dd MMM yyyy' }}
+
+                  </td>
+
+
+                  <td>
+
+                    <button
+                      type="button"
+                      class="view-button"
+                      (click)="openInspection(inspection)">
+
+                      View Details
+
+                    </button>
+
+                  </td>
+
+                </tr>
+
+              }
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      }
+
+    </section>
+
+
+    <!-- ========================================= -->
+    <!-- QUICK ACTIONS -->
+    <!-- ========================================= -->
+
+    <section class="dashboard-card">
+
+      <div class="card-header">
+
+        <div>
+
+          <span class="section-kicker">
+            QUICK ACTIONS
+          </span>
+
+          <h2>
+            Administration
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      <div class="quick-actions-grid">
+
+
+        <!-- CREATE REQUEST -->
+
+        <a
+          routerLink="/create-inspection-request"
+          class="action-card">
+
+          <div class="action-icon">
+            +
+          </div>
+
+          <h3>
+            Create Inspection Request
+          </h3>
+
+          <p>
+            Create a customer inspection request and generate a secure inspection link.
+          </p>
+
+        </a>
+
+
+        <!-- HISTORY -->
+
+        <a
+          routerLink="/history"
+          class="action-card">
+
+          <div class="action-icon">
+            📋
+          </div>
+
+          <h3>
+            Inspection History
+          </h3>
+
+          <p>
+            View every inspection submitted by customers and open detailed reports.
+          </p>
+
+        </a>
+
+
+        <!-- REPORTS -->
+
+        <a
+          routerLink="/reports"
+          class="action-card">
+
+          <div class="action-icon">
+            📊
+          </div>
+
+          <h3>
+            Inspection Reports
+          </h3>
+
+          <p>
+            Review inspection statistics, trends and operational performance.
+          </p>
+
+        </a>
+
+
+        <!-- SETTINGS -->
+
+        <a
+          routerLink="/settings"
+          class="action-card">
+
+          <div class="action-icon">
+            ⚙
+          </div>
+
+          <h3>
+            Settings
+          </h3>
+
+          <p>
+            Manage Falcon AI platform settings and administration preferences.
+          </p>
+
+        </a>
+
+
+      </div>
+
+    </section>
+
+
+    <!-- ========================================= -->
+    <!-- DASHBOARD SUMMARY -->
+    <!-- ========================================= -->
+
+    <section class="dashboard-card">
+
+      <div class="card-header">
+
+        <div>
+
+          <span class="section-kicker">
+            PLATFORM
+          </span>
+
+          <h2>
+            Falcon AI Overview
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      <div class="summary-grid">
+
+        <div class="summary-item">
+
+          <strong>
+            {{ totalInspections }}
+          </strong>
+
+          <span>
+            Total inspections recorded
+          </span>
+
+        </div>
+
+
+        <div class="summary-item">
+
+          <strong>
+            {{ submittedInspections }}
+          </strong>
+
+          <span>
+            Awaiting processing
+          </span>
+
+        </div>
+
+
+        <div class="summary-item">
+
+          <strong>
+            {{ completedInspections }}
+          </strong>
+
+          <span>
+            Successfully completed
+          </span>
+
+        </div>
+
+
+        <div class="summary-item">
+
+          <strong>
+            {{ underReviewInspections }}
+          </strong>
+
+          <span>
+            Currently under review
+          </span>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  }
 
 </div>

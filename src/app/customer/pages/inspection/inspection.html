@@ -1,0 +1,140 @@
+<div class="inspection-page">
+
+  <div class="inspection-card">
+
+    <!-- Progress -->
+
+    <div class="progress-section">
+
+      <span class="progress-label">
+        Step 4 of 6
+      </span>
+
+      <div class="progress-bar">
+
+        <div
+          class="progress-fill"
+          [style.width.%]="progress"
+        ></div>
+
+      </div>
+
+      <p class="progress-text">
+        Photo {{ currentStep + 1 }} of {{ photoSteps.length }}
+      </p>
+
+    </div>
+
+    <!-- Header -->
+
+    <div class="page-header">
+
+      <div class="photo-icon">
+        {{ currentPhoto.icon }}
+      </div>
+
+      <h1>
+        {{ currentPhoto.title }}
+      </h1>
+
+      <p>
+        {{ currentPhoto.description }}
+      </p>
+
+    </div>
+
+    <!-- Camera Placeholder -->
+
+    <div class="camera-preview">
+
+      <div class="camera-placeholder">
+
+        <div class="placeholder-icon">
+          📷
+        </div>
+
+        <h3>
+          Camera Preview
+        </h3>
+
+        <p>
+          Camera integration will be enabled in the next sprint.
+          For now, click the button below to simulate capturing
+          this inspection photo.
+        </p>
+
+      </div>
+
+    </div>
+
+    <!-- Checklist -->
+
+    <div class="checklist">
+
+      @for (photo of photoSteps; track photo.title; let i = $index) {
+
+        <div
+          class="check-item"
+          [class.completed]="i < currentStep"
+          [class.active]="i === currentStep"
+        >
+
+          <div class="check-number">
+
+            @if (i < currentStep) {
+
+              ✓
+
+            } @else {
+
+              {{ i + 1 }}
+
+            }
+
+          </div>
+
+          <span>
+            {{ photo.title }}
+          </span>
+
+        </div>
+
+      }
+
+    </div>
+
+    <!-- Actions -->
+
+    <div class="actions">
+
+      <button
+        type="button"
+        class="secondary-button"
+        (click)="previous()"
+      >
+        Back
+      </button>
+
+      <button
+        type="button"
+        class="primary-button"
+        (click)="uploadPhoto()"
+      >
+
+        @if (currentStep < photoSteps.length - 1) {
+
+          Capture & Continue →
+
+        } @else {
+
+          Finish Inspection →
+
+        }
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>

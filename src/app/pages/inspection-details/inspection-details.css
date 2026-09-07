@@ -1,0 +1,1310 @@
+/* ==========================================================
+   FALCON AI
+   INSPECTION DETAILS
+   Enterprise UI
+========================================================== */
+
+:host {
+  display: block;
+  width: 100%;
+  background: #f4f7fb;
+  min-height: 100vh;
+}
+
+*,
+*::before,
+*::after{
+  box-sizing:border-box;
+}
+
+.inspection-details-page{
+
+  max-width:1600px;
+
+  margin:0 auto;
+
+  padding:34px;
+
+  color:#1b2b42;
+
+}
+
+/* ==========================================================
+   STATES
+========================================================== */
+
+.state-card{
+
+  background:#fff;
+
+  border-radius:18px;
+
+  padding:70px 50px;
+
+  text-align:center;
+
+  border:1px solid #e7edf5;
+
+  box-shadow:
+      0 8px 30px rgba(18,38,63,.05);
+
+}
+
+.loading-spinner{
+
+  width:64px;
+
+  height:64px;
+
+  margin:0 auto 25px;
+
+  border-radius:50%;
+
+  border:6px solid #e6edf7;
+
+  border-top-color:#287dd8;
+
+  animation:spin 1s linear infinite;
+
+}
+
+@keyframes spin{
+
+  to{
+
+    transform:rotate(360deg);
+
+  }
+
+}
+
+.state-card h2{
+
+  margin:0 0 10px;
+
+  font-size:30px;
+
+  font-weight:700;
+
+  color:#1d2f49;
+
+}
+
+.state-card p{
+
+  margin:0;
+
+  color:#748499;
+
+  font-size:15px;
+
+  line-height:1.7;
+
+}
+
+.error-icon{
+
+  width:74px;
+
+  height:74px;
+
+  margin:0 auto 22px;
+
+  border-radius:50%;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  background:#fdecec;
+
+  color:#d84545;
+
+  font-size:34px;
+
+  font-weight:700;
+
+}
+
+.back-button{
+
+  margin-top:35px;
+
+  height:46px;
+
+  padding:0 24px;
+
+  border:none;
+
+  border-radius:10px;
+
+  cursor:pointer;
+
+  background:#2d79d7;
+
+  color:#fff;
+
+  font-size:14px;
+
+  font-weight:700;
+
+  transition:.25s;
+
+}
+
+.back-button:hover{
+
+  background:#185ea8;
+
+}
+
+/* ==========================================================
+   HEADER
+========================================================== */
+
+.page-header{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:flex-start;
+
+  gap:30px;
+
+  margin-bottom:28px;
+
+}
+
+.header-left{
+
+  flex:1;
+
+}
+
+.back-link{
+
+  display:inline-flex;
+
+  align-items:center;
+
+  gap:10px;
+
+  border:none;
+
+  background:none;
+
+  padding:0;
+
+  margin-bottom:24px;
+
+  cursor:pointer;
+
+  color:#2d7ad7;
+
+  font-size:14px;
+
+  font-weight:700;
+
+}
+
+.back-link:hover{
+
+  color:#0e5eb3;
+
+}
+
+.back-arrow{
+
+  font-size:18px;
+
+}
+
+.eyebrow{
+
+  display:block;
+
+  margin-bottom:8px;
+
+  color:#6e8ba8;
+
+  font-size:11px;
+
+  font-weight:800;
+
+  letter-spacing:.18em;
+
+}
+
+.page-header h1{
+
+  margin:0 0 12px;
+
+  font-size:38px;
+
+  font-weight:800;
+
+  letter-spacing:-.03em;
+
+  color:#182a44;
+
+}
+
+.subtitle{
+
+  max-width:700px;
+
+  margin:0;
+
+  color:#75859a;
+
+  font-size:15px;
+
+  line-height:1.7;
+
+}
+
+/* ==========================================================
+   STATUS BADGE
+========================================================== */
+
+.status-badge{
+
+  display:inline-flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  min-width:140px;
+
+  height:44px;
+
+  padding:0 20px;
+
+  border-radius:999px;
+
+  font-size:13px;
+
+  font-weight:700;
+
+  letter-spacing:.05em;
+
+}
+
+.status-submitted{
+
+  background:#edf4ff;
+
+  color:#2b74c7;
+
+}
+
+.status-completed{
+
+  background:#e9f8ef;
+
+  color:#2a9665;
+
+}
+
+.status-pending{
+
+  background:#fff6e8;
+
+  color:#cf8b22;
+
+}
+
+.status-failed{
+
+  background:#fdecec;
+
+  color:#cb4747;
+
+}
+
+/* ==========================================================
+   SUMMARY CARD
+========================================================== */
+
+.summary-card{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:center;
+
+  gap:40px;
+
+  margin-bottom:30px;
+
+  padding:34px;
+
+  border-radius:20px;
+
+  overflow:hidden;
+
+  background:
+      linear-gradient(
+          135deg,
+          #0d2b49,
+          #13456f,
+          #1b6599
+      );
+
+  color:#fff;
+
+  box-shadow:
+      0 18px 45px rgba(16,54,92,.18);
+
+}
+
+.summary-main{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:24px;
+
+}
+
+.summary-icon{
+
+  width:82px;
+
+  height:82px;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  border-radius:20px;
+
+  font-size:38px;
+
+  background:
+      rgba(255,255,255,.12);
+
+}
+
+.summary-content h2{
+
+  margin:0 0 8px;
+
+  font-size:32px;
+
+  font-weight:700;
+
+}
+
+.registration{
+
+  margin:0;
+
+  color:#d8ebfb;
+
+  font-size:18px;
+
+  letter-spacing:.04em;
+
+}
+
+.summary-meta{
+
+  display:flex;
+
+  gap:40px;
+
+}
+
+.summary-meta-item{
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:6px;
+
+}
+
+.meta-label{
+
+  font-size:11px;
+
+  color:#b8d5eb;
+
+  letter-spacing:.12em;
+
+  text-transform:uppercase;
+
+}
+
+.summary-meta-item strong{
+
+  font-size:18px;
+
+  font-weight:700;
+
+  color:#fff;
+
+}
+/* ==========================================================
+   MAIN REPORT LAYOUT
+========================================================== */
+
+.report-grid{
+
+  display:grid;
+
+  grid-template-columns:
+      minmax(0,1.65fr)
+      360px;
+
+  gap:28px;
+
+  align-items:start;
+
+}
+
+.report-main{
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:24px;
+
+}
+
+.report-sidebar{
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:24px;
+
+}
+
+/* ==========================================================
+   REPORT CARDS
+========================================================== */
+
+.report-card{
+
+  background:#ffffff;
+
+  border-radius:18px;
+
+  border:1px solid #e6edf5;
+
+  overflow:hidden;
+
+  box-shadow:
+      0 8px 28px rgba(16,43,72,.05);
+
+}
+
+.card-header{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:center;
+
+  padding:26px 30px;
+
+  border-bottom:1px solid #edf2f8;
+
+}
+
+.card-header h2{
+
+  margin:6px 0 0;
+
+  color:#182a44;
+
+  font-size:23px;
+
+  font-weight:700;
+
+}
+
+.section-kicker{
+
+  display:block;
+
+  color:#7c91a9;
+
+  font-size:11px;
+
+  font-weight:800;
+
+  letter-spacing:.16em;
+
+}
+
+.section-icon{
+
+  width:56px;
+
+  height:56px;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  border-radius:14px;
+
+  background:#eef5fc;
+
+  font-size:24px;
+
+}
+
+/* ==========================================================
+   DETAILS GRID
+========================================================== */
+
+.details-grid{
+
+  display:grid;
+
+  grid-template-columns:
+      repeat(2,minmax(0,1fr));
+
+  gap:26px;
+
+  padding:30px;
+
+}
+
+.vehicle-details{
+
+  grid-template-columns:
+      repeat(3,minmax(0,1fr));
+
+}
+
+.detail-item{
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:8px;
+
+}
+
+.detail-label{
+
+  color:#7c8da2;
+
+  font-size:12px;
+
+  font-weight:700;
+
+  letter-spacing:.05em;
+
+  text-transform:uppercase;
+
+}
+
+.detail-value{
+
+  color:#1d3048;
+
+  font-size:17px;
+
+  font-weight:600;
+
+  line-height:1.6;
+
+  word-break:break-word;
+
+}
+
+.highlight-value{
+
+  color:#1668c7;
+
+  font-size:20px;
+
+  font-weight:700;
+
+}
+
+.id-value{
+
+  font-family:monospace;
+
+  font-size:14px;
+
+  color:#506174;
+
+}
+
+/* ==========================================================
+   SIDEBAR CARDS
+========================================================== */
+
+.side-card{
+
+  background:#ffffff;
+
+  border-radius:18px;
+
+  border:1px solid #e6edf5;
+
+  padding:26px;
+
+  box-shadow:
+      0 8px 28px rgba(16,43,72,.05);
+
+}
+
+.side-card-header{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:center;
+
+  margin-bottom:18px;
+
+}
+
+.status-dot{
+
+  width:14px;
+
+  height:14px;
+
+  border-radius:50%;
+
+  background:#9ca8b5;
+
+}
+
+.dot-submitted{
+
+  background:#2c7ad7;
+
+}
+
+.dot-completed{
+
+  background:#2fa66d;
+
+}
+
+.dot-pending{
+
+  background:#d89225;
+
+}
+
+.status-large{
+
+  font-size:32px;
+
+  font-weight:700;
+
+  color:#1d3048;
+
+  margin-bottom:14px;
+
+}
+
+.side-description{
+
+  margin:0;
+
+  color:#77889d;
+
+  line-height:1.7;
+
+  font-size:14px;
+
+}
+
+/* ==========================================================
+   INSPECTION TYPE
+========================================================== */
+
+.inspection-type{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:18px;
+
+}
+
+.type-icon{
+
+  width:60px;
+
+  height:60px;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  border-radius:16px;
+
+  background:#eef5fc;
+
+  font-size:28px;
+
+}
+
+.inspection-type strong{
+
+  display:block;
+
+  color:#1d3048;
+
+  font-size:18px;
+
+  margin-bottom:6px;
+
+}
+
+.inspection-type span{
+
+  color:#7b8da3;
+
+  font-size:14px;
+
+}
+
+/* ==========================================================
+   QUICK SUMMARY
+========================================================== */
+
+.quick-summary{
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:18px;
+
+}
+
+.quick-item{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:center;
+
+  gap:20px;
+
+  padding-bottom:16px;
+
+  border-bottom:1px solid #edf2f8;
+
+}
+
+.quick-item:last-child{
+
+  border-bottom:none;
+
+  padding-bottom:0;
+
+}
+
+.quick-item span{
+
+  color:#7f90a4;
+
+  font-size:13px;
+
+}
+
+.quick-item strong{
+
+  color:#1b2d46;
+
+  font-size:14px;
+
+  font-weight:700;
+
+  text-align:right;
+
+}
+/* ==========================================================
+   PHOTO GALLERY
+========================================================== */
+
+.photo-grid{
+
+  display:grid;
+
+  grid-template-columns:
+      repeat(auto-fill,minmax(240px,1fr));
+
+  gap:24px;
+
+  padding:30px;
+
+}
+
+.photo-card{
+
+  background:#ffffff;
+
+  border:1px solid #e7edf5;
+
+  border-radius:16px;
+
+  overflow:hidden;
+
+  transition:
+      transform .25s ease,
+      box-shadow .25s ease,
+      border-color .25s ease;
+
+  box-shadow:
+      0 4px 16px rgba(16,43,72,.04);
+
+}
+
+.photo-card:hover{
+
+  transform:translateY(-6px);
+
+  border-color:#c7daf0;
+
+  box-shadow:
+      0 18px 35px rgba(20,60,100,.12);
+
+}
+
+.photo-card img{
+
+  display:block;
+
+  width:100%;
+
+  height:220px;
+
+  object-fit:cover;
+
+  background:#eef3f8;
+
+}
+
+.photo-label{
+
+  padding:18px;
+
+  font-size:14px;
+
+  font-weight:600;
+
+  color:#22364f;
+
+  border-top:1px solid #edf2f8;
+
+}
+
+/* ==========================================================
+   EMPTY PHOTO STATE
+========================================================== */
+
+.empty-state{
+
+  padding:70px 40px;
+
+  text-align:center;
+
+}
+
+.empty-icon{
+
+  width:78px;
+
+  height:78px;
+
+  margin:0 auto 22px;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  border-radius:18px;
+
+  background:#eef5fc;
+
+  font-size:38px;
+
+}
+
+.empty-state h3{
+
+  margin:0 0 12px;
+
+  color:#22344d;
+
+  font-size:24px;
+
+  font-weight:700;
+
+}
+
+.empty-state p{
+
+  margin:0;
+
+  color:#7b8ea4;
+
+  font-size:15px;
+
+  line-height:1.7;
+
+}
+
+/* ==========================================================
+   TABLET
+========================================================== */
+
+@media (max-width:1200px){
+
+  .report-grid{
+
+    grid-template-columns:1fr;
+
+  }
+
+  .report-sidebar{
+
+    display:grid;
+
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+
+    gap:24px;
+
+  }
+
+}
+
+@media (max-width:900px){
+
+  .summary-card{
+
+    flex-direction:column;
+
+    align-items:flex-start;
+
+    gap:28px;
+
+  }
+
+  .summary-meta{
+
+    width:100%;
+
+    justify-content:space-between;
+
+    flex-wrap:wrap;
+
+    gap:24px;
+
+  }
+
+  .vehicle-details{
+
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+
+  }
+
+  .details-grid{
+
+    grid-template-columns:1fr;
+
+  }
+
+  .photo-grid{
+
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+
+  }
+
+  .page-header{
+
+    flex-direction:column;
+
+    align-items:flex-start;
+
+  }
+
+}
+
+@media (max-width:700px){
+
+  .inspection-details-page{
+
+    padding:20px;
+
+  }
+
+  .summary-main{
+
+    flex-direction:column;
+
+    align-items:flex-start;
+
+  }
+
+  .summary-content h2{
+
+    font-size:26px;
+
+  }
+
+  .vehicle-details{
+
+    grid-template-columns:1fr;
+
+  }
+
+  .photo-grid{
+
+    grid-template-columns:1fr;
+
+  }
+
+  .report-sidebar{
+
+    grid-template-columns:1fr;
+
+  }
+
+  .card-header{
+
+    flex-direction:column;
+
+    align-items:flex-start;
+
+    gap:16px;
+
+  }
+
+  .section-icon{
+
+    width:48px;
+
+    height:48px;
+
+    font-size:22px;
+
+  }
+
+}
+
+@media (max-width:500px){
+
+  .inspection-details-page{
+
+    padding:16px;
+
+  }
+
+  .page-header h1{
+
+    font-size:30px;
+
+  }
+
+  .summary-card{
+
+    padding:24px;
+
+  }
+
+  .summary-icon{
+
+    width:68px;
+
+    height:68px;
+
+    font-size:30px;
+
+  }
+
+  .summary-content h2{
+
+    font-size:22px;
+
+  }
+
+  .registration{
+
+    font-size:16px;
+
+  }
+
+  .details-grid{
+
+    padding:22px;
+
+  }
+
+  .photo-card img{
+
+    height:200px;
+
+  }
+
+  .status-large{
+
+    font-size:26px;
+
+  }
+
+  .quick-item{
+
+    flex-direction:column;
+
+    align-items:flex-start;
+
+    gap:6px;
+
+  }
+
+}
+
+/* ==========================================================
+   END OF FILE
+========================================================== */
+
+/* ===================================================
+   RESPONSIVE DESIGN
+=================================================== */
+
+@media (max-width: 1400px) {
+
+  .report-grid {
+    grid-template-columns: 1fr 320px;
+  }
+
+}
+
+@media (max-width: 1200px) {
+
+  .inspection-details-page {
+    padding: 28px;
+  }
+
+  .report-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .report-sidebar {
+    order: -1;
+  }
+
+  .summary-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+  }
+
+  .summary-meta {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+}
+
+@media (max-width: 900px) {
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .header-actions {
+    width: 100%;
+  }
+
+  .status-badge {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .details-grid,
+  .vehicle-details {
+    grid-template-columns: 1fr;
+  }
+
+  .photo-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+}
+
+@media (max-width: 640px) {
+
+  .inspection-details-page {
+    padding: 18px;
+  }
+
+  .summary-main {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .summary-meta {
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .photo-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .report-card,
+  .side-card {
+    padding: 20px;
+  }
+
+  .detail-item {
+    padding-bottom: 14px;
+    border-bottom: 1px solid #eef2f7;
+  }
+
+  .detail-item:last-child {
+    border-bottom: none;
+  }
+
+  .back-link {
+    width: 100%;
+    justify-content: center;
+  }
+
+}

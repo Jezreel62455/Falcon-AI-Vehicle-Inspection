@@ -1,1 +1,436 @@
-<p>history works!</p>
+<div class="history-page">
+
+
+  <!-- =========================================================
+       PAGE HEADER
+  ========================================================= -->
+
+  <section class="history-header">
+
+    <div>
+
+      <span class="page-eyebrow">
+        FALCON AI PLATFORM
+      </span>
+
+      <h1>
+        Inspection History
+      </h1>
+
+      <p class="subtitle">
+        View all vehicle inspections submitted through Falcon AI.
+      </p>
+
+    </div>
+
+
+    <button
+      type="button"
+      class="new-inspection-button"
+      (click)="createInspection()"
+    >
+
+      <span>
+        +
+      </span>
+
+      New Inspection
+
+    </button>
+
+  </section>
+
+
+
+  <!-- =========================================================
+       LOADING
+  ========================================================= -->
+
+  @if (isLoading) {
+
+    <section class="state-card">
+
+      <div class="loading-spinner"></div>
+
+      <h3>
+        Loading inspection history...
+      </h3>
+
+      <p>
+        Retrieving the latest inspections.
+      </p>
+
+    </section>
+
+  }
+
+
+
+  <!-- =========================================================
+       ERROR
+  ========================================================= -->
+
+  @else if (errorMessage) {
+
+    <section class="state-card error-state">
+
+      <h3>
+        Unable to load inspection history
+      </h3>
+
+      <p>
+        {{ errorMessage }}
+      </p>
+
+
+      <button
+        type="button"
+        class="retry-button"
+        (click)="createInspection()"
+      >
+
+        Create Inspection
+
+      </button>
+
+    </section>
+
+  }
+
+
+
+  <!-- =========================================================
+       EMPTY
+  ========================================================= -->
+
+  @else if (inspections.length === 0) {
+
+    <section class="state-card empty-state">
+
+      <div class="empty-icon">
+        📋
+      </div>
+
+      <h2>
+        No inspections yet
+      </h2>
+
+      <p>
+        Start your first vehicle inspection to see it here.
+      </p>
+
+
+      <button
+        type="button"
+        class="new-inspection-button"
+        (click)="createInspection()"
+      >
+
+        + Create Inspection Request
+
+      </button>
+
+    </section>
+
+  }
+
+
+
+  <!-- =========================================================
+       INSPECTIONS
+  ========================================================= -->
+
+  @else {
+
+    <section class="inspection-list">
+
+
+      @for (
+        inspection of inspections;
+        track trackByInspection($index, inspection)
+      ) {
+
+
+        <article class="inspection-card">
+
+
+          <!-- ===================================================
+               CARD HEADER
+          =================================================== -->
+
+          <div class="inspection-card-header">
+
+            <div>
+
+              <span class="card-eyebrow">
+                INSPECTION
+              </span>
+
+              <h2>
+                {{ getCustomerName(inspection) }}
+              </h2>
+
+              <p class="inspection-id">
+                ID:
+                {{ inspection.id }}
+              </p>
+
+            </div>
+
+
+            <span
+              class="status"
+              [ngClass]="getStatusClass(inspection)"
+            >
+
+              {{ getStatus(inspection) }}
+
+            </span>
+
+          </div>
+
+
+
+          <!-- ===================================================
+               SUMMARY
+          =================================================== -->
+
+          <div class="inspection-summary">
+
+
+            <div class="summary-item">
+
+              <span>
+                Vehicle
+              </span>
+
+              <strong>
+                {{ getVehicleRegistration(inspection) }}
+              </strong>
+
+            </div>
+
+
+            <div class="summary-item">
+
+              <span>
+                Type
+              </span>
+
+              <strong>
+                {{ getInspectionType(inspection) }}
+              </strong>
+
+            </div>
+
+
+            <div class="summary-item">
+
+              <span>
+                Created
+              </span>
+
+              <strong>
+
+                {{ inspection.createdAt | date:'dd MMM yyyy' }}
+
+              </strong>
+
+            </div>
+
+
+          </div>
+
+
+
+          <!-- ===================================================
+               VEHICLE INFORMATION
+          =================================================== -->
+
+          <div class="vehicle-section">
+
+            <div class="section-heading">
+
+              <h3>
+                Vehicle Information
+              </h3>
+
+            </div>
+
+
+            <div class="vehicle-grid">
+
+
+              <div class="detail-item">
+
+                <span>
+                  Registration
+                </span>
+
+                <strong>
+                  {{ getVehicleRegistration(inspection) }}
+                </strong>
+
+              </div>
+
+
+              <div class="detail-item">
+
+                <span>
+                  Make
+                </span>
+
+                <strong>
+                  {{ getVehicleMake(inspection) }}
+                </strong>
+
+              </div>
+
+
+              <div class="detail-item">
+
+                <span>
+                  Model
+                </span>
+
+                <strong>
+                  {{ getVehicleModel(inspection) }}
+                </strong>
+
+              </div>
+
+
+              <div class="detail-item">
+
+                <span>
+                  Year
+                </span>
+
+                <strong>
+                  {{ getVehicleYear(inspection) }}
+                </strong>
+
+              </div>
+
+
+              <div class="detail-item">
+
+                <span>
+                  Colour
+                </span>
+
+                <strong>
+                  {{ getVehicleColour(inspection) }}
+                </strong>
+
+              </div>
+
+
+              <div class="detail-item">
+
+                <span>
+                  Mileage
+                </span>
+
+                <strong>
+                  {{ getVehicleMileage(inspection) }}
+                </strong>
+
+              </div>
+
+
+            </div>
+
+          </div>
+
+
+
+          <!-- ===================================================
+               INSPECTION INFORMATION
+          =================================================== -->
+
+          <div class="inspection-information">
+
+
+            <div class="detail-item">
+
+              <span>
+                Inspection Type
+              </span>
+
+              <strong>
+                {{ getInspectionType(inspection) }}
+              </strong>
+
+            </div>
+
+
+            <div class="detail-item">
+
+              <span>
+                Created
+              </span>
+
+              <strong>
+                {{ inspection.createdAt | date:'medium' }}
+              </strong>
+
+            </div>
+
+
+            <div class="detail-item">
+
+              <span>
+                Status
+              </span>
+
+              <strong>
+                {{ getStatus(inspection) }}
+              </strong>
+
+            </div>
+
+
+          </div>
+
+
+
+          <!-- ===================================================
+               ACTION
+               
+               SAME STRUCTURE AS REPORTS:
+               button -> click -> viewInspection()
+               
+               NO routerLink.
+               NO private router in HTML.
+          =================================================== -->
+
+          <div class="inspection-actions">
+
+            <button
+              type="button"
+              class="view-details-button"
+              (click)="viewInspection(inspection)"
+            >
+
+              View Details
+
+              <span>
+                →
+              </span>
+
+            </button>
+
+          </div>
+
+
+        </article>
+
+      }
+
+
+    </section>
+
+  }
+
+</div>

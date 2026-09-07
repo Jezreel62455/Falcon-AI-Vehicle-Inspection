@@ -1,0 +1,213 @@
+:host {
+  display: block;
+}
+
+
+.instructions-page {
+
+  min-height: 100vh;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  padding: 30px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #071426,
+      #102b4c
+    );
+
+}
+
+
+
+.instructions-card {
+
+  width: 100%;
+
+  max-width: 850px;
+
+  background: white;
+
+  border-radius: 26px;
+
+  padding: 45px;
+
+  box-shadow:
+    0 25px 60px rgba(0,0,0,.25);
+
+}
+
+
+
+.header {
+
+  text-align: center;
+
+  margin-bottom: 35px;
+
+}
+
+
+
+.header h1 {
+
+  margin: 0;
+
+  color: #172033;
+
+  font-size: 34px;
+
+}
+
+
+
+.header p {
+
+  color: #64748b;
+
+  margin-top: 12px;
+
+  line-height: 1.6;
+
+}
+
+
+
+
+.steps {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 18px;
+
+}
+
+
+
+
+.step-card {
+
+  display: flex;
+
+  gap: 20px;
+
+  align-items: center;
+
+  background: #f8fafc;
+
+  padding: 22px;
+
+  border-radius: 16px;
+
+  border: 1px solid #e5e7eb;
+
+}
+
+
+
+.number {
+
+  width: 45px;
+
+  height: 45px;
+
+  border-radius: 50%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background: #1d7cff;
+
+  color: white;
+
+  font-size: 20px;
+
+  font-weight: 700;
+
+}
+
+
+
+.step-card h3 {
+
+  margin: 0 0 6px;
+
+  color: #172033;
+
+}
+
+
+
+.step-card p {
+
+  margin: 0;
+
+  color: #64748b;
+
+}
+
+
+
+
+.continue-button {
+
+  width: 100%;
+
+  margin-top: 35px;
+
+  padding: 17px;
+
+  border: none;
+
+  border-radius: 14px;
+
+  background: #1d7cff;
+
+  color: white;
+
+  font-size: 18px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+}
+
+
+
+.continue-button:hover {
+
+  background: #0056d6;
+
+}
+
+
+
+
+@media(max-width:600px){
+
+  .instructions-card {
+
+    padding: 25px;
+
+  }
+
+
+  .step-card {
+
+    align-items: flex-start;
+
+  }
+
+}

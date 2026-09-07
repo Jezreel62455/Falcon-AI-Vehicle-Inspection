@@ -1,0 +1,868 @@
+<div class="inspection-details-page">
+
+  <!-- =====================================================
+       HEADER
+       ===================================================== -->
+
+  <section class="page-header">
+
+    <div>
+
+      <span class="eyebrow">
+        FALCON AI PLATFORM
+      </span>
+
+      <h1>
+        Inspection Details
+      </h1>
+
+      <p>
+        Review the complete vehicle inspection record.
+      </p>
+
+    </div>
+
+
+    <button
+      type="button"
+      class="back-button"
+      (click)="backToHistory()">
+
+      ← Back to History
+
+    </button>
+
+  </section>
+
+
+  <!-- =====================================================
+       LOADING
+       ===================================================== -->
+
+  @if (isLoading) {
+
+    <section class="loading-card">
+
+      <span class="loading-spinner"></span>
+
+      <div>
+
+        <strong>
+          Loading inspection...
+        </strong>
+
+        <span>
+          Please wait while we retrieve the inspection details.
+        </span>
+
+      </div>
+
+    </section>
+
+  }
+
+
+  <!-- =====================================================
+       ERROR
+       ===================================================== -->
+
+  @else if (errorMessage && !inspection) {
+
+    <section class="error-card">
+
+      <div>
+
+        <strong>
+          Unable to load inspection
+        </strong>
+
+        <p>
+          {{ errorMessage }}
+        </p>
+
+      </div>
+
+
+      <div class="error-actions">
+
+        <button
+          type="button"
+          class="secondary-button"
+          (click)="backToHistory()">
+
+          Back to History
+
+        </button>
+
+
+        <button
+          type="button"
+          class="primary-button"
+          (click)="retry()">
+
+          Try Again
+
+        </button>
+
+      </div>
+
+    </section>
+
+  }
+
+
+  <!-- =====================================================
+       DETAILS
+       ===================================================== -->
+
+  @else if (inspection) {
+
+    <!-- ===================================================
+         HERO
+         =================================================== -->
+
+    <section class="details-hero">
+
+      <div class="hero-left">
+
+        <div class="hero-icon">
+
+          @if (isAccidentInspection()) {
+            ⚠
+          } @else {
+            ✓
+          }
+
+        </div>
+
+
+        <div>
+
+          <span class="hero-label">
+            {{ getInspectionType() }}
+          </span>
+
+          <h2>
+            {{ getVehicleName() }}
+          </h2>
+
+          <p>
+            Reference:
+            <strong>
+              {{ getReference() }}
+            </strong>
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <span
+        class="status-badge"
+        [class]="getStatusClass()">
+
+        {{ getStatus() }}
+
+      </span>
+
+    </section>
+
+
+    <!-- ===================================================
+         QUICK SUMMARY
+         =================================================== -->
+
+    <section class="summary-grid">
+
+      <article class="summary-card">
+
+        <span>
+          Vehicle
+        </span>
+
+        <strong>
+          {{ getVehicleName() }}
+        </strong>
+
+      </article>
+
+
+      <article class="summary-card">
+
+        <span>
+          Registration
+        </span>
+
+        <strong>
+          {{ getRegistration() }}
+        </strong>
+
+      </article>
+
+
+      <article class="summary-card">
+
+        <span>
+          Inspection Type
+        </span>
+
+        <strong>
+          {{ getInspectionType() }}
+        </strong>
+
+      </article>
+
+
+      <article class="summary-card">
+
+        <span>
+          Photos
+        </span>
+
+        <strong>
+          {{ getPhotoCount() }}
+        </strong>
+
+      </article>
+
+    </section>
+
+
+    <!-- ===================================================
+         CUSTOMER
+         =================================================== -->
+
+    <section class="details-card">
+
+      <div class="section-heading">
+
+        <div>
+
+          <span class="eyebrow">
+            CUSTOMER
+          </span>
+
+          <h2>
+            Customer Information
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      <div class="details-grid">
+
+        <div class="detail-field">
+
+          <span>
+            First Name
+          </span>
+
+          <strong>
+            {{ getCustomerFirstName() }}
+          </strong>
+
+        </div>
+
+
+        <div class="detail-field">
+
+          <span>
+            Surname
+          </span>
+
+          <strong>
+            {{ getCustomerSurname() }}
+          </strong>
+
+        </div>
+
+
+        <div class="detail-field">
+
+          <span>
+            Phone
+          </span>
+
+          <strong>
+            {{ getCustomerPhone() }}
+          </strong>
+
+        </div>
+
+
+        <div class="detail-field">
+
+          <span>
+            Email
+          </span>
+
+          <strong>
+            {{ getCustomerEmail() }}
+          </strong>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         POLICY
+         =================================================== -->
+
+    <section class="details-card">
+
+      <div class="section-heading">
+
+        <div>
+
+          <span class="eyebrow">
+            INSURANCE
+          </span>
+
+          <h2>
+            Policy Information
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      <div class="details-grid">
+
+        <div class="detail-field">
+
+          <span>
+            Policy Number
+          </span>
+
+          <strong>
+            {{ getPolicyNumber() }}
+          </strong>
+
+        </div>
+
+
+        <div class="detail-field">
+
+          <span>
+            Insurance Company
+          </span>
+
+          <strong>
+            {{ getInsuranceCompany() }}
+          </strong>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         VEHICLE
+         =================================================== -->
+
+    <section class="details-card">
+
+      <div class="section-heading">
+
+        <div>
+
+          <span class="eyebrow">
+            VEHICLE
+          </span>
+
+          <h2>
+            Vehicle Information
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      <div class="details-grid">
+
+        <div class="detail-field">
+
+          <span>
+            Registration
+          </span>
+
+          <strong>
+            {{ getRegistration() }}
+          </strong>
+
+        </div>
+
+
+        <div class="detail-field">
+
+          <span>
+            VIN
+          </span>
+
+          <strong>
+            {{ getVehicleVin() }}
+          </strong>
+
+        </div>
+
+
+        <div class="detail-field">
+
+          <span>
+            Make
+          </span>
+
+          <strong>
+            {{ getVehicleMake() }}
+          </strong>
+
+        </div>
+
+
+        <div class="detail-field">
+
+          <span>
+            Model
+          </span>
+
+          <strong>
+            {{ getVehicleModel() }}
+          </strong>
+
+        </div>
+
+
+        <div class="detail-field">
+
+          <span>
+            Year
+          </span>
+
+          <strong>
+            {{ getVehicleYear() }}
+          </strong>
+
+        </div>
+
+
+        <div class="detail-field">
+
+          <span>
+            Colour
+          </span>
+
+          <strong>
+            {{ getVehicleColour() }}
+          </strong>
+
+        </div>
+
+
+        <div class="detail-field">
+
+          <span>
+            Mileage
+          </span>
+
+          <strong>
+            {{ getVehicleMileage() }}
+          </strong>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         INSPECTION INFORMATION
+         =================================================== -->
+
+    <section class="details-card">
+
+      <div class="section-heading">
+
+        <div>
+
+          <span class="eyebrow">
+            INSPECTION
+          </span>
+
+          <h2>
+            Inspection Information
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      <div class="details-grid">
+
+        <div class="detail-field">
+
+          <span>
+            Reference
+          </span>
+
+          <strong>
+            {{ getReference() }}
+          </strong>
+
+        </div>
+
+
+        <div class="detail-field">
+
+          <span>
+            Type
+          </span>
+
+          <strong>
+            {{ getInspectionType() }}
+          </strong>
+
+        </div>
+
+
+        <div class="detail-field">
+
+          <span>
+            Status
+          </span>
+
+          <strong>
+            {{ getStatus() }}
+          </strong>
+
+        </div>
+
+
+        <div class="detail-field">
+
+          <span>
+            Created
+          </span>
+
+          <strong>
+            {{ formatDate(inspection.createdAt) }}
+          </strong>
+
+        </div>
+
+
+        <div class="detail-field">
+
+          <span>
+            Updated
+          </span>
+
+          <strong>
+            {{ formatDate(inspection.updatedAt) }}
+          </strong>
+
+        </div>
+
+
+        <div class="detail-field">
+
+          <span>
+            Submitted
+          </span>
+
+          <strong>
+            {{ formatDate(inspection.submittedAt) }}
+          </strong>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         AI RESULTS
+         =================================================== -->
+
+    @if (inspection.ai) {
+
+      <section class="details-card">
+
+        <div class="section-heading">
+
+          <div>
+
+            <span class="eyebrow">
+              AI ANALYSIS
+            </span>
+
+            <h2>
+              AI Inspection Results
+            </h2>
+
+          </div>
+
+        </div>
+
+
+        <div class="details-grid">
+
+          <div class="detail-field">
+
+            <span>
+              Processing Status
+            </span>
+
+            <strong>
+              {{ inspection.ai.status || 'Not processed' }}
+            </strong>
+
+          </div>
+
+
+          <div class="detail-field">
+
+            <span>
+              AI Score
+            </span>
+
+            <strong>
+              {{
+                inspection.ai.score !== null &&
+                inspection.ai.score !== undefined
+                  ? inspection.ai.score
+                  : 'Not available'
+              }}
+            </strong>
+
+          </div>
+
+
+          <div class="detail-field">
+
+            <span>
+              Damage Detected
+            </span>
+
+            <strong>
+              {{
+                inspection.ai.damageDetected === true
+                  ? 'Yes'
+                  : inspection.ai.damageDetected === false
+                    ? 'No'
+                    : 'Not available'
+              }}
+            </strong>
+
+          </div>
+
+
+          <div class="detail-field">
+
+            <span>
+              Provider
+            </span>
+
+            <strong>
+              {{ inspection.ai.provider || 'Not available' }}
+            </strong>
+
+          </div>
+
+
+          <div class="detail-field full-width">
+
+            <span>
+              Damage Summary
+            </span>
+
+            <strong>
+              {{ inspection.ai.damageSummary || 'No summary available.' }}
+            </strong>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    }
+
+
+    <!-- ===================================================
+         PHOTOS
+         =================================================== -->
+
+    <section class="details-card">
+
+      <div class="section-heading">
+
+        <div>
+
+          <span class="eyebrow">
+            PHOTOS
+          </span>
+
+          <h2>
+            Inspection Photos
+          </h2>
+
+        </div>
+
+        <span class="photo-count">
+          {{ getPhotoCount() }} photo(s)
+        </span>
+
+      </div>
+
+
+      @if (getPhotoCount() === 0) {
+
+        <div class="empty-photos">
+
+          <span>
+            No photos have been uploaded for this inspection.
+          </span>
+
+        </div>
+
+      } @else {
+
+        <div class="photo-grid">
+
+          @for (
+            photo of getVehiclePhotos();
+            track $index
+          ) {
+
+            @if (getPhotoUrl(photo)) {
+
+              <div class="photo-card">
+
+                <img
+                  [src]="getPhotoUrl(photo)"
+                  alt="Vehicle inspection photo"
+                />
+
+              </div>
+
+            }
+
+          }
+
+
+          @for (
+            photo of getAccidentPhotos();
+            track $index
+          ) {
+
+            @if (getPhotoUrl(photo)) {
+
+              <div class="photo-card">
+
+                <img
+                  [src]="getPhotoUrl(photo)"
+                  alt="Accident damage photo"
+                />
+
+              </div>
+
+            }
+
+          }
+
+
+          @for (
+            photo of getDamagePhotos();
+            track $index
+          ) {
+
+            @if (getPhotoUrl(photo)) {
+
+              <div class="photo-card">
+
+                <img
+                  [src]="getPhotoUrl(photo)"
+                  alt="Vehicle damage photo"
+                />
+
+              </div>
+
+            }
+
+          }
+
+        </div>
+
+      }
+
+    </section>
+
+
+    <!-- ===================================================
+         ACCIDENT SECTION
+         =================================================== -->
+
+    @if (isAccidentInspection()) {
+
+      <section class="details-card accident-card">
+
+        <div class="section-heading">
+
+          <div>
+
+            <span class="eyebrow">
+              ACCIDENT CLAIM
+            </span>
+
+            <h2>
+              Accident Inspection
+            </h2>
+
+          </div>
+
+        </div>
+
+
+        <p>
+          This inspection was created for capturing vehicle
+          damage following an accident.
+        </p>
+
+      </section>
+
+    }
+
+
+    <!-- ===================================================
+         FOOTER ACTIONS
+         =================================================== -->
+
+    <section class="page-actions">
+
+      <button
+        type="button"
+        class="secondary-button"
+        (click)="backToHistory()">
+
+        ← Back to History
+
+      </button>
+
+    </section>
+
+  }
+
+</div>

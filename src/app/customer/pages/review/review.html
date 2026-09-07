@@ -1,0 +1,200 @@
+<div class="review-page">
+
+
+  <div class="review-card">
+
+
+    <div class="header">
+
+      <h1>
+        Review Inspection
+      </h1>
+
+      <p>
+        Please confirm your information before submitting.
+      </p>
+
+    </div>
+
+
+
+    <section class="review-section">
+
+      <h2>
+        Customer Details
+      </h2>
+
+
+      <div class="info">
+
+        <p>
+          <strong>Name:</strong>
+          {{inspection.customer.firstName}}
+          {{inspection.customer.lastName}}
+        </p>
+
+
+        <p>
+          <strong>Phone:</strong>
+          {{inspection.customer.phone}}
+        </p>
+
+
+        <p>
+          <strong>Email:</strong>
+          {{inspection.customer.email}}
+        </p>
+
+
+      </div>
+
+    </section>
+
+
+
+
+
+    <section class="review-section">
+
+      <h2>
+        Vehicle Details
+      </h2>
+
+
+      <div class="info">
+
+
+        <p>
+          <strong>Registration:</strong>
+          {{inspection.vehicle.registration}}
+        </p>
+
+
+
+        <p>
+          <strong>Vehicle:</strong>
+          {{inspection.vehicle.make}}
+          {{inspection.vehicle.model}}
+        </p>
+
+
+
+        <p>
+          <strong>Year:</strong>
+          {{inspection.vehicle.year}}
+        </p>
+
+
+
+        <p>
+          <strong>Mileage:</strong>
+          {{inspection.vehicle.mileage}}
+          km
+        </p>
+
+
+      </div>
+
+
+    </section>
+
+
+
+
+
+    <section class="review-section">
+
+
+      <h2>
+        Inspection Summary
+      </h2>
+
+
+
+      <div class="status-box">
+
+
+
+        <div>
+
+          <span>
+            Type
+          </span>
+
+
+          <strong>
+            {{getInspectionType()}}
+          </strong>
+
+
+        </div>
+
+
+
+
+
+        <div>
+
+          <span>
+            Photos
+          </span>
+
+
+          <strong>
+            {{inspection.photos.filter(photo => photo.uploaded).length}}
+            /
+            {{inspection.photos.length}}
+          </strong>
+
+
+        </div>
+
+
+
+      </div>
+
+
+    </section>
+
+
+
+
+
+    <div class="actions">
+
+
+
+      <button
+        class="back"
+        type="button"
+        (click)="back()"
+      >
+
+        Back
+
+      </button>
+
+
+
+
+
+      <button
+        class="submit"
+        type="button"
+        (click)="submitInspection()"
+      >
+
+        Submit Inspection
+
+      </button>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+</div>

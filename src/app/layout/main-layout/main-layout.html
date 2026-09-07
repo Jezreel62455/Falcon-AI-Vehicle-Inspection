@@ -1,56 +1,422 @@
-<mat-toolbar color="primary">
-  <span>🚗 Falcon AI Vehicle Inspection</span>
+<div
+  class="app-shell"
+  [class.sidebar-collapsed]="isSidebarCollapsed"
+  [class.mobile-sidebar-open]="isMobileSidebarOpen"
+>
 
-  <span style="flex:1"></span>
+  <!-- =========================================================
+       MOBILE OVERLAY
+  ========================================================== -->
 
-  <button mat-icon-button>
-    <mat-icon>notifications</mat-icon>
-  </button>
+  @if (isMobileSidebarOpen) {
+    <div
+      class="mobile-overlay"
+      (click)="closeMobileSidebar()"
+    ></div>
+  }
 
-  <button mat-icon-button>
-    <mat-icon>account_circle</mat-icon>
-  </button>
-</mat-toolbar>
 
-<mat-sidenav-container class="container">
+  <!-- =========================================================
+       SIDEBAR
+  ========================================================== -->
 
-  <mat-sidenav mode="side" opened>
+  <aside class="sidebar">
 
-    <mat-nav-list>
+    <!-- BRAND -->
 
-      <a mat-list-item routerLink="/">
-        <mat-icon>dashboard</mat-icon>
-        Dashboard
-      </a>
+    <div class="sidebar-brand">
 
-      <a mat-list-item routerLink="/new-inspection">
-        <mat-icon>directions_car</mat-icon>
-        New Inspection
-      </a>
+      <div class="brand-mark">
+        <span>F</span>
+      </div>
 
-      <a mat-list-item routerLink="/history">
-        <mat-icon>history</mat-icon>
-        History
-      </a>
+      @if (!isSidebarCollapsed) {
+        <div class="brand-copy">
+          <strong>Falcon</strong>
+          <span>Vehicle Inspection</span>
+        </div>
+      }
 
-      <a mat-list-item routerLink="/reports">
-        <mat-icon>description</mat-icon>
-        Reports
-      </a>
+      <button
+        type="button"
+        class="mobile-close-button"
+        aria-label="Close navigation"
+        (click)="closeMobileSidebar()"
+      >
+        ×
+      </button>
 
-      <a mat-list-item routerLink="/settings">
-        <mat-icon>settings</mat-icon>
-        Settings
-      </a>
+    </div>
 
-    </mat-nav-list>
 
-  </mat-sidenav>
+    <!-- =======================================================
+         CREATE INSPECTION REQUEST
+    ======================================================== -->
 
-  <mat-sidenav-content>
+    <div class="sidebar-action">
 
-    <router-outlet></router-outlet>
+      <button
+        type="button"
+        class="new-inspection-button"
+        (click)="navigateToNewInspection()"
+      >
 
-  </mat-sidenav-content>
+        <span class="button-icon">
+          +
+        </span>
 
-</mat-sidenav-container>
+        @if (!isSidebarCollapsed) {
+          <span>
+            Create Inspection Request
+          </span>
+        }
+
+      </button>
+
+    </div>
+
+
+    <!-- =======================================================
+         NAVIGATION
+    ======================================================== -->
+
+    <nav class="navigation">
+
+      <!-- WORKSPACE -->
+
+      <div class="navigation-section">
+
+        @if (!isSidebarCollapsed) {
+          <span class="navigation-label">
+            WORKSPACE
+          </span>
+        }
+
+
+        <!-- ===================================================
+             DASHBOARD
+        ==================================================== -->
+
+        <button
+          type="button"
+          class="navigation-item"
+          [class.active]="isActive('/dashboard')"
+          (click)="goToDashboard()"
+        >
+
+          <span class="navigation-icon">
+            <span class="icon-dashboard"></span>
+          </span>
+
+          @if (!isSidebarCollapsed) {
+            <span class="navigation-text">
+              Dashboard
+            </span>
+          }
+
+        </button>
+
+
+        <!-- ===================================================
+             INSPECTION HISTORY
+        ==================================================== -->
+
+        <button
+          type="button"
+          class="navigation-item"
+          [class.active]="isActive('/history')"
+          (click)="goToHistory()"
+        >
+
+          <span class="navigation-icon">
+            <span class="icon-history"></span>
+          </span>
+
+          @if (!isSidebarCollapsed) {
+            <span class="navigation-text">
+              Inspection History
+            </span>
+          }
+
+        </button>
+
+
+        <!-- ===================================================
+             REPORTS
+
+             KEEP THIS AS REPORTS.
+             ROUTE: /reports
+             METHOD: goToReports()
+        ==================================================== -->
+
+        <button
+          type="button"
+          class="navigation-item"
+          [class.active]="isActive('/reports')"
+          (click)="goToReports()"
+        >
+
+          <span class="navigation-icon">
+            <span class="icon-report"></span>
+          </span>
+
+          @if (!isSidebarCollapsed) {
+            <span class="navigation-text">
+              Reports
+            </span>
+          }
+
+        </button>
+
+      </div>
+
+
+      <!-- =====================================================
+           SYSTEM
+      ====================================================== -->
+
+      <div class="navigation-section secondary-navigation">
+
+        @if (!isSidebarCollapsed) {
+          <span class="navigation-label">
+            SYSTEM
+          </span>
+        }
+
+
+        <!-- SETTINGS -->
+
+        <button
+          type="button"
+          class="navigation-item"
+          [class.active]="isActive('/settings')"
+          (click)="goToSettings()"
+        >
+
+          <span class="navigation-icon">
+            <span class="icon-settings"></span>
+          </span>
+
+          @if (!isSidebarCollapsed) {
+            <span class="navigation-text">
+              Settings
+            </span>
+          }
+
+        </button>
+
+
+        <!-- LOGOUT -->
+
+        <button
+          type="button"
+          class="navigation-item"
+          (click)="logout()"
+        >
+
+          <span class="navigation-icon">
+            ⎋
+          </span>
+
+          @if (!isSidebarCollapsed) {
+            <span class="navigation-text">
+              Logout
+            </span>
+          }
+
+        </button>
+
+      </div>
+
+    </nav>
+
+
+    <!-- =======================================================
+         SIDEBAR FOOTER
+    ======================================================== -->
+
+    <div class="sidebar-footer">
+
+      <!-- SUPPORT -->
+
+      <div class="support-card">
+
+        <div class="support-icon">
+          ?
+        </div>
+
+        @if (!isSidebarCollapsed) {
+
+          <div class="support-copy">
+
+            <strong>
+              Need help?
+            </strong>
+
+            <span>
+              Contact support
+            </span>
+
+          </div>
+
+        }
+
+      </div>
+
+
+      <!-- COLLAPSE BUTTON -->
+
+      <button
+        type="button"
+        class="collapse-button"
+        aria-label="Toggle sidebar"
+        (click)="toggleSidebar()"
+      >
+
+        <span
+          class="collapse-arrow"
+          [class.rotated]="isSidebarCollapsed"
+        >
+          ‹
+        </span>
+
+        @if (!isSidebarCollapsed) {
+          <span>
+            Collapse sidebar
+          </span>
+        }
+
+      </button>
+
+    </div>
+
+  </aside>
+
+
+  <!-- =========================================================
+       MAIN AREA
+  ========================================================== -->
+
+  <main class="main-area">
+
+
+    <!-- =======================================================
+         TOP BAR
+    ======================================================== -->
+
+    <header class="topbar">
+
+      <div class="topbar-left">
+
+        <!-- MOBILE MENU -->
+
+        <button
+          type="button"
+          class="mobile-menu-button"
+          aria-label="Open navigation"
+          (click)="toggleMobileSidebar()"
+        >
+          ☰
+        </button>
+
+
+        <!-- BREADCRUMB -->
+
+        <div class="breadcrumb">
+
+          <span class="breadcrumb-root">
+            Falcon AI
+          </span>
+
+          <span class="breadcrumb-separator">
+            /
+          </span>
+
+          <span class="breadcrumb-current">
+            Vehicle Inspection Platform
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- =====================================================
+           TOPBAR RIGHT
+      ====================================================== -->
+
+      <div class="topbar-right">
+
+        <!-- NOTIFICATIONS -->
+
+        <button
+          type="button"
+          class="topbar-icon-button"
+          aria-label="Notifications"
+        >
+
+          <span class="notification-icon">
+
+            <span class="bell-body"></span>
+
+            <span class="notification-dot"></span>
+
+          </span>
+
+        </button>
+
+
+        <div class="topbar-divider"></div>
+
+
+        <!-- USER MENU -->
+
+        <button
+          type="button"
+          class="user-menu"
+        >
+
+          <div class="user-avatar">
+            {{ userInitials }}
+          </div>
+
+          <div class="user-details">
+
+            <strong>
+              {{ userName }}
+            </strong>
+
+            <span>
+              {{ userRole }}
+            </span>
+
+          </div>
+
+          <span class="user-chevron">
+            ˅
+          </span>
+
+        </button>
+
+      </div>
+
+    </header>
+
+
+    <!-- =======================================================
+         PAGE CONTENT
+         
+         Dashboard / Inspection History / Reports /
+         Settings / Create Inspection Request
+         render here.
+    ======================================================== -->
+
+    <section class="page-content">
+
+      <router-outlet></router-outlet>
+
+    </section>
+
+  </main>
+
+</div>

@@ -1,0 +1,505 @@
+<div class="welcome-page">
+
+  <!-- BACKGROUND DECORATION -->
+  <div class="background-glow glow-one"></div>
+  <div class="background-glow glow-two"></div>
+
+
+  <main class="welcome-container">
+
+    <!-- =====================================================
+         BRAND HEADER
+    ====================================================== -->
+
+    <header class="brand-header">
+
+      <div class="brand-mark">
+        F
+      </div>
+
+      <div class="brand-text">
+
+        <strong>
+          FALCON
+        </strong>
+
+        <span>
+          VEHICLE INSPECTION
+        </span>
+
+      </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         MAIN CARD
+    ====================================================== -->
+
+    <section class="welcome-card">
+
+
+      <!-- TOP LABEL -->
+
+      @if (isCustomerLink) {
+
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          INSPECTION REQUEST
+        </div>
+
+      }
+
+      @else {
+
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          SECURE INSPECTION PORTAL
+        </div>
+
+      }
+
+
+      <!-- ===================================================
+           HERO
+      ==================================================== -->
+
+      <div class="hero-content">
+
+        @if (isCustomerLink) {
+
+          <h1>
+            Your Vehicle Inspection
+            <span>is Ready</span>
+          </h1>
+
+          <p>
+            Your insurance inspection request has been
+            prepared for you. Continue below to begin
+            your guided vehicle inspection.
+          </p>
+
+        }
+
+        @else {
+
+          <h1>
+            Start Your Vehicle
+            <span>Inspection</span>
+          </h1>
+
+          <p>
+            Complete a secure, guided inspection of your
+            vehicle for your insurance requirements.
+          </p>
+
+        }
+
+      </div>
+
+
+      <!-- ===================================================
+           ERROR
+      ==================================================== -->
+
+      @if (errorMessage) {
+
+        <div class="error-message">
+
+          <div class="error-icon">
+            !
+          </div>
+
+          <div>
+
+            <strong>
+              Unable to continue
+            </strong>
+
+            <span>
+              {{ errorMessage }}
+            </span>
+
+          </div>
+
+        </div>
+
+      }
+
+
+      <!-- ===================================================
+           NORMAL CUSTOMER TYPE SELECTION
+      ==================================================== -->
+
+      @if (!isCustomerLink) {
+
+        <div class="section-label">
+          SELECT INSPECTION TYPE
+        </div>
+
+
+        <div class="inspection-options">
+
+
+          <!-- PRE-COVER -->
+
+          <button
+            type="button"
+            class="inspection-option"
+            [class.selected]="isPreCover()"
+            [disabled]="isStarting"
+            (click)="selectInspectionType('pre-cover')"
+          >
+
+            <div class="option-icon pre-cover-icon">
+              <span>✓</span>
+            </div>
+
+
+            <div class="option-content">
+
+              <div class="option-title-row">
+
+                <h2>
+                  Pre-Cover Inspection
+                </h2>
+
+                @if (isPreCover()) {
+
+                  <span class="selected-badge">
+                    SELECTED
+                  </span>
+
+                }
+
+              </div>
+
+              <p>
+                Capture your vehicle's current condition
+                before insurance cover begins.
+              </p>
+
+            </div>
+
+
+            <div class="option-check">
+
+              @if (isPreCover()) {
+
+                <span class="check-active">
+                  ✓
+                </span>
+
+              }
+
+              @else {
+
+                <span class="check-empty"></span>
+
+              }
+
+            </div>
+
+          </button>
+
+
+          <!-- ACCIDENT -->
+
+          <button
+            type="button"
+            class="inspection-option"
+            [class.selected]="isAccident()"
+            [disabled]="isStarting"
+            (click)="selectInspectionType('accident')"
+          >
+
+            <div class="option-icon accident-icon">
+              <span>!</span>
+            </div>
+
+
+            <div class="option-content">
+
+              <div class="option-title-row">
+
+                <h2>
+                  Accident Claim Inspection
+                </h2>
+
+                @if (isAccident()) {
+
+                  <span class="selected-badge">
+                    SELECTED
+                  </span>
+
+                }
+
+              </div>
+
+              <p>
+                Capture vehicle damage and accident
+                evidence for your insurance claim.
+              </p>
+
+            </div>
+
+
+            <div class="option-check">
+
+              @if (isAccident()) {
+
+                <span class="check-active">
+                  ✓
+                </span>
+
+              }
+
+              @else {
+
+                <span class="check-empty"></span>
+
+              }
+
+            </div>
+
+          </button>
+
+        </div>
+
+      }
+
+
+      <!-- ===================================================
+           ADMIN GENERATED REQUEST
+      ==================================================== -->
+
+      @if (isCustomerLink) {
+
+        <div class="request-details">
+
+          <div class="request-reference">
+
+            <div class="reference-icon">
+              ✓
+            </div>
+
+            <div>
+
+              <span>
+                INSPECTION REFERENCE
+              </span>
+
+              <strong>
+                {{ reference }}
+              </strong>
+
+            </div>
+
+          </div>
+
+
+          <div class="request-type">
+
+            <div
+              class="request-type-icon"
+              [class.accident-type]="isAccident()"
+            >
+
+              @if (isAccident()) {
+                !
+              }
+              @else {
+                ✓
+              }
+
+            </div>
+
+
+            <div>
+
+              <span>
+                INSPECTION TYPE
+              </span>
+
+              <strong>
+
+                @if (isAccident()) {
+                  Accident Claim Inspection
+                }
+                @else {
+                  Pre-Cover Inspection
+                }
+
+              </strong>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      }
+
+
+      <!-- ===================================================
+           TRUST / INFO
+      ==================================================== -->
+
+      <div class="inspection-info">
+
+        <div class="info-item">
+
+          <div class="info-icon">
+            ✓
+          </div>
+
+          <div>
+
+            <strong>
+              Guided process
+            </strong>
+
+            <span>
+              We'll guide you through every step.
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div class="info-item">
+
+          <div class="info-icon">
+            ⏱
+          </div>
+
+          <div>
+
+            <strong>
+              Quick and simple
+            </strong>
+
+            <span>
+              Complete your inspection from your phone.
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div class="info-item">
+
+          <div class="info-icon">
+            🔒
+          </div>
+
+          <div>
+
+            <strong>
+              Secure
+            </strong>
+
+            <span>
+              Your inspection information is protected.
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ===================================================
+           CONTINUE
+      ==================================================== -->
+
+      <button
+        type="button"
+        class="continue-button"
+        [disabled]="
+          !selectedInspectionType ||
+          isStarting
+        "
+        (click)="continueInspection()"
+      >
+
+        @if (isStarting) {
+
+          <span class="button-spinner"></span>
+
+          <span>
+            Starting Inspection...
+          </span>
+
+        }
+
+        @else {
+
+          <span>
+            Continue to Inspection
+          </span>
+
+          <span class="button-arrow">
+            →
+          </span>
+
+        }
+
+      </button>
+
+
+      <!-- BACK -->
+
+      @if (!isCustomerLink) {
+
+        <button
+          type="button"
+          class="back-button"
+          [disabled]="isStarting"
+          (click)="goBack()"
+        >
+
+          ← Back
+
+        </button>
+
+      }
+
+
+    </section>
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer class="welcome-footer">
+
+      <div class="footer-security">
+
+        <span class="footer-lock">
+          🔒
+        </span>
+
+        <span>
+          Secure vehicle inspection
+        </span>
+
+      </div>
+
+      <span class="footer-divider">
+        •
+      </span>
+
+      <span>
+        Falcon AI
+      </span>
+
+    </footer>
+
+  </main>
+
+</div>

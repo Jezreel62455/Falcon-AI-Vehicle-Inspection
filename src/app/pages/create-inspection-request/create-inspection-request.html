@@ -1,0 +1,793 @@
+<div class="request-page">
+
+
+  <!-- =====================================================
+       PAGE HEADER
+  ====================================================== -->
+
+  <section class="page-header">
+
+    <div>
+
+      <span class="eyebrow">
+        FALCON VEHICLE INSPECTION
+      </span>
+
+      <h1>
+        Create Inspection Request
+      </h1>
+
+      <p>
+        Generate a secure inspection link for your customer.
+      </p>
+
+    </div>
+
+
+    <button
+      type="button"
+      class="back-button"
+      [disabled]="isSubmitting"
+      (click)="cancel()"
+    >
+
+      <span>
+        ←
+      </span>
+
+      Dashboard
+
+    </button>
+
+  </section>
+
+
+
+  <!-- =====================================================
+       ERROR
+  ====================================================== -->
+
+  <div
+    class="error-banner"
+    *ngIf="errorMessage"
+  >
+
+    <div class="error-icon">
+      !
+    </div>
+
+    <div>
+
+      <strong>
+        Request could not be created
+      </strong>
+
+      <p>
+        {{ errorMessage }}
+      </p>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       SUCCESS STATE
+  ====================================================== -->
+
+  <section
+    class="success-card"
+    *ngIf="requestCreated"
+  >
+
+    <div class="success-icon">
+      ✓
+    </div>
+
+
+    <div class="success-content">
+
+      <span class="success-eyebrow">
+        REQUEST CREATED SUCCESSFULLY
+      </span>
+
+      <h2>
+        Inspection request created successfully
+      </h2>
+
+      <p class="success-description">
+        Your inspection request has been created and is ready
+        for the customer. Copy the secure link below and send
+        it to the customer.
+      </p>
+
+
+      <!-- ===============================================
+           REFERENCE
+      ================================================ -->
+
+      <div class="reference-card">
+
+        <span>
+          INSPECTION REFERENCE
+        </span>
+
+        <strong>
+          {{ generatedReference }}
+        </strong>
+
+        <small>
+          Keep this reference for tracking this inspection.
+        </small>
+
+      </div>
+
+
+      <!-- ===============================================
+           CUSTOMER LINK
+      ================================================ -->
+
+      <div class="link-section">
+
+        <label for="customerInspectionLink">
+          SECURE CUSTOMER INSPECTION LINK
+        </label>
+
+
+        <div class="link-box">
+
+          <input
+            id="customerInspectionLink"
+            type="text"
+            [value]="customerLink"
+            readonly
+            aria-label="Secure customer inspection link"
+          />
+
+
+          <button
+            type="button"
+            class="copy-button"
+            (click)="copyLink()"
+          >
+
+            <span *ngIf="!copied">
+              Copy Link
+            </span>
+
+            <span *ngIf="copied">
+              ✓ Copied
+            </span>
+
+          </button>
+
+        </div>
+
+
+        <p>
+          Send this link directly to the customer. They can
+          open it on their phone, tablet or computer.
+        </p>
+
+      </div>
+
+
+
+      <!-- ===============================================
+           SECURITY NOTICE
+      ================================================ -->
+
+      <div class="security-notice">
+
+        <div class="security-icon">
+          🔒
+        </div>
+
+        <div>
+
+          <strong>
+            Secure inspection access
+          </strong>
+
+          <p>
+            This link is associated with the inspection
+            reference shown above. The customer's inspection
+            activity remains linked to this specific request.
+          </p>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- ===============================================
+           WHAT HAPPENS NEXT
+      ================================================ -->
+
+      <div class="next-steps">
+
+        <div class="next-steps-header">
+
+          <span class="next-number">
+            01
+          </span>
+
+          <div>
+
+            <strong>
+              Send the secure link
+            </strong>
+
+            <p>
+              Copy the customer link and send it to the
+              customer using your normal communication channel.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="next-steps-header">
+
+          <span class="next-number">
+            02
+          </span>
+
+          <div>
+
+            <strong>
+              Customer completes inspection
+            </strong>
+
+            <p>
+              The customer provides their details, vehicle
+              information and required photographs.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="next-steps-header">
+
+          <span class="next-number">
+            03
+          </span>
+
+          <div>
+
+            <strong>
+              Inspection is submitted
+            </strong>
+
+            <p>
+              Their completed inspection remains linked to
+              {{ generatedReference }}.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="next-steps-header">
+
+          <span class="next-number">
+            04
+          </span>
+
+          <div>
+
+            <strong>
+              Review in Falcon
+            </strong>
+
+            <p>
+              The completed inspection becomes available in
+              your inspection history.
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- ===============================================
+           ACTIONS
+      ================================================ -->
+
+      <div class="success-actions">
+
+        <button
+          type="button"
+          class="primary-button"
+          (click)="copyLink()"
+        >
+
+          <span *ngIf="!copied">
+            Copy Customer Link
+          </span>
+
+          <span *ngIf="copied">
+            ✓ Link Copied
+          </span>
+
+        </button>
+
+
+        <a
+          class="secondary-button open-link-button"
+          [href]="customerLink"
+          target="_blank"
+          rel="noopener noreferrer"
+          *ngIf="customerLink"
+        >
+          Open Customer Link
+        </a>
+
+
+        <button
+          type="button"
+          class="secondary-button"
+          (click)="createAnotherRequest()"
+        >
+          Create Another Request
+        </button>
+
+
+        <button
+          type="button"
+          class="text-button"
+          (click)="cancel()"
+        >
+          Return to Dashboard
+        </button>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- =====================================================
+       CREATE FORM
+  ====================================================== -->
+
+  <form
+    class="request-form"
+    *ngIf="!requestCreated"
+    [formGroup]="requestForm"
+    (ngSubmit)="submitRequest($event)"
+  >
+
+
+    <!-- ===================================================
+         INSPECTION TYPE
+    ==================================================== -->
+
+    <section class="form-card">
+
+      <div class="section-heading">
+
+        <div class="step-number">
+          01
+        </div>
+
+        <div>
+
+          <h2>
+            Inspection Type
+          </h2>
+
+          <p>
+            Select the type of inspection the customer needs.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="type-grid">
+
+        <button
+          type="button"
+          class="type-option"
+          [class.selected]="inspectionType === 'pre-cover'"
+          [disabled]="isSubmitting"
+          (click)="selectInspectionType('pre-cover')"
+        >
+
+          <div class="type-radio">
+
+            <span
+              *ngIf="inspectionType === 'pre-cover'"
+            ></span>
+
+          </div>
+
+
+          <div class="type-content">
+
+            <strong>
+              Pre-Cover Inspection
+            </strong>
+
+            <span>
+              Vehicle assessment before insurance cover begins.
+            </span>
+
+          </div>
+
+
+          <div class="type-arrow">
+            →
+          </div>
+
+        </button>
+
+
+        <button
+          type="button"
+          class="type-option"
+          [class.selected]="inspectionType === 'accident'"
+          [disabled]="isSubmitting"
+          (click)="selectInspectionType('accident')"
+        >
+
+          <div class="type-radio">
+
+            <span
+              *ngIf="inspectionType === 'accident'"
+            ></span>
+
+          </div>
+
+
+          <div class="type-content">
+
+            <strong>
+              Accident Claim
+            </strong>
+
+            <span>
+              Capture vehicle damage for an accident claim.
+            </span>
+
+          </div>
+
+
+          <div class="type-arrow">
+            →
+          </div>
+
+        </button>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ===================================================
+         CUSTOMER DETAILS
+    ==================================================== -->
+
+    <section class="form-card">
+
+      <div class="section-heading">
+
+        <div class="step-number">
+          02
+        </div>
+
+        <div>
+
+          <h2>
+            Customer Details
+          </h2>
+
+          <p>
+            Optional. Add the customer's information now,
+            or let them complete it from the secure link.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="optional-note">
+
+        <span>
+          OPTIONAL
+        </span>
+
+        <p>
+          You can create the inspection without customer
+          details. The customer can provide their own
+          information when they open the link.
+        </p>
+
+      </div>
+
+
+      <div class="field-grid">
+
+        <div class="field">
+
+          <label for="firstName">
+            First Name
+          </label>
+
+          <input
+            id="firstName"
+            type="text"
+            formControlName="firstName"
+            placeholder="Enter first name"
+            autocomplete="given-name"
+          />
+
+        </div>
+
+
+        <div class="field">
+
+          <label for="surname">
+            Surname
+          </label>
+
+          <input
+            id="surname"
+            type="text"
+            formControlName="surname"
+            placeholder="Enter surname"
+            autocomplete="family-name"
+          />
+
+        </div>
+
+
+        <div class="field">
+
+          <label for="email">
+            Email Address
+          </label>
+
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            placeholder="customer@example.com"
+            autocomplete="email"
+          />
+
+        </div>
+
+
+        <div class="field">
+
+          <label for="phone">
+            Phone Number
+          </label>
+
+          <input
+            id="phone"
+            type="tel"
+            formControlName="phone"
+            placeholder="Enter phone number"
+            autocomplete="tel"
+          />
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ===================================================
+         INSURANCE DETAILS
+    ==================================================== -->
+
+    <section class="form-card">
+
+      <div class="section-heading">
+
+        <div class="step-number">
+          03
+        </div>
+
+        <div>
+
+          <h2>
+            Insurance Details
+          </h2>
+
+          <p>
+            Optional. Add policy information if it is already
+            available.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="field-grid">
+
+        <div class="field">
+
+          <label for="policyNumber">
+            Policy Number
+          </label>
+
+          <input
+            id="policyNumber"
+            type="text"
+            formControlName="policyNumber"
+            placeholder="Enter policy number"
+          />
+
+        </div>
+
+
+        <div class="field">
+
+          <label for="insuranceCompany">
+            Insurance Company
+          </label>
+
+          <input
+            id="insuranceCompany"
+            type="text"
+            formControlName="insuranceCompany"
+            placeholder="Enter insurance company"
+          />
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ===================================================
+         REQUEST SUMMARY
+    ==================================================== -->
+
+    <section class="summary-card">
+
+      <div class="summary-header">
+
+        <div>
+
+          <span>
+            REQUEST SUMMARY
+          </span>
+
+          <h2>
+            Ready to create
+          </h2>
+
+        </div>
+
+        <div class="summary-status">
+          READY
+        </div>
+
+      </div>
+
+
+      <div class="summary-grid">
+
+        <div>
+
+          <span>
+            INSPECTION TYPE
+          </span>
+
+          <strong>
+            {{ inspectionTypeLabel }}
+          </strong>
+
+        </div>
+
+
+        <div>
+
+          <span>
+            REFERENCE
+          </span>
+
+          <strong>
+            Generated securely by server
+          </strong>
+
+        </div>
+
+
+        <div>
+
+          <span>
+            CUSTOMER
+          </span>
+
+          <strong>
+            {{
+              requestForm.controls.firstName.value ||
+              requestForm.controls.surname.value
+                ?
+                  (
+                    requestForm.controls.firstName.value +
+                    ' ' +
+                    requestForm.controls.surname.value
+                  ).trim()
+                :
+                  'Customer completes later'
+            }}
+          </strong>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ===================================================
+         ACTIONS
+    ==================================================== -->
+
+    <div class="form-actions">
+
+      <button
+        type="button"
+        class="secondary-button"
+        [disabled]="isSubmitting"
+        (click)="cancel()"
+      >
+        Cancel
+      </button>
+
+
+      <button
+        type="submit"
+        class="primary-button create-button"
+        [disabled]="isSubmitting"
+      >
+
+        <span
+          class="spinner"
+          *ngIf="isSubmitting"
+        ></span>
+
+
+        <span *ngIf="!isSubmitting">
+          Create Inspection Request
+        </span>
+
+
+        <span *ngIf="isSubmitting">
+          Creating Request...
+        </span>
+
+      </button>
+
+    </div>
+
+  </form>
+
+</div>
