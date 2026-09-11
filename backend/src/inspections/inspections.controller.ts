@@ -408,17 +408,6 @@ export class InspectionsController {
   // =========================================================
   // CUSTOMER SUBMIT
   // =========================================================
-  //
-  // Customer submits using the secure reference.
-  //
-  // PATCH
-  // /inspections/reference/FAL-XXXXXXXX/submit
-  //
-  // The submitted customer data is first saved to the
-  // existing inspection, then the inspection is marked
-  // as submitted.
-  //
-  // =========================================================
 
   @Patch('reference/:reference/submit')
   async submitInspection(
@@ -451,10 +440,6 @@ export class InspectionsController {
 
     try {
 
-      // =====================================================
-      // SAVE CUSTOMER SUBMITTED DATA
-      // =====================================================
-
       if (
         inspectionData &&
         typeof inspectionData === 'object' &&
@@ -485,10 +470,6 @@ export class InspectionsController {
 
       }
 
-
-      // =====================================================
-      // MARK INSPECTION AS SUBMITTED
-      // =====================================================
 
       const inspection =
         await this.inspectionsService
@@ -559,6 +540,126 @@ export class InspectionsController {
         {
           message:
             'Failed to submit inspection.',
+
+          error:
+            error instanceof Error
+              ? error.message
+              : String(error),
+        },
+
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+
+    }
+
+  }
+
+
+  // =========================================================
+  // RE-RUN AI ANALYSIS
+  // =========================================================
+  //
+  // Re-analyses an existing inspection using the photos
+  // already stored on that inspection.
+  //
+  // POST
+  // /inspections/:id/analyse
+  //
+  // This does NOT create a new inspection.
+  // =========================================================
+
+  @Post(':id/analyse')
+  async analyseInspection(
+
+    @Param('id')
+    id: string,
+
+  ) {
+
+    console.log(
+      '======================================'
+    );
+
+    console.log(
+      'RE-RUNNING AI ANALYSIS'
+    );
+
+    console.log(
+      'INSPECTION ID:',
+      id
+    );
+
+    console.log(
+      '======================================'
+    );
+
+
+    try {
+
+      const inspection =
+        await this.inspectionsService
+          .analyseInspection(
+            id,
+          );
+
+
+      console.log(
+        '======================================'
+      );
+
+      console.log(
+        'AI RE-ANALYSIS COMPLETED'
+      );
+
+      console.log(
+        'INSPECTION ID:',
+        id
+      );
+
+      console.log(
+        '======================================'
+      );
+
+
+      return inspection;
+
+    } catch (error) {
+
+      console.error(
+        '======================================'
+      );
+
+      console.error(
+        'AI RE-ANALYSIS FAILED'
+      );
+
+      console.error(
+        'INSPECTION ID:',
+        id
+      );
+
+      console.error(
+        error
+      );
+
+      console.error(
+        '======================================'
+      );
+
+
+      if (
+        error instanceof NotFoundException
+      ) {
+
+        throw error;
+
+      }
+
+
+      throw new HttpException(
+        {
+          message:
+            'Failed to analyse inspection.',
 
           error:
             error instanceof Error
@@ -717,14 +818,6 @@ export class InspectionsController {
   // =========================================================
   // GET INSPECTION BY ID
   // =========================================================
-  //
-  // IMPORTANT:
-  // Keep this AFTER the specific routes such as:
-  //
-  // /bedrock-test
-  // /reference/:reference
-  //
-  // =========================================================
 
   @Get(':id')
   async getInspectionById(
@@ -748,7 +841,6 @@ export class InspectionsController {
       );
 
     }
-
 
 
     return inspection;

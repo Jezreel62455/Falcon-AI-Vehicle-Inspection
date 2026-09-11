@@ -71,60 +71,125 @@ export interface Policy {
 }
 
 
+export interface InspectionAI {
+  status?: string;
+  score?: number | null;
+
+  damagePercentage?: number | null;
+  damagePercent?: number | null;
+  damageScore?: number | null;
+
+  confidence?: number | null;
+  aiConfidence?: number | null;
+  confidencePercentage?: number | null;
+  confidencePercent?: number | null;
+
+  damageDetected?: boolean;
+
+  damageCategories?: unknown[];
+  overallCondition?: string | null;
+
+  damageSummary?: string | null;
+  potentialConcerns?: unknown[];
+  recommendedFollowUp?: unknown[];
+  insuranceProcessing?: string | null;
+
+  vin?: string | null;
+  vinExtracted?: string | null;
+
+  odometer?: string | number | null;
+  odometerReading?: string | number | null;
+
+  provider?: string | null;
+  aiProvider?: string | null;
+
+  processedAt?: string | null;
+
+  assessment?: Record<string, unknown> | null;
+  result?: Record<string, unknown> | null;
+  results?: Record<string, unknown> | null;
+  analysis?: Record<string, unknown> | null;
+  data?: Record<string, unknown> | null;
+  response?: Record<string, unknown> | null;
+  structuredAssessment?: Record<string, unknown> | null;
+  structuredResult?: Record<string, unknown> | null;
+
+  [key: string]: unknown;
+}
+
+
 export interface Inspection {
   id?: string;
+
   reference?: string;
 
   status?: InspectionStatus | string;
+
   inspectionType?: InspectionType | string;
+
   type?: InspectionType | string;
 
   createdAt?: string;
+
   updatedAt?: string;
+
   submittedAt?: string | null;
 
   inspectionUrl?: string;
+
   secureLink?: string;
+
   url?: string;
 
   customer?: Customer;
 
   customerFirstName?: string;
+
   customerSurname?: string;
+
   customerLastName?: string;
+
   customerEmail?: string;
+
   customerPhone?: string;
 
   policy?: Policy;
 
   policyNumber?: string;
+
   claimNumber?: string;
+
   insuranceCompany?: string;
 
   vehicle?: Vehicle;
 
   make?: string;
+
   model?: string;
+
   year?: string | number;
+
   registration?: string;
+
   colour?: string;
+
   mileage?: string | number;
+
   vin?: string;
 
   photos?: unknown[];
+
   accidentPhotos?: unknown[];
+
   damagePhotos?: unknown[];
 
-  ai?: {
-    status?: string;
-    score?: number | null;
-    damageDetected?: boolean;
-    damageSummary?: string | null;
-    vin?: string | null;
-    odometer?: string | number | null;
-    provider?: string | null;
-    processedAt?: string | null;
-  };
+  ai?: InspectionAI;
+
+  /*
+   * Backend stores the structured Bedrock response
+   * in aiAssessment.
+   */
+  aiAssessment?: InspectionAI | Record<string, unknown> | null;
 }
 
 
@@ -136,40 +201,63 @@ export interface CreateInspectionRequestPayload {
   inspectionType: InspectionInputType;
 
   status?: InspectionStatus | string | null;
+
   reference?: string | null;
 
   customer?: Customer | null;
+
   vehicle?: Vehicle | null;
+
   policy?: Policy | null;
 
   policyNumber?: string | null;
+
   claimNumber?: string | null;
+
   insuranceCompany?: string | null;
 
   customerFirstName?: string | null;
+
   customerSurname?: string | null;
+
   customerLastName?: string | null;
+
   customerEmail?: string | null;
+
   customerPhone?: string | null;
 
   vehicleMake?: string | null;
+
   vehicleModel?: string | null;
+
   vehicleYear?: string | number | null;
+
   vehicleRegistration?: string | null;
+
   vehicleColour?: string | null;
+
   vehicleMileage?: string | number | null;
+
   vehicleVin?: string | null;
 
   make?: string | null;
+
   model?: string | null;
+
   year?: string | number | null;
+
   registration?: string | null;
+
   colour?: string | null;
+
   mileage?: string | number | null;
+
   vin?: string | null;
 
   photos?: unknown[];
+
   accidentPhotos?: unknown[];
+
   damagePhotos?: unknown[];
 }
 
@@ -184,13 +272,19 @@ export type CreateInspectionRequest =
 
 export interface CreateInspectionResponse {
   id?: string;
+
   reference: string;
+
   inspectionType: InspectionType;
+
   status?: InspectionStatus | string;
+
   createdAt?: string;
 
   inspectionUrl?: string;
+
   secureLink?: string;
+
   url?: string;
 
   inspection?: Inspection;
@@ -254,11 +348,11 @@ export class InspectionService {
     /*
      * Production/runtime API configuration.
      */
+
     if (
       runtimeApiUrl &&
       runtimeApiUrl.trim()
     ) {
-
       return this.normalizeApiUrl(
         runtimeApiUrl
       );
@@ -268,6 +362,7 @@ export class InspectionService {
     /*
      * Local browser development.
      */
+
     if (
       typeof window !== 'undefined'
     ) {
@@ -279,11 +374,11 @@ export class InspectionService {
       /*
        * Local computer.
        */
+
       if (
         hostname === 'localhost' ||
         hostname === '127.0.0.1'
       ) {
-
         return 'http://localhost:3000/inspections';
       }
 
@@ -291,12 +386,12 @@ export class InspectionService {
       /*
        * LAN testing.
        */
+
       if (
         this.isPrivateNetworkAddress(
           hostname
         )
       ) {
-
         return `http://${hostname}:3000/inspections`;
       }
     }
@@ -305,11 +400,11 @@ export class InspectionService {
     /*
      * No production API configured yet.
      */
+
     console.warn(
       'Falcon API URL is not configured. ' +
       'Set globalThis.__FALCON_API_URL__ to the deployed API URL.'
     );
-
 
     return '/inspections';
   }
@@ -326,22 +421,18 @@ export class InspectionService {
     let normalized =
       apiUrl.trim();
 
-
     normalized =
       normalized.replace(
         /\/+$/,
         ''
       );
 
-
     if (
       !normalized.endsWith('/inspections')
     ) {
-
       normalized =
         `${normalized}/inspections`;
     }
-
 
     return normalized;
   }
@@ -358,11 +449,11 @@ export class InspectionService {
     /*
      * 10.0.0.0/8
      */
+
     if (
       /^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/
         .test(hostname)
     ) {
-
       return true;
     }
 
@@ -370,11 +461,11 @@ export class InspectionService {
     /*
      * 192.168.0.0/16
      */
+
     if (
       /^192\.168\.\d{1,3}\.\d{1,3}$/
         .test(hostname)
     ) {
-
       return true;
     }
 
@@ -382,9 +473,9 @@ export class InspectionService {
     /*
      * 172.16.0.0 - 172.31.255.255
      */
+
     const parts =
       hostname.split('.');
-
 
     if (
       parts.length === 4 &&
@@ -394,16 +485,13 @@ export class InspectionService {
       const second =
         Number(parts[1]);
 
-
       if (
         second >= 16 &&
         second <= 31
       ) {
-
         return true;
       }
     }
-
 
     return false;
   }
@@ -414,7 +502,6 @@ export class InspectionService {
      ======================================================= */
 
   getApiBaseUrl(): string {
-
     return this.apiUrl;
   }
 
@@ -490,6 +577,54 @@ export class InspectionService {
       default:
         return 'pending';
     }
+  }
+
+
+  /* =======================================================
+     NORMALISE AI ASSESSMENT
+     ======================================================= */
+
+  private normalizeAiAssessment(
+    inspection: Inspection
+  ): InspectionAI | undefined {
+
+    const existingAi =
+      inspection.ai;
+
+    const assessment =
+      inspection.aiAssessment;
+
+    /*
+     * If the backend has no structured AI assessment,
+     * preserve the existing ai object exactly as before.
+     */
+
+    if (
+      !assessment ||
+      typeof assessment !== 'object'
+    ) {
+      return existingAi;
+    }
+
+    /*
+     * The backend's aiAssessment is the canonical
+     * structured Bedrock result.
+     *
+     * Merge it into the existing ai object so that
+     * Inspection Details can continue using:
+     *
+     * inspection.ai
+     *
+     * without changing the existing UI.
+     */
+
+    const normalizedAssessment =
+      assessment as Record<string, unknown>;
+
+    return {
+      ...(existingAi ?? {}),
+      ...normalizedAssessment
+    } as InspectionAI;
   }
 
 
@@ -601,7 +736,24 @@ export class InspectionService {
       '';
 
 
+    /*
+     * IMPORTANT:
+     *
+     * Backend structured Bedrock results are stored
+     * in aiAssessment.
+     *
+     * Convert that data into the existing ai property
+     * consumed by Inspection Details and Reports.
+     */
+
+    const ai =
+      this.normalizeAiAssessment(
+        inspection
+      );
+
+
     return {
+
       ...inspection,
 
       inspectionType,
@@ -617,6 +769,7 @@ export class InspectionService {
 
 
       customer: {
+
         ...customer,
 
         firstName,
@@ -632,6 +785,7 @@ export class InspectionService {
 
         phone:
           phone || undefined
+
       },
 
 
@@ -652,28 +806,43 @@ export class InspectionService {
 
 
       vehicle: {
+
         ...vehicle,
 
         make,
+
         model,
+
         year,
+
         registration,
+
         colour,
+
         mileage,
+
         vin
+
       },
 
 
       make,
+
       model,
+
       year,
+
       registration,
+
       colour,
+
       mileage,
+
       vin,
 
 
       policy: {
+
         ...(inspection.policy ?? {}),
 
         policyNumber:
@@ -687,6 +856,7 @@ export class InspectionService {
         insuranceCompany:
           inspection.policy?.insuranceCompany ??
           inspection.insuranceCompany
+
       },
 
 
@@ -711,9 +881,18 @@ export class InspectionService {
         accidentPhotos,
 
 
-      ai:
-        inspection.ai ??
-        undefined
+      /*
+       * Normalised AI assessment.
+       *
+       * This is the important fix for:
+       *
+       * AI Confidence — Not available
+       *
+       * because the backend returns confidence inside
+       * aiAssessment.
+       */
+
+      ai
     };
   }
 
@@ -741,7 +920,9 @@ export class InspectionService {
           );
 
           return of([]);
+
         })
+
       );
   }
 
@@ -772,7 +953,9 @@ export class InspectionService {
           return throwError(
             () => error
           );
+
         })
+
       );
   }
 
@@ -815,7 +998,9 @@ export class InspectionService {
           return throwError(
             () => error
           );
+
         })
+
       );
   }
 
@@ -839,6 +1024,7 @@ export class InspectionService {
      *
      * Do not generate a reference in Angular.
      */
+
     const requestPayload = {
 
       ...payload,
@@ -850,12 +1036,16 @@ export class InspectionService {
 
       ...(payload.status !== undefined
         ? {
+
             status:
               this.normalizeInspectionStatus(
                 payload.status
               )
+
           }
+
         : {})
+
     };
 
 
@@ -878,7 +1068,9 @@ export class InspectionService {
           return throwError(
             () => error
           );
+
         })
+
       );
   }
 
@@ -907,6 +1099,7 @@ export class InspectionService {
     data:
       | Partial<Inspection>
       | Record<string, unknown>
+
   ): Observable<Inspection> {
 
     return this.http
@@ -928,7 +1121,9 @@ export class InspectionService {
           return throwError(
             () => error
           );
+
         })
+
       );
   }
 
@@ -959,7 +1154,9 @@ export class InspectionService {
           return throwError(
             () => error
           );
+
         })
+
       );
   }
 
@@ -984,6 +1181,7 @@ export class InspectionService {
   ): Observable<UploadPhotoResponse> {
 
     let files: File[];
+
     let inspectionId: string;
 
 
@@ -1002,6 +1200,7 @@ export class InspectionService {
 
       files =
         second as File[];
+
     }
 
 
@@ -1048,6 +1247,7 @@ export class InspectionService {
         file,
         file.name
       );
+
     }
 
 
@@ -1076,7 +1276,9 @@ export class InspectionService {
           return throwError(
             () => error
           );
+
         })
+
       );
   }
 
@@ -1111,12 +1313,17 @@ export class InspectionService {
 
 
     if (
+
       path.startsWith('http://') ||
+
       path.startsWith('https://') ||
+
       path.startsWith('data:')
+
     ) {
 
       return path;
+
     }
 
 
@@ -1133,6 +1340,7 @@ export class InspectionService {
       ) {
 
         return `${apiOrigin}${path}`;
+
       }
 
 
@@ -1145,6 +1353,7 @@ export class InspectionService {
       ) {
 
         return path;
+
       }
 
 
@@ -1180,7 +1389,9 @@ export class InspectionService {
           return throwError(
             () => error
           );
+
         })
+
       );
   }
 
@@ -1212,7 +1423,9 @@ export class InspectionService {
           return throwError(
             () => error
           );
+
         })
+
       );
   }
 

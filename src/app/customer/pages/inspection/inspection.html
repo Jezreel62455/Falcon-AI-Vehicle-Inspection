@@ -2,13 +2,39 @@
 
   <div class="inspection-card">
 
-    <!-- Progress -->
+
+    <!-- =====================================================
+         TOP / PROGRESS
+    ====================================================== -->
 
     <div class="progress-section">
 
-      <span class="progress-label">
-        Step 4 of 6
-      </span>
+      <div class="progress-header">
+
+        <div>
+
+          <span class="progress-label">
+
+            @if (isAccidentClaim) {
+              Accident Claim Inspection
+            } @else {
+              Pre-Cover Inspection
+            }
+
+          </span>
+
+          <span class="progress-step">
+            Photo {{ photoNumber }} of {{ totalPhotos }}
+          </span>
+
+        </div>
+
+        <div class="progress-percentage">
+          {{ progress }}%
+        </div>
+
+      </div>
+
 
       <div class="progress-bar">
 
@@ -19,121 +45,436 @@
 
       </div>
 
+
       <p class="progress-text">
-        Photo {{ currentStep + 1 }} of {{ photoSteps.length }}
+        {{ completedPhotoCount }} of {{ totalPhotos }}
+        required photos completed
       </p>
 
     </div>
 
-    <!-- Header -->
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
 
     <div class="page-header">
 
       <div class="photo-icon">
-        {{ currentPhoto.icon }}
+
+        <span>
+          {{ currentPhotoStep.icon }}
+        </span>
+
       </div>
 
+
+      <div class="step-badge">
+        STEP {{ photoNumber }} OF {{ totalPhotos }}
+      </div>
+
+
       <h1>
-        {{ currentPhoto.title }}
+        {{ currentPhotoStep.title }}
       </h1>
 
+
       <p>
-        {{ currentPhoto.description }}
+        {{ currentPhotoStep.description }}
       </p>
 
     </div>
 
-    <!-- Camera Placeholder -->
+
+
+    <!-- =====================================================
+         HIDDEN CAMERA INPUT
+    ====================================================== -->
+
+    <input
+      id="vehicle-photo-input"
+      class="photo-input"
+      type="file"
+      accept="image/*"
+      capture="environment"
+      hidden
+      (change)="onPhotoSelected($event)"
+    />
+
+
+
+    <!-- =====================================================
+         CAMERA / IMAGE AREA
+    ====================================================== -->
 
     <div class="camera-preview">
 
-      <div class="camera-placeholder">
+      @if (displayedImage) {
 
-        <div class="placeholder-icon">
-          📷
+        <div class="image-preview">
+
+          <img
+            [src]="displayedImage"
+            [alt]="currentPhotoStep.title"
+          />
+
+
+          @if (hasSelectedPhoto) {
+
+            <div class="preview-overlay">
+
+              <span class="preview-badge">
+                New photo
+              </span>
+
+            </div>
+
+          }
+
         </div>
 
-        <h3>
-          Camera Preview
-        </h3>
+      } @else {
 
-        <p>
-          Camera integration will be enabled in the next sprint.
-          For now, click the button below to simulate capturing
-          this inspection photo.
-        </p>
-
-      </div>
-
-    </div>
-
-    <!-- Checklist -->
-
-    <div class="checklist">
-
-      @for (photo of photoSteps; track photo.title; let i = $index) {
-
-        <div
-          class="check-item"
-          [class.completed]="i < currentStep"
-          [class.active]="i === currentStep"
+        <button
+          type="button"
+          class="camera-placeholder"
+          [disabled]="savingPhoto"
+          (click)="takePhoto()"
         >
 
-          <div class="check-number">
+          <div class="placeholder-icon">
+            📷
+          </div>
 
-            @if (i < currentStep) {
 
-              ✓
+          <div class="placeholder-content">
 
-            } @else {
+            <h3>
+              Capture {{ currentPhotoStep.title }}
+            </h3>
 
-              {{ i + 1 }}
+            <p>
+              Position the vehicle correctly and take
+              a clear, well-lit photograph.
+            </p>
 
-            }
+            <span class="capture-hint">
+              Tap here to open camera
+            </span>
 
           </div>
 
-          <span>
-            {{ photo.title }}
-          </span>
-
-        </div>
+        </button>
 
       }
 
     </div>
 
-    <!-- Actions -->
 
-    <div class="actions">
 
-      <button
-        type="button"
-        class="secondary-button"
-        (click)="previous()"
-      >
-        Back
-      </button>
+    <!-- =====================================================
+         SAVED PHOTO STATUS
+    ====================================================== -->
 
-      <button
-        type="button"
-        class="primary-button"
-        (click)="uploadPhoto()"
-      >
+    @if (
+      currentPhotoCompleted &&
+      !hasSelectedPhoto
+    ) {
 
-        @if (currentStep < photoSteps.length - 1) {
+      <div class="photo-status">
 
-          Capture & Continue →
+        <div class="status-icon">
+          ✓
+        </div>
 
-        } @else {
+        <div>
 
-          Finish Inspection →
+          <strong>
+            Photo saved
+          </strong>
+
+          <span>
+            This inspection photo has been captured successfully.
+          </span>
+
+        </div>
+
+      </div>
+
+    }
+
+
+
+    <!-- =====================================================
+         PHOTO CHECKLIST
+    ====================================================== -->
+
+    <div class="checklist-section">
+
+      <div class="section-heading">
+
+        <div>
+
+          <h2>
+            @if (isAccidentClaim) {
+              Accident inspection photos
+            } @else {
+              Pre-cover inspection photos
+            }
+          </h2>
+
+          <p>
+            Complete all seven photos before continuing.
+          </p>
+
+        </div>
+
+        <span class="completion-count">
+          {{ completedPhotoCount }}/{{ totalPhotos }}
+        </span>
+
+      </div>
+
+
+      <div class="checklist">
+
+        @for (
+          photo of photoSteps;
+          track photo.id;
+          let i = $index
+        ) {
+
+          <button
+            type="button"
+            class="check-item"
+            [class.completed]="isCompleted(i)"
+            [class.active]="i === currentIndex"
+            [disabled]="savingPhoto"
+            (click)="selectPhoto(i)"
+          >
+
+            <div class="check-number">
+
+              @if (isCompleted(i)) {
+
+                <span>
+                  ✓
+                </span>
+
+              } @else {
+
+                <span>
+                  {{ i + 1 }}
+                </span>
+
+              }
+
+            </div>
+
+
+            <div class="check-content">
+
+              <strong>
+                {{ photo.title }}
+              </strong>
+
+              <span>
+
+                @if (isCompleted(i)) {
+
+                  Completed
+
+                } @else if (i === currentIndex) {
+
+                  Current photo
+
+                } @else {
+
+                  Required
+
+                }
+
+              </span>
+
+            </div>
+
+
+            @if (i === currentIndex) {
+
+              <div class="active-indicator">
+                →
+              </div>
+
+            }
+
+          </button>
 
         }
 
-      </button>
+      </div>
 
     </div>
+
+
+
+    <!-- =====================================================
+         ACTIONS
+    ====================================================== -->
+
+    <div class="actions">
+
+      <div class="left-actions">
+
+        @if (canGoBack) {
+
+          <button
+            type="button"
+            class="secondary-button"
+            [disabled]="savingPhoto"
+            (click)="previousPhoto()"
+          >
+            ← Previous
+          </button>
+
+        } @else {
+
+          <button
+            type="button"
+            class="secondary-button"
+            [disabled]="savingPhoto"
+            (click)="back()"
+          >
+            ← Back
+          </button>
+
+        }
+
+      </div>
+
+
+      <div class="right-actions">
+
+        @if (hasSelectedPhoto) {
+
+          <button
+            type="button"
+            class="secondary-button"
+            [disabled]="savingPhoto"
+            (click)="retakePhoto()"
+          >
+            Retake
+          </button>
+
+
+          <button
+            type="button"
+            class="primary-button"
+            [disabled]="savingPhoto"
+            (click)="confirmPhoto()"
+          >
+
+            @if (savingPhoto) {
+
+              <span class="button-spinner"></span>
+
+              Saving...
+
+            } @else {
+
+              Save Photo
+
+            }
+
+          </button>
+
+        } @else {
+
+          @if (currentPhotoCompleted) {
+
+            <button
+              type="button"
+              class="secondary-button"
+              [disabled]="savingPhoto"
+              (click)="retakePhoto()"
+            >
+              Retake Photo
+            </button>
+
+          } @else {
+
+            <button
+              type="button"
+              class="primary-button"
+              [disabled]="savingPhoto"
+              (click)="takePhoto()"
+            >
+
+              <span>
+                📷
+              </span>
+
+              Capture Photo
+
+            </button>
+
+          }
+
+        }
+
+      </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         CONTINUE TO REVIEW
+    ====================================================== -->
+
+    @if (allPhotosComplete) {
+
+      <div class="review-action">
+
+        <div class="review-ready">
+
+          <div class="ready-icon">
+            ✓
+          </div>
+
+          <div>
+
+            <strong>
+              Inspection photos complete
+            </strong>
+
+            <span>
+              All {{ totalPhotos }} required photos have been captured.
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <button
+          type="button"
+          class="review-button"
+          [disabled]="savingPhoto"
+          (click)="continueToReview()"
+        >
+
+          Continue to Review
+
+          <span>
+            →
+          </span>
+
+        </button>
+
+      </div>
+
+    }
 
   </div>
 

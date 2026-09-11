@@ -1,123 +1,28 @@
 <div class="history-page">
 
+  <!-- ===================================================== -->
+  <!-- HEADER -->
+  <!-- ===================================================== -->
 
-  <!-- =========================================================
-       PAGE HEADER
-  ========================================================= -->
+  <div class="history-header">
 
-  <section class="history-header">
+    <div class="history-header-content">
 
-    <div>
+      <div>
 
-      <span class="page-eyebrow">
-        FALCON AI PLATFORM
-      </span>
+        <div class="history-eyebrow">
+          FALCON AI PLATFORM
+        </div>
 
-      <h1>
-        Inspection History
-      </h1>
+        <h1>
+          Inspection History
+        </h1>
 
-      <p class="subtitle">
-        View all vehicle inspections submitted through Falcon AI.
-      </p>
+        <p>
+          View and manage all vehicle inspections.
+        </p>
 
-    </div>
-
-
-    <button
-      type="button"
-      class="new-inspection-button"
-      (click)="createInspection()"
-    >
-
-      <span>
-        +
-      </span>
-
-      New Inspection
-
-    </button>
-
-  </section>
-
-
-
-  <!-- =========================================================
-       LOADING
-  ========================================================= -->
-
-  @if (isLoading) {
-
-    <section class="state-card">
-
-      <div class="loading-spinner"></div>
-
-      <h3>
-        Loading inspection history...
-      </h3>
-
-      <p>
-        Retrieving the latest inspections.
-      </p>
-
-    </section>
-
-  }
-
-
-
-  <!-- =========================================================
-       ERROR
-  ========================================================= -->
-
-  @else if (errorMessage) {
-
-    <section class="state-card error-state">
-
-      <h3>
-        Unable to load inspection history
-      </h3>
-
-      <p>
-        {{ errorMessage }}
-      </p>
-
-
-      <button
-        type="button"
-        class="retry-button"
-        (click)="createInspection()"
-      >
-
-        Create Inspection
-
-      </button>
-
-    </section>
-
-  }
-
-
-
-  <!-- =========================================================
-       EMPTY
-  ========================================================= -->
-
-  @else if (inspections.length === 0) {
-
-    <section class="state-card empty-state">
-
-      <div class="empty-icon">
-        📋
       </div>
-
-      <h2>
-        No inspections yet
-      </h2>
-
-      <p>
-        Start your first vehicle inspection to see it here.
-      </p>
 
 
       <button
@@ -125,312 +30,423 @@
         class="new-inspection-button"
         (click)="createInspection()"
       >
+        <span class="button-icon">
+          +
+        </span>
 
-        + Create Inspection Request
-
+        New Inspection
       </button>
 
-    </section>
+    </div>
 
-  }
-
-
-
-  <!-- =========================================================
-       INSPECTIONS
-  ========================================================= -->
-
-  @else {
-
-    <section class="inspection-list">
+  </div>
 
 
-      @for (
-        inspection of inspections;
-        track trackByInspection($index, inspection)
-      ) {
+  <!-- ===================================================== -->
+  <!-- CONTENT -->
+  <!-- ===================================================== -->
+
+  <div class="history-content">
 
 
-        <article class="inspection-card">
+    <!-- =================================================== -->
+    <!-- LOADING -->
+    <!-- =================================================== -->
+
+    @if (isLoading) {
+
+      <div class="history-loading">
+
+        <div class="loading-spinner"></div>
+
+        <p>
+          Loading inspection history...
+        </p>
+
+      </div>
+
+    }
 
 
-          <!-- ===================================================
-               CARD HEADER
-          =================================================== -->
+    <!-- =================================================== -->
+    <!-- ERROR -->
+    <!-- =================================================== -->
 
-          <div class="inspection-card-header">
+    @if (!isLoading && errorMessage) {
 
-            <div>
+      <div class="history-error">
 
-              <span class="card-eyebrow">
-                INSPECTION
-              </span>
+        <div class="error-icon">
+          !
+        </div>
 
-              <h2>
-                {{ getCustomerName(inspection) }}
-              </h2>
+        <div>
 
-              <p class="inspection-id">
-                ID:
-                {{ inspection.id }}
-              </p>
+          <h3>
+            Unable to load inspection history
+          </h3>
 
-            </div>
+          <p>
+            {{ errorMessage }}
+          </p>
 
+        </div>
 
-            <span
-              class="status"
-              [ngClass]="getStatusClass(inspection)"
-            >
+      </div>
 
-              {{ getStatus(inspection) }}
-
-            </span>
-
-          </div>
+    }
 
 
+    <!-- =================================================== -->
+    <!-- EMPTY -->
+    <!-- =================================================== -->
 
-          <!-- ===================================================
-               SUMMARY
-          =================================================== -->
+    @if (
+      !isLoading &&
+      !errorMessage &&
+      inspections.length === 0
+    ) {
 
-          <div class="inspection-summary">
+      <div class="history-empty">
 
+        <div class="empty-icon">
+          ✓
+        </div>
 
-            <div class="summary-item">
+        <h2>
+          No inspections yet
+        </h2>
 
-              <span>
-                Vehicle
-              </span>
+        <p>
+          Create your first inspection request to get started.
+        </p>
 
-              <strong>
-                {{ getVehicleRegistration(inspection) }}
-              </strong>
+        <button
+          type="button"
+          class="new-inspection-button"
+          (click)="createInspection()"
+        >
+          + New Inspection
+        </button>
 
-            </div>
+      </div>
 
-
-            <div class="summary-item">
-
-              <span>
-                Type
-              </span>
-
-              <strong>
-                {{ getInspectionType(inspection) }}
-              </strong>
-
-            </div>
-
-
-            <div class="summary-item">
-
-              <span>
-                Created
-              </span>
-
-              <strong>
-
-                {{ inspection.createdAt | date:'dd MMM yyyy' }}
-
-              </strong>
-
-            </div>
+    }
 
 
-          </div>
+    <!-- =================================================== -->
+    <!-- INSPECTION LIST -->
+    <!-- =================================================== -->
+
+    @if (
+      !isLoading &&
+      !errorMessage &&
+      inspections.length > 0
+    ) {
+
+      <div class="inspection-list">
+
+        @for (
+          inspection of inspections;
+          track trackByInspection($index, inspection)
+        ) {
+
+          <div class="inspection-card">
 
 
+            <!-- =========================================== -->
+            <!-- CARD HEADER -->
+            <!-- =========================================== -->
 
-          <!-- ===================================================
-               VEHICLE INFORMATION
-          =================================================== -->
+            <div class="inspection-card-header">
 
-          <div class="vehicle-section">
+              <div class="inspection-customer">
 
-            <div class="section-heading">
+                <h2>
+                  {{ getCustomerName(inspection) }}
+                </h2>
 
-              <h3>
-                Vehicle Information
-              </h3>
-
-            </div>
-
-
-            <div class="vehicle-grid">
-
-
-              <div class="detail-item">
-
-                <span>
-                  Registration
+                <span class="inspection-reference">
+                  {{ inspection.reference || inspection.id }}
                 </span>
-
-                <strong>
-                  {{ getVehicleRegistration(inspection) }}
-                </strong>
 
               </div>
 
 
-              <div class="detail-item">
-
-                <span>
-                  Make
-                </span>
-
-                <strong>
-                  {{ getVehicleMake(inspection) }}
-                </strong>
-
-              </div>
-
-
-              <div class="detail-item">
-
-                <span>
-                  Model
-                </span>
-
-                <strong>
-                  {{ getVehicleModel(inspection) }}
-                </strong>
-
-              </div>
-
-
-              <div class="detail-item">
-
-                <span>
-                  Year
-                </span>
-
-                <strong>
-                  {{ getVehicleYear(inspection) }}
-                </strong>
-
-              </div>
-
-
-              <div class="detail-item">
-
-                <span>
-                  Colour
-                </span>
-
-                <strong>
-                  {{ getVehicleColour(inspection) }}
-                </strong>
-
-              </div>
-
-
-              <div class="detail-item">
-
-                <span>
-                  Mileage
-                </span>
-
-                <strong>
-                  {{ getVehicleMileage(inspection) }}
-                </strong>
-
-              </div>
-
-
-            </div>
-
-          </div>
-
-
-
-          <!-- ===================================================
-               INSPECTION INFORMATION
-          =================================================== -->
-
-          <div class="inspection-information">
-
-
-            <div class="detail-item">
-
-              <span>
-                Inspection Type
-              </span>
-
-              <strong>
-                {{ getInspectionType(inspection) }}
-              </strong>
-
-            </div>
-
-
-            <div class="detail-item">
-
-              <span>
-                Created
-              </span>
-
-              <strong>
-                {{ inspection.createdAt | date:'medium' }}
-              </strong>
-
-            </div>
-
-
-            <div class="detail-item">
-
-              <span>
-                Status
-              </span>
-
-              <strong>
+              <div
+                class="inspection-status"
+                [class]="getStatusClass(inspection)"
+              >
                 {{ getStatus(inspection) }}
-              </strong>
+              </div>
+
+            </div>
+
+
+            <!-- =========================================== -->
+            <!-- SUMMARY -->
+            <!-- =========================================== -->
+
+            <div class="inspection-summary">
+
+              <div class="summary-item">
+
+                <span class="summary-label">
+                  Vehicle
+                </span>
+
+                <span class="summary-value">
+                  {{ getVehicleMake(inspection) }}
+                  {{ getVehicleModel(inspection) }}
+                </span>
+
+              </div>
+
+
+              <div class="summary-item">
+
+                <span class="summary-label">
+                  Type
+                </span>
+
+                <span class="summary-value">
+                  {{ getInspectionType(inspection) }}
+                </span>
+
+              </div>
+
+
+              <div class="summary-item">
+
+                <span class="summary-label">
+                  Created
+                </span>
+
+                <span class="summary-value">
+
+                  {{
+                    inspection.createdAt
+                      ? (inspection.createdAt | date:'dd MMM yyyy, HH:mm')
+                      : 'Not available'
+                  }}
+
+                </span>
+
+              </div>
+
+            </div>
+
+
+            <!-- =========================================== -->
+            <!-- VEHICLE INFORMATION -->
+            <!-- =========================================== -->
+
+            <div class="inspection-section">
+
+              <div class="section-title">
+                Vehicle Information
+              </div>
+
+
+              <div class="inspection-grid">
+
+                <div class="inspection-field">
+
+                  <span class="field-label">
+                    Registration
+                  </span>
+
+                  <span class="field-value">
+                    {{ getVehicleRegistration(inspection) }}
+                  </span>
+
+                </div>
+
+
+                <div class="inspection-field">
+
+                  <span class="field-label">
+                    Make
+                  </span>
+
+                  <span class="field-value">
+                    {{ getVehicleMake(inspection) }}
+                  </span>
+
+                </div>
+
+
+                <div class="inspection-field">
+
+                  <span class="field-label">
+                    Model
+                  </span>
+
+                  <span class="field-value">
+                    {{ getVehicleModel(inspection) }}
+                  </span>
+
+                </div>
+
+
+                <div class="inspection-field">
+
+                  <span class="field-label">
+                    Year
+                  </span>
+
+                  <span class="field-value">
+                    {{ getVehicleYear(inspection) }}
+                  </span>
+
+                </div>
+
+
+                <div class="inspection-field">
+
+                  <span class="field-label">
+                    Colour
+                  </span>
+
+                  <span class="field-value">
+                    {{ getVehicleColour(inspection) }}
+                  </span>
+
+                </div>
+
+
+                <div class="inspection-field">
+
+                  <span class="field-label">
+                    Mileage
+                  </span>
+
+                  <span class="field-value">
+                    {{ getVehicleMileage(inspection) }}
+                  </span>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <!-- =========================================== -->
+            <!-- INSPECTION INFORMATION -->
+            <!-- =========================================== -->
+
+            <div class="inspection-section">
+
+              <div class="section-title">
+                Inspection Information
+              </div>
+
+
+              <div class="inspection-grid">
+
+                <div class="inspection-field">
+
+                  <span class="field-label">
+                    Inspection Type
+                  </span>
+
+                  <span class="field-value">
+                    {{ getInspectionType(inspection) }}
+                  </span>
+
+                </div>
+
+
+                <div class="inspection-field">
+
+                  <span class="field-label">
+                    Created
+                  </span>
+
+                  <span class="field-value">
+
+                    {{
+                      inspection.createdAt
+                        ? (inspection.createdAt | date:'dd MMM yyyy, HH:mm')
+                        : 'Not available'
+                    }}
+
+                  </span>
+
+                </div>
+
+
+                <div class="inspection-field">
+
+                  <span class="field-label">
+                    Status
+                  </span>
+
+                  <span class="field-value">
+                    {{ getStatus(inspection) }}
+                  </span>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <!-- =========================================== -->
+            <!-- ACTIONS -->
+            <!-- =========================================== -->
+
+            <div class="inspection-actions">
+
+              <button
+                type="button"
+                class="view-details-button"
+                (click)="viewInspection(inspection)"
+              >
+                <span>
+                  View Details
+                </span>
+
+                <span class="view-arrow">
+                  →
+                </span>
+              </button>
+
+
+              <button
+                type="button"
+                class="delete-inspection-button"
+                [disabled]="deletingInspectionId === inspection.id"
+                (click)="deleteInspection(inspection)"
+              >
+
+                @if (
+                  deletingInspectionId === inspection.id
+                ) {
+
+                  Deleting...
+
+                } @else {
+
+                  Delete
+
+                }
+
+              </button>
 
             </div>
 
 
           </div>
 
+        }
 
+      </div>
 
-          <!-- ===================================================
-               ACTION
-               
-               SAME STRUCTURE AS REPORTS:
-               button -> click -> viewInspection()
-               
-               NO routerLink.
-               NO private router in HTML.
-          =================================================== -->
+    }
 
-          <div class="inspection-actions">
-
-            <button
-              type="button"
-              class="view-details-button"
-              (click)="viewInspection(inspection)"
-            >
-
-              View Details
-
-              <span>
-                →
-              </span>
-
-            </button>
-
-          </div>
-
-
-        </article>
-
-      }
-
-
-    </section>
-
-  }
+  </div>
 
 </div>

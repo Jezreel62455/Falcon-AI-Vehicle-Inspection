@@ -8,68 +8,34 @@ datasource db {
 }
 
 model Inspection {
-  id                String   @id @default(uuid())
-
-  // =========================================================
-  // INSPECTION REQUEST
-  // =========================================================
-
-  reference         String?  @unique
+  id                String    @id @default(uuid())
   status            String
   inspectionType    String?
-
-  // =========================================================
-  // CUSTOMER
-  // =========================================================
-
   customerFirstName String?
   customerSurname   String?
-  customerEmail     String?
-  customerPhone     String?
-
-  // =========================================================
-  // POLICY
-  // =========================================================
-
   policyNumber      String?
   insuranceCompany  String?
-
-  // =========================================================
-  // VEHICLE
-  // =========================================================
-
   registration      String?
   make              String?
   model             String?
   year              String?
   colour            String?
   mileage           String?
-
-  // =========================================================
-  // PHOTOS
-  // =========================================================
-
   photos            Json?
   damagePhotos      Json?
-
-  // =========================================================
-  // AI PROCESSING
-  // =========================================================
-
-  aiStatus          String   @default("PENDING")
+  aiStatus          String    @default("PENDING")
   aiScore           Float?
-  damageDetected    Boolean  @default(false)
+  damageDetected    Boolean   @default(false)
   damageSummary     String?
   vinExtracted      String?
   odometerReading   String?
   aiProvider        String?
   processedAt       DateTime?
-
-  // =========================================================
-  // TIMESTAMPS
-  // =========================================================
-
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
+  customerEmail     String?
+  customerPhone     String?
+  reference         String?   @unique
   submittedAt       DateTime?
+  aiAssessment      Json?
 }

@@ -1,6 +1,7 @@
 import {
   Component,
   OnInit,
+  OnDestroy,
   inject,
   ChangeDetectorRef
 } from '@angular/core';
@@ -36,7 +37,7 @@ import {
     './inspection-details.css'
   ]
 })
-export class InspectionDetails implements OnInit {
+export class InspectionDetails implements OnInit, OnDestroy {
 
   private readonly route =
     inject(ActivatedRoute);
@@ -47,11 +48,6 @@ export class InspectionDetails implements OnInit {
   private readonly inspectionService =
     inject(InspectionService);
 
-  /*
-   * IMPORTANT:
-   * Forces Angular to refresh the view after the
-   * inspection has been loaded from the API.
-   */
   private readonly cdr =
     inject(ChangeDetectorRef);
 
@@ -68,6 +64,27 @@ export class InspectionDetails implements OnInit {
 
 
   /* =========================================================
+     AI REFRESH / POLLING
+     ========================================================= */
+
+  private refreshTimer:
+    ReturnType<typeof setTimeout> | null =
+    null;
+
+  private readonly refreshIntervalMs =
+    3000;
+
+  private readonly maximumRefreshAttempts =
+    40;
+
+  private refreshAttempts =
+    0;
+
+  private destroyed =
+    false;
+
+
+  /* =========================================================
      INIT
      ========================================================= */
 
@@ -79,10 +96,27 @@ export class InspectionDetails implements OnInit {
 
 
   /* =========================================================
+     DESTROY
+     ========================================================= */
+
+  ngOnDestroy(): void {
+
+    this.destroyed = true;
+
+    this.stopAutoRefresh();
+
+  }
+
+
+  /* =========================================================
      LOAD INSPECTION
      ========================================================= */
 
   loadInspection(): void {
+
+    this.stopAutoRefresh();
+
+    this.refreshAttempts = 0;
 
     const routeId =
       this.route.snapshot.paramMap.get('id');
@@ -99,7 +133,6 @@ export class InspectionDetails implements OnInit {
       return;
     }
 
-
     this.isLoading = true;
 
     this.errorMessage = '';
@@ -110,7 +143,7 @@ export class InspectionDetails implements OnInit {
 
 
     /*
-     * First try the database ID endpoint.
+     * First attempt to load using the database ID.
      */
     this.inspectionService
       .getInspectionById(routeId)
@@ -129,17 +162,13 @@ export class InspectionDetails implements OnInit {
 
         },
 
-        error: idError => {
+        error: error => {
 
           console.warn(
             'ID lookup failed. Trying reference lookup:',
-            idError
+            error
           );
 
-          /*
-           * History may have passed the inspection
-           * reference instead of the database ID.
-           */
           this.loadByReference(
             routeId
           );
@@ -183,11 +212,9 @@ export class InspectionDetails implements OnInit {
             error
           );
 
-          this.inspection =
-            null;
+          this.inspection = null;
 
-          this.isLoading =
-            false;
+          this.isLoading = false;
 
           this.errorMessage =
             'Unable to load this inspection.';
@@ -211,14 +238,14 @@ export class InspectionDetails implements OnInit {
 
     if (!inspection) {
 
-      this.inspection =
-        null;
+      this.inspection = null;
 
-      this.isLoading =
-        false;
+      this.isLoading = false;
 
       this.errorMessage =
         'Inspection information was not returned.';
+
+      this.stopAutoRefresh();
 
       this.cdr.detectChanges();
 
@@ -226,14 +253,6 @@ export class InspectionDetails implements OnInit {
     }
 
 
-    /*
-     * IMPORTANT:
-     *
-     * The backend can return customer / vehicle / policy
-     * information in different structures.
-     *
-     * Always normalize before displaying it.
-     */
     this.inspection =
       this.inspectionService
         .normalizeInspection(
@@ -247,23 +266,340 @@ export class InspectionDetails implements OnInit {
     );
 
 
-    /*
-     * Stop the loading state.
-     */
-    this.isLoading =
-      false;
-
-    this.errorMessage =
-      '';
+    console.log(
+      'NORMALISED AI DATA:',
+      (this.inspection as any)?.ai
+    );
 
 
-    /*
-     * IMPORTANT FIX:
-     *
-     * Explicitly tell Angular that the API response has
-     * arrived and the template must be rendered again.
-     */
+    this.isLoading = false;
+
+    this.errorMessage = '';
+
     this.cdr.detectChanges();
+
+
+    if (this.isAiProcessing()) {
+
+      this.startAutoRefresh();
+
+    } else {
+
+      this.stopAutoRefresh();
+
+    }
+
+  }
+
+
+  /* =========================================================
+     AI STATUS
+     ========================================================= */
+
+  private isAiProcessing(): boolean {
+
+    if (!this.inspection) {
+
+      return false;
+
+    }
+
+
+    const inspectionStatus =
+      this.normaliseStatus(
+        this.inspection.status
+      );
+
+
+    const aiStatus =
+      this.normaliseAiStatus(
+        this.inspection.ai?.status
+      );
+
+
+    const inspectionStillWaiting =
+      inspectionStatus === 'submitted' ||
+      inspectionStatus === 'processing' ||
+      inspectionStatus === 'in-progress' ||
+      inspectionStatus === 'inprogress';
+
+
+    const aiStillProcessing =
+      aiStatus === 'processing' ||
+      aiStatus === 'pending' ||
+      aiStatus === 'in-progress' ||
+      aiStatus === 'inprogress' ||
+      aiStatus === 'queued';
+
+
+    if (aiStillProcessing) {
+
+      return true;
+
+    }
+
+
+    if (
+      inspectionStillWaiting &&
+      (
+        !this.inspection.ai ||
+        !this.inspection.ai.status
+      )
+    ) {
+
+      return true;
+
+    }
+
+
+    return false;
+
+  }
+
+
+  private normaliseAiStatus(
+    status:
+      string | undefined |
+      null
+  ): string {
+
+    return (
+      status || ''
+    )
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-');
+
+  }
+
+
+  /* =========================================================
+     AUTOMATIC REFRESH
+     ========================================================= */
+
+  private startAutoRefresh(): void {
+
+    if (this.destroyed) {
+
+      return;
+
+    }
+
+
+    if (this.refreshTimer !== null) {
+
+      return;
+
+    }
+
+
+    this.refreshAttempts = 0;
+
+
+    console.log(
+      'AI ANALYSIS STILL PROCESSING - AUTO REFRESH STARTED'
+    );
+
+
+    this.scheduleNextRefresh();
+
+  }
+
+
+  private scheduleNextRefresh(): void {
+
+    if (this.destroyed) {
+
+      return;
+
+    }
+
+
+    if (this.refreshTimer !== null) {
+
+      clearTimeout(
+        this.refreshTimer
+      );
+
+    }
+
+
+    this.refreshTimer =
+      setTimeout(
+        () => {
+
+          this.refreshTimer = null;
+
+          this.refreshInspection();
+
+        },
+        this.refreshIntervalMs
+      );
+
+  }
+
+
+  private refreshInspection(): void {
+
+    if (
+      this.destroyed ||
+      !this.inspection
+    ) {
+
+      return;
+
+    }
+
+
+    if (
+      this.refreshAttempts >=
+      this.maximumRefreshAttempts
+    ) {
+
+      console.warn(
+        'AI AUTO REFRESH STOPPED AFTER MAXIMUM ATTEMPTS'
+      );
+
+      this.stopAutoRefresh();
+
+      return;
+
+    }
+
+
+    this.refreshAttempts++;
+
+
+    const reference =
+      this.inspection.reference;
+
+
+    if (!reference) {
+
+      console.warn(
+        'Cannot refresh inspection: no reference available.'
+      );
+
+      this.stopAutoRefresh();
+
+      return;
+
+    }
+
+
+    console.log(
+      `REFRESHING INSPECTION FROM BACKEND - ATTEMPT ${this.refreshAttempts}`
+    );
+
+
+    this.inspectionService
+      .getInspectionByReference(reference)
+      .subscribe({
+
+        next: updatedInspection => {
+
+          if (this.destroyed) {
+
+            return;
+
+          }
+
+
+          if (!updatedInspection) {
+
+            console.warn(
+              'Inspection refresh returned no inspection.'
+            );
+
+            this.scheduleNextRefresh();
+
+            return;
+
+          }
+
+
+          console.log(
+            'INSPECTION DETAILS REFRESHED:',
+            updatedInspection
+          );
+
+
+          this.inspection =
+            this.inspectionService
+              .normalizeInspection(
+                updatedInspection
+              );
+
+
+          console.log(
+            'REFRESHED NORMALISED INSPECTION:',
+            this.inspection
+          );
+
+
+          console.log(
+            'REFRESHED AI DATA:',
+            (this.inspection as any)?.ai
+          );
+
+
+          this.cdr.detectChanges();
+
+
+          if (!this.isAiProcessing()) {
+
+            console.log(
+              'AI ANALYSIS COMPLETE - AUTO REFRESH STOPPED'
+            );
+
+            this.stopAutoRefresh();
+
+            return;
+
+          }
+
+
+          this.scheduleNextRefresh();
+
+        },
+
+        error: error => {
+
+          if (this.destroyed) {
+
+            return;
+
+          }
+
+
+          console.warn(
+            'INSPECTION AUTO REFRESH FAILED:',
+            error
+          );
+
+
+          this.scheduleNextRefresh();
+
+        }
+
+      });
+
+  }
+
+
+  private stopAutoRefresh(): void {
+
+    if (
+      this.refreshTimer !== null
+    ) {
+
+      clearTimeout(
+        this.refreshTimer
+      );
+
+      this.refreshTimer = null;
+
+    }
 
   }
 
@@ -321,12 +657,12 @@ export class InspectionDetails implements OnInit {
 
   private normaliseStatus(
     status:
-      string | undefined
+      string | undefined |
+      null
   ): string {
 
     return (
-      status ||
-      'pending'
+      status || 'pending'
     )
       .toLowerCase()
       .trim()
@@ -337,7 +673,8 @@ export class InspectionDetails implements OnInit {
 
   private formatStatus(
     status:
-      string | undefined
+      string | undefined |
+      null
   ): string {
 
     const value =
@@ -418,11 +755,8 @@ export class InspectionDetails implements OnInit {
   isAccidentInspection(): boolean {
 
     return (
-      this.inspection?.inspectionType ===
-        'accident' ||
-
-      this.inspection?.type ===
-        'accident'
+      this.inspection?.inspectionType === 'accident' ||
+      this.inspection?.type === 'accident'
     );
 
   }
@@ -692,6 +1026,700 @@ export class InspectionDetails implements OnInit {
 
 
   /* =========================================================
+     AI RESULTS
+     ========================================================= */
+
+  private getAiData(): any {
+
+    return (
+      (this.inspection as any)?.ai ??
+      null
+    );
+
+  }
+
+
+  /*
+   * AI results may be returned in slightly different shapes
+   * depending on how InspectionService normalises the backend
+   * response.
+   *
+   * We do not modify the data.
+   * We only search it for display purposes.
+   */
+  private getAiCandidates(): any[] {
+
+    const ai =
+      this.getAiData();
+
+
+    if (!ai) {
+
+      return [];
+
+    }
+
+
+    const candidates: any[] = [
+      ai
+    ];
+
+
+    const nestedKeys = [
+      'assessment',
+      'result',
+      'results',
+      'analysis',
+      'data',
+      'response',
+      'structuredAssessment',
+      'structuredResult'
+    ];
+
+
+    for (const key of nestedKeys) {
+
+      const value =
+        ai?.[key];
+
+
+      if (
+        value &&
+        typeof value === 'object'
+      ) {
+
+        candidates.push(
+          value
+        );
+
+      }
+
+    }
+
+
+    return candidates;
+
+  }
+
+
+  private findAiValue(
+    keys: string[]
+  ): any {
+
+    const candidates =
+      this.getAiCandidates();
+
+
+    for (const candidate of candidates) {
+
+      if (!candidate) {
+
+        continue;
+
+      }
+
+
+      for (const key of keys) {
+
+        const value =
+          candidate?.[key];
+
+
+        if (
+          value !== undefined &&
+          value !== null &&
+          value !== ''
+        ) {
+
+          return value;
+
+        }
+
+      }
+
+    }
+
+
+    return null;
+
+  }
+
+
+  private getCombinedAiSummary(): string {
+
+    const value =
+      this.findAiValue([
+        'damageSummary',
+        'summary',
+        'assessmentSummary',
+        'aiSummary'
+      ]);
+
+
+    if (
+      typeof value === 'string' &&
+      value.trim()
+    ) {
+
+      return value.trim();
+
+    }
+
+
+    return '';
+
+  }
+
+
+  private extractAiSection(
+    sectionName: string
+  ): string {
+
+    const summary =
+      this.getCombinedAiSummary();
+
+
+    if (!summary) {
+
+      return '';
+
+    }
+
+
+    const escapedName =
+      sectionName.replace(
+        /[.*+?^${}()|[\]\\]/g,
+        '\\$&'
+      );
+
+
+    const nextSections =
+      [
+        'OVERALL CONDITION',
+        'DAMAGE ASSESSMENT',
+        'POTENTIAL CONCERNS',
+        'RECOMMENDED FOLLOW-UP',
+        'INSURANCE PROCESSING'
+      ]
+        .filter(
+          section =>
+            section !== sectionName
+        )
+        .join('|');
+
+
+    const expression =
+      new RegExp(
+        `${escapedName}\\s*:\\s*(.*?)(?=\\s*(?:${nextSections})\\s*:|$)`,
+        'i'
+      );
+
+
+    const match =
+      summary.match(
+        expression
+      );
+
+
+    if (
+      !match ||
+      !match[1]
+    ) {
+
+      return '';
+
+    }
+
+
+    return match[1]
+      .trim()
+      .replace(
+        /\s+/g,
+        ' '
+      );
+
+  }
+
+
+  getDamageScore(): string {
+
+    const score =
+      this.findAiValue([
+        'damagePercentage',
+        'damagePercent',
+        'damageScore',
+        'score'
+      ]);
+
+
+    if (
+      score === undefined ||
+      score === null ||
+      score === ''
+    ) {
+
+      return 'Not available';
+
+    }
+
+
+    const numericScore =
+      Number(score);
+
+
+    if (
+      Number.isFinite(
+        numericScore
+      )
+    ) {
+
+      return `${numericScore}%`;
+
+    }
+
+
+    return String(score);
+
+  }
+
+
+  getAiConfidence(): string {
+
+    const confidence =
+      this.findAiValue([
+        'confidence',
+        'aiConfidence',
+        'confidencePercentage',
+        'confidencePercent'
+      ]);
+
+
+    if (
+      confidence === undefined ||
+      confidence === null ||
+      confidence === ''
+    ) {
+
+      return 'Not available';
+
+    }
+
+
+    const numericConfidence =
+      Number(confidence);
+
+
+    if (
+      Number.isFinite(
+        numericConfidence
+      )
+    ) {
+
+      return `${numericConfidence}%`;
+
+    }
+
+
+    return String(confidence);
+
+  }
+
+
+  getDamageDetected(): string {
+
+    const detected =
+      this.findAiValue([
+        'damageDetected',
+        'hasDamage',
+        'damage'
+      ]);
+
+
+    if (detected === true) {
+
+      return 'Yes';
+
+    }
+
+
+    if (detected === false) {
+
+      return 'No';
+
+    }
+
+
+    if (
+      typeof detected === 'string'
+    ) {
+
+      const normalised =
+        detected
+          .toLowerCase()
+          .trim();
+
+
+      if (
+        normalised === 'true' ||
+        normalised === 'yes'
+      ) {
+
+        return 'Yes';
+
+      }
+
+
+      if (
+        normalised === 'false' ||
+        normalised === 'no'
+      ) {
+
+        return 'No';
+
+      }
+
+    }
+
+
+    return 'Not available';
+
+  }
+
+
+  getOverallCondition(): string {
+
+    const condition =
+      this.findAiValue([
+        'overallCondition',
+        'condition',
+        'overall'
+      ]);
+
+
+    if (
+      condition !== undefined &&
+      condition !== null &&
+      String(condition).trim()
+    ) {
+
+      return String(condition).trim();
+
+    }
+
+
+    const extracted =
+      this.extractAiSection(
+        'OVERALL CONDITION'
+      );
+
+
+    return (
+      extracted ||
+      'Not available'
+    );
+
+  }
+
+
+  getDamageCategories(): string {
+
+    const categories =
+      this.findAiValue([
+        'damageCategories',
+        'damageCategory',
+        'categories'
+      ]);
+
+
+    if (
+      Array.isArray(categories) &&
+      categories.length > 0
+    ) {
+
+      return categories
+        .map(
+          category =>
+            String(category).trim()
+        )
+        .filter(Boolean)
+        .join(', ');
+
+    }
+
+
+    if (
+      typeof categories === 'string' &&
+      categories.trim()
+    ) {
+
+      return categories.trim();
+
+    }
+
+
+    return 'None detected';
+
+  }
+
+
+  getPotentialConcerns(): string {
+
+    const concerns =
+      this.findAiValue([
+        'potentialConcerns',
+        'concerns',
+        'potentialIssues'
+      ]);
+
+
+    if (
+      Array.isArray(concerns) &&
+      concerns.length > 0
+    ) {
+
+      return concerns
+        .map(
+          concern =>
+            String(concern).trim()
+        )
+        .filter(Boolean)
+        .join(' • ');
+
+    }
+
+
+    if (
+      typeof concerns === 'string' &&
+      concerns.trim()
+    ) {
+
+      return concerns.trim();
+
+    }
+
+
+    const extracted =
+      this.extractAiSection(
+        'POTENTIAL CONCERNS'
+      );
+
+
+    return (
+      extracted ||
+      'None identified'
+    );
+
+  }
+
+
+  getRecommendedFollowUp(): string {
+
+    const followUp =
+      this.findAiValue([
+        'recommendedFollowUp',
+        'recommendedFollowup',
+        'followUp',
+        'followup',
+        'recommendations'
+      ]);
+
+
+    if (
+      Array.isArray(followUp) &&
+      followUp.length > 0
+    ) {
+
+      return followUp
+        .map(
+          item =>
+            String(item).trim()
+        )
+        .filter(Boolean)
+        .join(' • ');
+
+    }
+
+
+    if (
+      typeof followUp === 'string' &&
+      followUp.trim()
+    ) {
+
+      return followUp.trim();
+
+    }
+
+
+    const extracted =
+      this.extractAiSection(
+        'RECOMMENDED FOLLOW-UP'
+      );
+
+
+    return (
+      extracted ||
+      'No additional follow-up recommended'
+    );
+
+  }
+
+
+  getInsuranceProcessing(): string {
+
+    const processing =
+      this.findAiValue([
+        'insuranceProcessing',
+        'insuranceAssessment',
+        'insuranceRecommendation'
+      ]);
+
+
+    if (
+      processing !== undefined &&
+      processing !== null &&
+      String(processing).trim()
+    ) {
+
+      return String(processing).trim();
+
+    }
+
+
+    const extracted =
+      this.extractAiSection(
+        'INSURANCE PROCESSING'
+      );
+
+
+    return (
+      extracted ||
+      'Not available'
+    );
+
+  }
+
+
+  getAiStatus(): string {
+
+    const status =
+      this.findAiValue([
+        'status',
+        'aiStatus',
+        'processingStatus'
+      ]);
+
+
+    if (!status) {
+
+      return 'Not processed';
+
+    }
+
+
+    return this.formatAiStatus(
+      String(status)
+    );
+
+  }
+
+
+  private formatAiStatus(
+    status: string
+  ): string {
+
+    return status
+      .toLowerCase()
+      .trim()
+      .replace(/[-_]+/g, ' ')
+      .split(' ')
+      .filter(Boolean)
+      .map(
+        word =>
+          word.charAt(0).toUpperCase() +
+          word.slice(1)
+      )
+      .join(' ');
+
+  }
+
+
+  getAiProvider(): string {
+
+    const provider =
+      this.findAiValue([
+        'provider',
+        'aiProvider'
+      ]);
+
+
+    return (
+      provider ||
+      'Amazon Bedrock'
+    );
+
+  }
+
+
+  getAiSummary(): string {
+
+    const structuredSummary =
+      this.findAiValue([
+        'damageSummary',
+        'summary',
+        'assessmentSummary',
+        'aiSummary'
+      ]);
+
+
+    if (
+      typeof structuredSummary === 'string' &&
+      structuredSummary.trim()
+    ) {
+
+      const summary =
+        structuredSummary.trim();
+
+
+      /*
+       * If Bedrock has already returned a clean summary,
+       * display it unchanged.
+       *
+       * If the value is the older combined section format,
+       * extract only DAMAGE ASSESSMENT.
+       */
+      const damageAssessment =
+        this.extractAiSection(
+          'DAMAGE ASSESSMENT'
+        );
+
+
+      if (damageAssessment) {
+
+        return damageAssessment;
+
+      }
+
+
+      return summary;
+
+    }
+
+
+    const extracted =
+      this.extractAiSection(
+        'DAMAGE ASSESSMENT'
+      );
+
+
+    return (
+      extracted ||
+      'No summary available.'
+    );
+
+  }
+
+
+  /* =========================================================
      PHOTOS
      ========================================================= */
 
@@ -713,12 +1741,6 @@ export class InspectionDetails implements OnInit {
         : 0;
 
 
-    /*
-     * Do NOT add damagePhotos separately.
-     *
-     * normalizeInspection() already maps damagePhotos
-     * into accidentPhotos.
-     */
     return (
       vehiclePhotos +
       accidentPhotos
@@ -751,12 +1773,6 @@ export class InspectionDetails implements OnInit {
 
   getDamagePhotos(): any[] {
 
-    /*
-     * Kept for template compatibility.
-     *
-     * Do not duplicate photos already normalized into
-     * accidentPhotos.
-     */
     return [];
 
   }
@@ -812,6 +1828,8 @@ export class InspectionDetails implements OnInit {
 
   backToHistory(): void {
 
+    this.stopAutoRefresh();
+
     this.router.navigate([
       '/history'
     ]);
@@ -827,6 +1845,8 @@ export class InspectionDetails implements OnInit {
 
 
   retry(): void {
+
+    this.stopAutoRefresh();
 
     this.loadInspection();
 

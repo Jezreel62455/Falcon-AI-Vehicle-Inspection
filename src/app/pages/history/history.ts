@@ -1,19 +1,21 @@
-import { CommonModule } from '@angular/common';
+import {
+  CommonModule,
+} from '@angular/common';
 
 import {
   ChangeDetectorRef,
   Component,
   OnInit,
-  inject
+  inject,
 } from '@angular/core';
 
 import {
-  Router
+  Router,
 } from '@angular/router';
 
 import {
   Inspection,
-  InspectionService
+  InspectionService,
 } from '../../services/inspection.service';
 
 
@@ -23,14 +25,17 @@ import {
   standalone: true,
 
   imports: [
-    CommonModule
+    CommonModule,
   ],
 
   templateUrl: './history.html',
 
-  styleUrl: './history.css'
+  styleUrls: [
+    './history.css',
+  ],
 })
-export class History implements OnInit {
+export class History
+  implements OnInit {
 
   private readonly inspectionService =
     inject(InspectionService);
@@ -42,20 +47,18 @@ export class History implements OnInit {
     inject(ChangeDetectorRef);
 
 
-  /* =========================================================
-     DATA
-  ========================================================= */
-
   inspections: Inspection[] = [];
 
   isLoading = true;
 
   errorMessage = '';
 
+  deletingInspectionId: string | null = null;
 
-  /* =========================================================
-     INITIAL LOAD
-  ========================================================= */
+
+  // =========================================================
+  // INITIAL LOAD
+  // =========================================================
 
   ngOnInit(): void {
 
@@ -64,9 +67,9 @@ export class History implements OnInit {
   }
 
 
-  /* =========================================================
-     LOAD INSPECTIONS
-  ========================================================= */
+  // =========================================================
+  // LOAD INSPECTIONS
+  // =========================================================
 
   private loadInspections(): void {
 
@@ -74,93 +77,95 @@ export class History implements OnInit {
 
     this.errorMessage = '';
 
-
     this.inspectionService
       .getInspections()
       .subscribe({
 
-        next: (data) => {
+        next: (
+          inspections
+        ) => {
 
           this.inspections =
-            Array.isArray(data)
-              ? data
-              : [];
-
+            inspections ?? [];
 
           this.isLoading = false;
 
-
-          /*
-           * Force the same immediate UI refresh
-           * used by Reports.
-           */
           this.cdr.detectChanges();
 
         },
 
-
-        error: (error) => {
+        error: (
+          error
+        ) => {
 
           console.error(
-            'Failed to load inspection history:',
+            'Failed to load inspections:',
             error
           );
 
-
-          this.inspections = [];
-
-          this.errorMessage =
-            'Unable to load inspection history. Please try again.';
-
           this.isLoading = false;
 
+          this.errorMessage =
+            'Failed to load inspection history. Please try again.';
 
           this.cdr.detectChanges();
 
-        }
+        },
 
       });
 
   }
 
 
-  /* =========================================================
-     CUSTOMER
-  ========================================================= */
+  // =========================================================
+  // CUSTOMER
+  // =========================================================
 
   getCustomerName(
     inspection: Inspection
   ): string {
 
+    const data =
+      inspection as any;
+
     const firstName =
-      inspection.customer?.firstName
-      || '';
+      data?.customerFirstName ??
+      data?.customer?.firstName ??
+      '';
 
-    const surname =
-      inspection.customer?.surname
-      || '';
-
+    const lastName =
+      data?.customerLastName ??
+      data?.customer?.lastName ??
+      '';
 
     const fullName =
-      `${firstName} ${surname}`.trim();
+      `${firstName} ${lastName}`.trim();
 
-
-    return fullName || 'Unknown Customer';
+    return (
+      fullName ||
+      data?.customer?.name ||
+      'Customer not provided'
+    );
 
   }
 
 
-  /* =========================================================
-     VEHICLE
-  ========================================================= */
+  // =========================================================
+  // VEHICLE
+  // =========================================================
 
   getVehicleRegistration(
     inspection: Inspection
   ): string {
 
+    const data =
+      inspection as any;
+
     return (
-      inspection.vehicle?.registration
-      || '-'
+      data?.vehicleRegistration ??
+      data?.vehicle?.registration ??
+      data?.vehicle?.registrationNumber ??
+      'Not provided'
     );
 
   }
@@ -170,9 +175,13 @@ export class History implements OnInit {
     inspection: Inspection
   ): string {
 
+    const data =
+      inspection as any;
+
     return (
-      inspection.vehicle?.make
-      || 'Not provided'
+      data?.vehicleMake ??
+      data?.vehicle?.make ??
+      'Not provided'
     );
 
   }
@@ -182,9 +191,13 @@ export class History implements OnInit {
     inspection: Inspection
   ): string {
 
+    const data =
+      inspection as any;
+
     return (
-      inspection.vehicle?.model
-      || 'Not provided'
+      data?.vehicleModel ??
+      data?.vehicle?.model ??
+      'Not provided'
     );
 
   }
@@ -192,12 +205,26 @@ export class History implements OnInit {
 
   getVehicleYear(
     inspection: Inspection
-  ): string | number {
+  ): string {
 
-    return (
-      inspection.vehicle?.year
-      || 'Not provided'
-    );
+    const data =
+      inspection as any;
+
+    const year =
+      data?.vehicleYear ??
+      data?.vehicle?.year;
+
+    if (
+      year === null ||
+      year === undefined ||
+      year === ''
+    ) {
+
+      return 'Not provided';
+
+    }
+
+    return String(year);
 
   }
 
@@ -206,9 +233,14 @@ export class History implements OnInit {
     inspection: Inspection
   ): string {
 
+    const data =
+      inspection as any;
+
     return (
-      inspection.vehicle?.colour
-      || 'Not provided'
+      data?.vehicleColour ??
+      data?.vehicle?.colour ??
+      data?.vehicle?.color ??
+      'Not provided'
     );
 
   }
@@ -216,43 +248,94 @@ export class History implements OnInit {
 
   getVehicleMileage(
     inspection: Inspection
-  ): string | number {
+  ): string {
 
-    return (
-      inspection.vehicle?.mileage
-      || 'Not provided'
-    );
+    const data =
+      inspection as any;
+
+    const mileage =
+      data?.vehicleMileage ??
+      data?.vehicle?.mileage;
+
+    if (
+      mileage === null ||
+      mileage === undefined ||
+      mileage === ''
+    ) {
+
+      return 'Not provided';
+
+    }
+
+    return String(mileage);
 
   }
 
 
-  /* =========================================================
-     INSPECTION TYPE
-  ========================================================= */
+  // =========================================================
+  // INSPECTION TYPE
+  // =========================================================
 
   getInspectionType(
     inspection: Inspection
   ): string {
 
+    const data =
+      inspection as any;
+
+    const type =
+      data?.inspectionType;
+
+    if (
+      type === 'accident' ||
+      type === 'accident-claim' ||
+      type === 'accident_claim'
+    ) {
+
+      return 'Accident Claim Inspection';
+
+    }
+
+    if (
+      type === 'pre-cover' ||
+      type === 'pre_cover'
+    ) {
+
+      return 'Pre-Cover Inspection';
+
+    }
+
     return (
-      inspection.inspectionType
-      || 'Pre-Cover Inspection'
+      type ||
+      'Inspection'
     );
 
   }
 
 
-  /* =========================================================
-     STATUS
-  ========================================================= */
+  // =========================================================
+  // STATUS
+  // =========================================================
 
   getStatus(
     inspection: Inspection
   ): string {
 
+    const data =
+      inspection as any;
+
+    const status =
+      data?.status;
+
+    if (!status) {
+
+      return 'Pending';
+
+    }
+
     return (
-      inspection.status
-      || 'Unknown'
+      status.charAt(0).toUpperCase() +
+      status.slice(1)
     );
 
   }
@@ -262,59 +345,56 @@ export class History implements OnInit {
     inspection: Inspection
   ): string {
 
-    switch (
-      this.getStatus(inspection)
-        .toUpperCase()
-    ) {
+    const data =
+      inspection as any;
 
-      case 'COMPLETED':
+    const status =
+      (
+        data?.status ??
+        ''
+      ).toLowerCase();
 
-        return 'status-approved';
+    switch (status) {
 
+      case 'completed':
+        return 'status-completed';
 
-      case 'PROCESSING':
+      case 'submitted':
+        return 'status-submitted';
 
+      case 'in-progress':
+      case 'in_progress':
+        return 'status-in-progress';
+
+      case 'processing':
         return 'status-processing';
 
+      case 'failed':
+        return 'status-failed';
 
-      case 'UNDER REVIEW':
-
-      case 'REVIEW':
-
-        return 'status-under-review';
-
-
-      case 'PENDING':
-
-        return 'status-pending';
-
-
-      case 'SUBMITTED':
-
-        return 'status-submitted';
-
-
-      case 'FAILED':
-
-        return 'status-rejected';
-
-
+      case 'pending':
       default:
-
-        return 'status-submitted';
+        return 'status-pending';
 
     }
 
   }
 
 
-  /* =========================================================
-     VIEW INSPECTION
-     
-     IMPORTANT:
-     This is deliberately the same pattern as Reports.
-     One click -> router.navigate()
-  ========================================================= */
+  // =========================================================
+  // VIEW DETAILS
+  // =========================================================
+  //
+  // KEEP THIS EXACTLY AS A NORMAL SINGLE CLICK.
+  //
+  // No:
+  // - setTimeout
+  // - double-click handling
+  // - extra subscriptions
+  // - reload
+  // - artificial delays
+  //
+  // =========================================================
 
   viewInspection(
     inspection: Inspection
@@ -323,7 +403,7 @@ export class History implements OnInit {
     if (!inspection?.id) {
 
       console.error(
-        'Cannot open inspection. Inspection ID is missing:',
+        'Cannot view inspection: missing inspection ID',
         inspection
       );
 
@@ -331,37 +411,164 @@ export class History implements OnInit {
 
     }
 
-
     console.log(
       'Opening inspection:',
       inspection.id
     );
 
-
-    void this.router.navigate([
+    this.router.navigate([
       '/inspection-details',
-      inspection.id
+      inspection.id,
     ]);
 
   }
 
 
-  /* =========================================================
-     CREATE INSPECTION
-  ========================================================= */
+  // =========================================================
+  // DELETE INSPECTION
+  // =========================================================
 
-  createInspection(): void {
+  deleteInspection(
+    inspection: Inspection
+  ): void {
 
-    void this.router.navigateByUrl(
-      '/create-inspection-request'
-    );
+    if (!inspection?.id) {
+
+      console.error(
+        'Cannot delete inspection: missing inspection ID',
+        inspection
+      );
+
+      return;
+
+    }
+
+    /*
+     * Prevent multiple delete requests from being
+     * triggered while one deletion is already running.
+     */
+    if (
+      this.deletingInspectionId !== null
+    ) {
+
+      return;
+
+    }
+
+    const customerName =
+      this.getCustomerName(
+        inspection
+      );
+
+    const data =
+      inspection as any;
+
+    const reference =
+      data?.reference ??
+      inspection.id;
+
+
+    const confirmed =
+      window.confirm(
+        `Are you sure you want to delete this inspection?\n\n` +
+        `Customer: ${customerName}\n` +
+        `Reference: ${reference}\n\n` +
+        `This action cannot be undone.`
+      );
+
+
+    if (!confirmed) {
+
+      return;
+
+    }
+
+
+    this.deletingInspectionId =
+      inspection.id;
+
+    this.cdr.detectChanges();
+
+
+    this.inspectionService
+      .deleteInspection(
+        inspection.id
+      )
+      .subscribe({
+
+        next: () => {
+
+          console.log(
+            'Inspection deleted successfully:',
+            inspection.id
+          );
+
+
+          /*
+           * Remove only the deleted inspection from
+           * the existing History list.
+           *
+           * We do NOT reload the page.
+           * We do NOT navigate.
+           * We do NOT touch View Details.
+           */
+          this.inspections =
+            this.inspections.filter(
+              item =>
+                item.id !==
+                inspection.id
+            );
+
+
+          this.deletingInspectionId =
+            null;
+
+          this.cdr.detectChanges();
+
+        },
+
+
+        error: (
+          error
+        ) => {
+
+          console.error(
+            'Failed to delete inspection:',
+            error
+          );
+
+
+          this.deletingInspectionId =
+            null;
+
+          this.errorMessage =
+            'Failed to delete the inspection. Please try again.';
+
+          this.cdr.detectChanges();
+
+        },
+
+      });
 
   }
 
 
-  /* =========================================================
-     TRACKING
-  ========================================================= */
+  // =========================================================
+  // CREATE INSPECTION
+  // =========================================================
+
+  createInspection(): void {
+
+    this.router.navigate([
+      '/create-inspection-request',
+    ]);
+
+  }
+
+
+  // =========================================================
+  // TRACK BY
+  // =========================================================
 
   trackByInspection(
     index: number,
@@ -369,8 +576,8 @@ export class History implements OnInit {
   ): string | number {
 
     return (
-      inspection.id
-      || index
+      inspection.id ??
+      index
     );
 
   }

@@ -65,6 +65,39 @@ export class Inspection implements OnDestroy {
 
   /*
    * =========================================================
+   * INSPECTION TYPE
+   * =========================================================
+   */
+
+  get inspectionType(): string {
+
+    const type = String(
+      this.inspection?.inspectionType ?? ''
+    ).toUpperCase();
+
+    if (
+      type === 'ACCIDENT_CLAIM' ||
+      type === 'ACCIDENT'
+    ) {
+      return 'ACCIDENT_CLAIM';
+    }
+
+    return 'PRE_COVER';
+  }
+
+
+  get isAccidentClaim(): boolean {
+    return this.inspectionType === 'ACCIDENT_CLAIM';
+  }
+
+
+  get isPreCover(): boolean {
+    return this.inspectionType === 'PRE_COVER';
+  }
+
+
+  /*
+   * =========================================================
    * CURRENT PHOTO
    * =========================================================
    */
@@ -86,93 +119,136 @@ export class Inspection implements OnDestroy {
    * =========================================================
    */
 
-  readonly photoSteps: PhotoStep[] = [
+  private readonly preCoverPhotoSteps: PhotoStep[] = [
 
     {
       id: 'front',
       title: 'Front of Vehicle',
-      description: 'Capture a complete front view of the vehicle.',
+      description:
+        'Capture a complete, clear front view of the vehicle.',
       icon: '🚗',
     },
 
     {
       id: 'rear',
       title: 'Rear of Vehicle',
-      description: 'Capture a complete rear view of the vehicle.',
+      description:
+        'Capture a complete, clear rear view of the vehicle.',
       icon: '🚙',
     },
 
     {
       id: 'left',
       title: 'Left Side',
-      description: 'Capture the complete left side of the vehicle.',
+      description:
+        'Capture the complete left side of the vehicle.',
       icon: '◀',
     },
 
     {
       id: 'right',
       title: 'Right Side',
-      description: 'Capture the complete right side of the vehicle.',
+      description:
+        'Capture the complete right side of the vehicle.',
       icon: '▶',
     },
 
     {
-      id: 'front-left',
-      title: 'Front Left Corner',
-      description: 'Capture the front left corner clearly.',
-      icon: '↙',
-    },
-
-    {
-      id: 'front-right',
-      title: 'Front Right Corner',
-      description: 'Capture the front right corner clearly.',
-      icon: '↘',
-    },
-
-    {
-      id: 'rear-left',
-      title: 'Rear Left Corner',
-      description: 'Capture the rear left corner clearly.',
-      icon: '↖',
-    },
-
-    {
-      id: 'rear-right',
-      title: 'Rear Right Corner',
-      description: 'Capture the rear right corner clearly.',
-      icon: '↗',
-    },
-
-    {
-      id: 'vin',
-      title: 'VIN Plate',
-      description: 'Capture the VIN plate so the number is readable.',
-      icon: '▣',
-    },
-
-    {
       id: 'odometer',
-      title: 'Odometer',
-      description: 'Capture the odometer so the mileage is clearly visible.',
-      icon: '◉',
+      title: 'Odometer Reading',
+      description:
+        'Capture a clear photo showing the current odometer reading.',
+      icon: '🔢',
     },
 
     {
-      id: 'engine',
-      title: 'Engine Bay',
-      description: 'Capture a clear view of the engine compartment.',
-      icon: '⚙',
+      id: 'windscreen',
+      title: 'Windscreen',
+      description:
+        'Capture a clear photo of the windscreen, including any visible chips or cracks.',
+      icon: '🪟',
     },
 
     {
-      id: 'interior',
-      title: 'Interior',
-      description: 'Capture a clear view of the vehicle interior.',
-      icon: '⌂',
+      id: 'vehicle-interior',
+      title: 'Vehicle Interior',
+      description:
+        'Capture a clear photograph of the vehicle interior and dashboard area.',
+      icon: '🚘',
     },
 
   ];
+
+
+  private readonly accidentPhotoSteps: PhotoStep[] = [
+
+    {
+      id: 'front',
+      title: 'Front of Vehicle',
+      description:
+        'Capture a complete front view showing the vehicle and any visible accident damage.',
+      icon: '🚗',
+    },
+
+    {
+      id: 'rear',
+      title: 'Rear of Vehicle',
+      description:
+        'Capture a complete rear view showing the vehicle and any visible accident damage.',
+      icon: '🚙',
+    },
+
+    {
+      id: 'left',
+      title: 'Left Side',
+      description:
+        'Capture the complete left side and any visible impact damage.',
+      icon: '◀',
+    },
+
+    {
+      id: 'right',
+      title: 'Right Side',
+      description:
+        'Capture the complete right side and any visible impact damage.',
+      icon: '▶',
+    },
+
+    {
+      id: 'damage-close',
+      title: 'Damage Close-up',
+      description:
+        'Capture a clear close-up of the main damaged or impacted area.',
+      icon: '🔍',
+    },
+
+    {
+      id: 'damage-wide',
+      title: 'Damage Wider View',
+      description:
+        'Capture a wider view showing the full extent and location of the damage.',
+      icon: '📷',
+    },
+
+    {
+      id: 'accident-scene',
+      title: 'Accident Scene',
+      description:
+        'Capture the relevant accident scene or surrounding area where appropriate.',
+      icon: '📍',
+    },
+
+  ];
+
+
+  get photoSteps(): PhotoStep[] {
+
+    if (this.isAccidentClaim) {
+      return this.accidentPhotoSteps;
+    }
+
+    return this.preCoverPhotoSteps;
+  }
 
 
   /*
@@ -231,10 +307,6 @@ export class Inspection implements OnDestroy {
       this.totalPhotos - 1;
   }
 
-
-  /*
-   * ONLY a newly selected photo.
-   */
 
   get hasSelectedPhoto(): boolean {
     return !!this.selectedImage;
@@ -331,11 +403,17 @@ export class Inspection implements OnDestroy {
 
       return Math.max(
         0,
-        photos.length - 1
+        Math.min(
+          photos.length - 1,
+          this.totalPhotos - 1
+        )
       );
     }
 
-    return index;
+    return Math.min(
+      index,
+      this.totalPhotos - 1
+    );
   }
 
 
@@ -412,6 +490,7 @@ export class Inspection implements OnDestroy {
         'image/'
       )
     ) {
+
       console.warn(
         'Selected file is not an image.'
       );
@@ -433,8 +512,7 @@ export class Inspection implements OnDestroy {
 
     this.zone.run(() => {
 
-      this.changeDetector
-        .detectChanges();
+      this.changeDetector.detectChanges();
 
     });
   }
@@ -452,14 +530,9 @@ export class Inspection implements OnDestroy {
       return;
     }
 
-    this.selectedFile = null;
+    this.clearTemporarySelection();
 
-    this.releasePreview();
-
-    this.selectedImage = null;
-
-    this.changeDetector
-      .detectChanges();
+    this.changeDetector.detectChanges();
 
     this.takePhoto();
   }
@@ -472,13 +545,15 @@ export class Inspection implements OnDestroy {
    *
    * IMPORTANT:
    *
-   * This method ONLY saves the current photo.
+   * CustomerInspectionService.updatePhoto() is synchronous.
+   * It does NOT return a Promise and does NOT return a photo.
    *
-   * It does not submit the inspection.
+   * The previous implementation was doing unnecessary
+   * change-detection work around this synchronous operation.
    *
-   * It does not navigate to Review unless the user
-   * explicitly presses Continue to Review on the final
-   * photo.
+   * This version deliberately performs the state transition
+   * in one controlled Angular zone.
+   * =========================================================
    */
 
   async confirmPhoto(): Promise<void> {
@@ -493,37 +568,42 @@ export class Inspection implements OnDestroy {
 
     this.savingPhoto = true;
 
-    this.changeDetector
-      .detectChanges();
+    this.changeDetector.detectChanges();
+
+
+    const fileToSave =
+      this.selectedFile;
+
+    const photoToSave =
+      this.currentInspectionPhoto;
+
+
+    if (!fileToSave) {
+
+      this.savingPhoto = false;
+
+      this.changeDetector.detectChanges();
+
+      return;
+    }
+
+
+    if (!photoToSave) {
+
+      this.savingPhoto = false;
+
+      this.changeDetector.detectChanges();
+
+      return;
+    }
+
 
     try {
 
       /*
-       * Keep a local reference because the temporary
-       * selection is cleared after the save.
-       */
-
-      const fileToSave =
-        this.selectedFile;
-
-      const photoToSave =
-        this.currentInspectionPhoto;
-
-      if (!fileToSave) {
-        throw new Error(
-          'No photo selected.'
-        );
-      }
-
-      if (!photoToSave) {
-        throw new Error(
-          'Current inspection photo was not found.'
-        );
-      }
-
-
-      /*
-       * Compress the image.
+       * =====================================================
+       * PROCESS IMAGE
+       * =====================================================
        */
 
       const compressedImage =
@@ -533,8 +613,9 @@ export class Inspection implements OnDestroy {
 
 
       /*
-       * Save the compressed image into the
-       * CustomerInspectionService.
+       * =====================================================
+       * SAVE INTO INSPECTION
+       * =====================================================
        */
 
       this.inspectionService.updatePhoto(
@@ -544,9 +625,36 @@ export class Inspection implements OnDestroy {
 
 
       /*
-       * The photo is now safely stored.
-       *
-       * Remove only the temporary camera preview.
+       * =====================================================
+       * READ THE UPDATED PHOTO DIRECTLY
+       * =====================================================
+       */
+
+      const updatedInspection =
+        this.inspectionService.getInspection();
+
+      const updatedPhoto =
+        updatedInspection.photos.find(
+          photo =>
+            photo.id === photoToSave.id
+        );
+
+
+      if (
+        !updatedPhoto ||
+        !updatedPhoto.uploaded
+      ) {
+
+        throw new Error(
+          'The photo was not marked as uploaded after saving.'
+        );
+      }
+
+
+      /*
+       * =====================================================
+       * RELEASE CAMERA PREVIEW
+       * =====================================================
        */
 
       this.releasePreview();
@@ -557,70 +665,38 @@ export class Inspection implements OnDestroy {
 
 
       /*
-       * Force Angular to immediately recognise that:
+       * =====================================================
+       * UPDATE SCREEN
+       * =====================================================
        *
-       * - Saving is finished
-       * - Photo is completed
-       * - Progress changed
-       * - Next photo can be displayed
+       * Everything below happens together so Angular sees:
+       *
+       *   photo completed
+       *   progress updated
+       *   saving stopped
+       *   next photo selected
+       *
+       * in the same UI update.
+       * =====================================================
        */
 
       this.zone.run(() => {
+
+        if (
+          this.currentIndex <
+          this.totalPhotos - 1
+        ) {
+
+          this.currentIndex =
+            this.currentIndex + 1;
+        }
 
         this.savingPhoto = false;
 
-        this.changeDetector
-          .detectChanges();
+        this.changeDetector.detectChanges();
 
       });
 
-
-      /*
-       * =====================================================
-       * LAST PHOTO
-       * =====================================================
-       *
-       * IMPORTANT:
-       *
-       * Do NOT navigate automatically.
-       *
-       * The HTML will now show:
-       *
-       * Continue to Review
-       *
-       * and the customer must click it.
-       */
-
-      if (this.isLastPhoto) {
-
-        this.zone.run(() => {
-
-          this.changeDetector
-            .detectChanges();
-
-        });
-
-        return;
-      }
-
-
-      /*
-       * =====================================================
-       * NEXT PHOTO
-       * =====================================================
-       *
-       * Move to the next photo only after the current
-       * photo has been successfully saved.
-       */
-
-      this.currentIndex++;
-
-      this.zone.run(() => {
-
-        this.changeDetector
-          .detectChanges();
-
-      });
 
     } catch (error) {
 
@@ -630,37 +706,20 @@ export class Inspection implements OnDestroy {
       );
 
       /*
-       * Make absolutely sure the page does not remain
-       * permanently stuck on "Saving..."
+       * Keep the selected image visible when saving fails.
+       * This lets the customer retry instead of losing the photo.
        */
 
       this.zone.run(() => {
 
         this.savingPhoto = false;
 
-        this.changeDetector
-          .detectChanges();
+        this.changeDetector.detectChanges();
 
       });
 
-    } finally {
-
-      /*
-       * Safety net.
-       *
-       * If anything unexpected happens anywhere in the
-       * save process, savingPhoto can never remain true.
-       */
-
-      this.zone.run(() => {
-
-        this.savingPhoto = false;
-
-        this.changeDetector
-          .detectChanges();
-
-      });
     }
+
   }
 
 
@@ -773,135 +832,481 @@ export class Inspection implements OnDestroy {
   ): Promise<string> {
 
     return new Promise(
-      (
+      async (
         resolve,
         reject
       ) => {
 
-        const reader =
-          new FileReader();
+        let timeoutId:
+          ReturnType<typeof setTimeout> | null =
+          null;
 
-        reader.onload = () => {
+        let objectUrl: string | null =
+          null;
 
-          const image =
-            new Image();
-
-          image.onload = () => {
-
-            const maxSize = 1800;
-
-            let width =
-              image.width;
-
-            let height =
-              image.height;
+        let finished = false;
 
 
-            if (
-              width > maxSize ||
-              height > maxSize
-            ) {
+        const cleanup = (): void => {
 
-              if (width > height) {
+          if (timeoutId !== null) {
 
-                height =
-                  Math.round(
-                    (
-                      height /
-                      width
-                    ) * maxSize
-                  );
-
-                width = maxSize;
-
-              } else {
-
-                width =
-                  Math.round(
-                    (
-                      width /
-                      height
-                    ) * maxSize
-                  );
-
-                height = maxSize;
-              }
-            }
-
-
-            const canvas =
-              document.createElement(
-                'canvas'
-              );
-
-            canvas.width = width;
-
-            canvas.height = height;
-
-
-            const context =
-              canvas.getContext(
-                '2d'
-              );
-
-            if (!context) {
-
-              reject(
-                new Error(
-                  'Unable to process image.'
-                )
-              );
-
-              return;
-            }
-
-
-            context.drawImage(
-              image,
-              0,
-              0,
-              width,
-              height
+            clearTimeout(
+              timeoutId
             );
 
+            timeoutId = null;
+          }
 
-            resolve(
-              canvas.toDataURL(
-                'image/jpeg',
-                0.82
-              )
+          if (objectUrl) {
+
+            URL.revokeObjectURL(
+              objectUrl
             );
-          };
 
-
-          image.onerror = () => {
-
-            reject(
-              new Error(
-                'Unable to read image.'
-              )
-            );
-          };
-
-
-          image.src =
-            String(
-              reader.result
-            );
+            objectUrl = null;
+          }
         };
 
 
-        reader.onerror = () => {
+        const fail = (
+          message: string
+        ): void => {
+
+          if (finished) {
+            return;
+          }
+
+          finished = true;
+
+          cleanup();
 
           reject(
-            new Error(
-              'Unable to read selected photo.'
-            )
+            new Error(message)
           );
         };
 
 
-        reader.readAsDataURL(file);
+        const succeed = (
+          value: string
+        ): void => {
+
+          if (finished) {
+            return;
+          }
+
+          finished = true;
+
+          cleanup();
+
+          resolve(value);
+        };
+
+
+        timeoutId =
+          setTimeout(() => {
+
+            fail(
+              'Photo processing timed out. Please retake the photo.'
+            );
+
+          }, 10000);
+
+
+        try {
+
+          if (!file) {
+
+            fail(
+              'No photo file was provided.'
+            );
+
+            return;
+          }
+
+
+          if (
+            !file.type.startsWith(
+              'image/'
+            )
+          ) {
+
+            fail(
+              'The selected file is not an image.'
+            );
+
+            return;
+          }
+
+
+          /*
+           * =================================================
+           * CREATE IMAGE BITMAP
+           * =================================================
+           */
+
+          let bitmap:
+            ImageBitmap | null =
+            null;
+
+
+          if (
+            typeof createImageBitmap ===
+            'function'
+          ) {
+
+            try {
+
+              bitmap =
+                await createImageBitmap(
+                  file
+                );
+
+            } catch (error) {
+
+              console.warn(
+                'createImageBitmap failed. Falling back to Image element.',
+                error
+              );
+
+            }
+
+          }
+
+
+          /*
+           * =================================================
+           * FALLBACK IMAGE ELEMENT
+           * =================================================
+           */
+
+          let sourceWidth = 0;
+
+          let sourceHeight = 0;
+
+          let drawSource:
+            CanvasImageSource | null =
+            null;
+
+
+          if (bitmap) {
+
+            sourceWidth =
+              bitmap.width;
+
+            sourceHeight =
+              bitmap.height;
+
+            drawSource =
+              bitmap;
+
+          } else {
+
+            objectUrl =
+              URL.createObjectURL(
+                file
+              );
+
+
+            const image =
+              await new Promise<HTMLImageElement>(
+                (
+                  imageResolve,
+                  imageReject
+                ) => {
+
+                  const image =
+                    new Image();
+
+                  let imageFinished =
+                    false;
+
+
+                  image.onload =
+                    () => {
+
+                      if (imageFinished) {
+                        return;
+                      }
+
+                      imageFinished =
+                        true;
+
+                      imageResolve(
+                        image
+                      );
+                    };
+
+
+                  image.onerror =
+                    () => {
+
+                      if (imageFinished) {
+                        return;
+                      }
+
+                      imageFinished =
+                        true;
+
+                      imageReject(
+                        new Error(
+                          'Unable to decode selected photo.'
+                        )
+                      );
+                    };
+
+
+                  image.src =
+                    objectUrl!;
+                }
+              );
+
+
+            sourceWidth =
+              image.naturalWidth ||
+              image.width;
+
+            sourceHeight =
+              image.naturalHeight ||
+              image.height;
+
+            drawSource =
+              image;
+          }
+
+
+          if (
+            sourceWidth <= 0 ||
+            sourceHeight <= 0 ||
+            !drawSource
+          ) {
+
+            if (bitmap) {
+              bitmap.close();
+            }
+
+            fail(
+              'The selected image has invalid dimensions.'
+            );
+
+            return;
+          }
+
+
+          /*
+           * =================================================
+           * RESIZE
+           * =================================================
+           */
+
+          const maxSize =
+            1800;
+
+          let width =
+            sourceWidth;
+
+          let height =
+            sourceHeight;
+
+
+          if (
+            width > maxSize ||
+            height > maxSize
+          ) {
+
+            if (width > height) {
+
+              height =
+                Math.round(
+                  (
+                    height /
+                    width
+                  ) *
+                  maxSize
+                );
+
+              width =
+                maxSize;
+
+            } else {
+
+              width =
+                Math.round(
+                  (
+                    width /
+                    height
+                  ) *
+                  maxSize
+                );
+
+              height =
+                maxSize;
+            }
+          }
+
+
+          /*
+           * =================================================
+           * CANVAS
+           * =================================================
+           */
+
+          const canvas =
+            document.createElement(
+              'canvas'
+            );
+
+          canvas.width =
+            width;
+
+          canvas.height =
+            height;
+
+
+          const context =
+            canvas.getContext(
+              '2d'
+            );
+
+
+          if (!context) {
+
+            if (bitmap) {
+              bitmap.close();
+            }
+
+            fail(
+              'Unable to process image.'
+            );
+
+            return;
+          }
+
+
+          context.drawImage(
+            drawSource,
+            0,
+            0,
+            width,
+            height
+          );
+
+
+          if (bitmap) {
+            bitmap.close();
+          }
+
+
+          /*
+           * =================================================
+           * JPEG ENCODING
+           * =================================================
+           */
+
+          const blob =
+            await new Promise<Blob | null>(
+              (
+                blobResolve
+              ) => {
+
+                canvas.toBlob(
+                  (
+                    generatedBlob
+                  ) => {
+
+                    blobResolve(
+                      generatedBlob
+                    );
+
+                  },
+                  'image/jpeg',
+                  0.82
+                );
+
+              }
+            );
+
+
+          if (!blob) {
+
+            fail(
+              'Unable to compress selected photo.'
+            );
+
+            return;
+          }
+
+
+          /*
+           * =================================================
+           * BLOB TO DATA URL
+           * =================================================
+           */
+
+          const reader =
+            new FileReader();
+
+
+          reader.onload =
+            () => {
+
+              const result =
+                reader.result;
+
+
+              if (
+                typeof result !== 'string' ||
+                !result ||
+                result === 'data:,'
+              ) {
+
+                fail(
+                  'Unable to create the processed photo.'
+                );
+
+                return;
+              }
+
+
+              succeed(
+                result
+              );
+            };
+
+
+          reader.onerror =
+            () => {
+
+              fail(
+                'Unable to read processed photo.'
+              );
+            };
+
+
+          reader.onabort =
+            () => {
+
+              fail(
+                'Photo processing was cancelled.'
+              );
+            };
+
+
+          reader.readAsDataURL(
+            blob
+          );
+
+        } catch (error) {
+
+          console.error(
+            'Photo compression failed:',
+            error
+          );
+
+          fail(
+            'Unable to process selected photo.'
+          );
+        }
       }
     );
   }

@@ -1,6 +1,10 @@
 import {
-  Injectable
+  Injectable,
 } from '@angular/core';
+
+import {
+  BehaviorSubject,
+} from 'rxjs';
 
 
 export type InspectionType =
@@ -17,801 +21,1213 @@ export type InspectionStatus =
 
 
 export interface CustomerDetails {
-
-  firstName: string;
-
-  lastName: string;
-
-  phone: string;
-
-  email: string;
+  firstName?: string;
+  lastName?: string;
+  surname?: string;
+  idNumber?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
 }
 
 
 export interface VehicleDetails {
-
-  registration: string;
-
-  vin: string;
-
-  make: string;
-
-  model: string;
-
-  year: string;
-
-  colour: string;
-
-  mileage: number | null;
+  registration?: string;
+  make?: string;
+  model?: string;
+  year?: string;
+  colour?: string;
+  vin?: string;
+  mileage?: number;
 }
 
 
 export interface InspectionPhoto {
-
   id: string;
-
   title: string;
-
   description: string;
-
   imageUrl: string | null;
-
   uploaded: boolean;
-
-  uploadedAt?: Date;
+  uploadedAt?: string;
 }
 
 
 export interface Inspection {
-
   reference: string;
 
-  inspectionType: InspectionType;
+  inspectionType:
+    InspectionType;
 
-  status: InspectionStatus;
+  type?:
+    InspectionType;
 
-  createdAt: Date;
+  status:
+    InspectionStatus;
 
-  submittedAt?: Date;
+  createdAt:
+    string;
 
-  customer: CustomerDetails;
+  submittedAt?:
+    string;
 
-  vehicle: VehicleDetails;
+  customer:
+    CustomerDetails;
 
-  photos: InspectionPhoto[];
+  vehicle:
+    VehicleDetails;
 
-  accidentPhotos: InspectionPhoto[];
+  photos:
+    InspectionPhoto[];
+
+  accidentPhotos:
+    InspectionPhoto[];
 }
 
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CustomerInspectionService {
 
+  private readonly storageKey =
+    'falcon_customer_inspection';
 
-  /*
-   * =========================================================
-   * CURRENT CUSTOMER INSPECTION
-   * =========================================================
-   */
 
-  private inspection:
-    Inspection =
-    this.createInspection(
-      'pre-cover'
+  private readonly inspectionSubject =
+    new BehaviorSubject<Inspection | null>(
+      this.loadInspection()
     );
 
 
-  /*
-   * =========================================================
-   * CREATE CLEAN INSPECTION
-   * =========================================================
-   */
+  readonly inspection$ =
+    this.inspectionSubject.asObservable();
 
-  private createInspection(
+
+  // =========================================================
+  // CURRENT INSPECTION
+  // =========================================================
+
+  getInspection():
+    Inspection {
+
+    return this.requireInspection();
+  }
+
+
+  getCurrentInspection():
+    Inspection {
+
+    return this.requireInspection();
+  }
+
+
+  // =========================================================
+  // START NEW INSPECTION
+  // =========================================================
+
+  startNewInspection(
     type: InspectionType,
     reference?: string
   ): Inspection {
 
-    return {
-
-      /*
-       * If a reference was supplied by the admin request,
-       * ALWAYS use it.
-       *
-       * Only generate a reference when this is a completely
-       * independent customer inspection.
-       */
+    const inspection: Inspection = {
 
       reference:
         reference ??
-        this.generateReference(),
+        this.generateLocalReference(),
 
       inspectionType:
+        type,
+
+      type:
         type,
 
       status:
         'draft',
 
       createdAt:
-        new Date(),
+        new Date().toISOString(),
 
       customer: {
-
-        firstName:
-          '',
-
-        lastName:
-          '',
-
-        phone:
-          '',
-
-        email:
-          ''
+        firstName: '',
+        lastName: '',
+        surname: '',
+        idNumber: '',
+        email: '',
+        phone: '',
+        address: '',
       },
 
       vehicle: {
-
-        registration:
-          '',
-
-        vin:
-          '',
-
-        make:
-          '',
-
-        model:
-          '',
-
-        year:
-          '',
-
-        colour:
-          '',
-
-        mileage:
-          null
+        registration: '',
+        make: '',
+        model: '',
+        year: '',
+        colour: '',
+        vin: '',
+        mileage: 0,
       },
 
       photos:
-        this.createVehicleChecklist(),
+        this.createSevenPhotoChecklist(
+          type
+        ),
 
       accidentPhotos:
-        this.createAccidentChecklist()
+        this.createSevenPhotoChecklist(
+          type
+        ),
     };
-  }
 
 
-  /*
-   * =========================================================
-   * VEHICLE CHECKLIST
-   * =========================================================
-   */
-
-  private createVehicleChecklist():
-    InspectionPhoto[] {
-
-    const photos:
-      Array<
-        [string, string, string]
-      > = [
-
-      [
-        'front',
-        'Front',
-        'Capture complete front view'
-      ],
-
-      [
-        'rear',
-        'Rear',
-        'Capture complete rear view'
-      ],
-
-      [
-        'left',
-        'Left Side',
-        'Capture left side'
-      ],
-
-      [
-        'right',
-        'Right Side',
-        'Capture right side'
-      ],
-
-      [
-        'front-left',
-        'Front Left Corner',
-        'Capture front left corner'
-      ],
-
-      [
-        'front-right',
-        'Front Right Corner',
-        'Capture front right corner'
-      ],
-
-      [
-        'rear-left',
-        'Rear Left Corner',
-        'Capture rear left corner'
-      ],
-
-      [
-        'rear-right',
-        'Rear Right Corner',
-        'Capture rear right corner'
-      ],
-
-      [
-        'vin',
-        'VIN Plate',
-        'Capture VIN plate'
-      ],
-
-      [
-        'odometer',
-        'Odometer',
-        'Capture mileage'
-      ],
-
-      [
-        'engine',
-        'Engine Bay',
-        'Capture engine compartment'
-      ],
-
-      [
-        'interior',
-        'Interior',
-        'Capture interior'
-      ]
-    ];
-
-
-    return photos.map(
-      (
-        [
-          id,
-          title,
-          description
-        ]
-      ) => ({
-
-        id,
-
-        title,
-
-        description,
-
-        imageUrl:
-          null,
-
-        uploaded:
-          false
-      })
-    );
-  }
-
-
-  /*
-   * =========================================================
-   * ACCIDENT CHECKLIST
-   * =========================================================
-   */
-
-  private createAccidentChecklist():
-    InspectionPhoto[] {
-
-    return [
-
-      {
-
-        id:
-          'damage',
-
-        title:
-          'Damage Area',
-
-        description:
-          'Capture damaged areas clearly',
-
-        imageUrl:
-          null,
-
-        uploaded:
-          false
-      },
-
-      {
-
-        id:
-          'accident-location',
-
-        title:
-          'Accident Location',
-
-        description:
-          'Capture where the accident occurred',
-
-        imageUrl:
-          null,
-
-        uploaded:
-          false
-      },
-
-      {
-
-        id:
-          'warning-lights',
-
-        title:
-          'Dashboard Warning Lights',
-
-        description:
-          'Capture dashboard warning lights',
-
-        imageUrl:
-          null,
-
-        uploaded:
-          false
-      }
-    ];
-  }
-
-
-  /*
-   * =========================================================
-   * GENERATE NEW REFERENCE
-   * =========================================================
-   */
-
-  private generateReference(): string {
-
-    const year =
-      new Date().getFullYear();
-
-
-    const number =
-      Math.floor(
-        100000 +
-        Math.random() *
-        900000
-      );
-
-
-    return `FAL-${year}-${number}`;
-  }
-
-
-  /*
-   * =========================================================
-   * GET INSPECTION
-   * =========================================================
-   */
-
-  getInspection():
-    Inspection {
-
-    return this.inspection;
-  }
-
-
-  /*
-   * =========================================================
-   * GET REFERENCE
-   * =========================================================
-   */
-
-  getReference():
-    string {
-
-    return this.inspection.reference;
-  }
-
-
-  /*
-   * =========================================================
-   * START NEW INSPECTION
-   * =========================================================
-   *
-   * THIS IS THE IMPORTANT RESET.
-   *
-   * Every call destroys the old customer inspection.
-   *
-   * Therefore:
-   *
-   * previous vehicle = removed
-   * previous photos = removed
-   * previous accident photos = removed
-   * previous customer data = removed
-   * previous submitted state = removed
-   *
-   * If a reference is supplied, it is preserved.
-   */
-
-  startNewInspection(
-    type: InspectionType,
-    reference?: string
-  ): void {
-
-    console.log(
-      'STARTING FRESH CUSTOMER INSPECTION',
-      {
-        type,
-        reference
-      }
+    this.setInspection(
+      inspection
     );
 
 
-    this.inspection =
-      this.createInspection(
-        type,
-        reference
-      );
-
-
-    console.log(
-      'FRESH CUSTOMER INSPECTION:',
-      this.inspection
-    );
+    return inspection;
   }
 
 
-  /*
-   * =========================================================
-   * RESET
-   * =========================================================
-   */
-
-  resetInspection(
-    type:
-      InspectionType =
-      'pre-cover',
-
-    reference?:
-      string
-  ): void {
-
-    this.startNewInspection(
-      type,
-      reference
-    );
-  }
-
-
-  /*
-   * =========================================================
-   * CUSTOMER
-   * =========================================================
-   */
+  // =========================================================
+  // CUSTOMER
+  // =========================================================
 
   updateCustomer(
-    customer: CustomerDetails
+    customer:
+      Partial<CustomerDetails>
   ): void {
 
-    this.inspection.customer = {
+    const inspection =
+      this.requireInspection();
 
-      firstName:
-        customer.firstName ??
-        '',
 
-      lastName:
-        customer.lastName ??
-        '',
-
-      phone:
-        customer.phone ??
-        '',
-
-      email:
-        customer.email ??
-        ''
+    inspection.customer = {
+      ...inspection.customer,
+      ...customer,
     };
 
 
-    this.inspection.status =
-      'in-progress';
+    this.setInspection(
+      inspection
+    );
   }
 
 
-  /*
-   * =========================================================
-   * VEHICLE
-   * =========================================================
-   */
+  // =========================================================
+  // VEHICLE
+  // =========================================================
 
   updateVehicle(
-    vehicle: VehicleDetails
+    vehicle:
+      Partial<VehicleDetails>
   ): void {
 
-    this.inspection.vehicle = {
+    const inspection =
+      this.requireInspection();
 
-      registration:
-        vehicle.registration ??
-        '',
 
-      vin:
-        vehicle.vin ??
-        '',
-
-      make:
-        vehicle.make ??
-        '',
-
-      model:
-        vehicle.model ??
-        '',
-
-      year:
-        vehicle.year ??
-        '',
-
-      colour:
-        vehicle.colour ??
-        '',
-
-      mileage:
-        vehicle.mileage ??
-        null
+    inspection.vehicle = {
+      ...inspection.vehicle,
+      ...vehicle,
     };
 
 
-    this.inspection.status =
-      'in-progress';
+    this.setInspection(
+      inspection
+    );
   }
 
 
-  /*
-   * =========================================================
-   * VEHICLE PHOTO
-   * =========================================================
-   */
+  // =========================================================
+  // PHOTO
+  // =========================================================
 
   updatePhoto(
-    id: string,
+    photoId: string,
     imageUrl: string
   ): void {
 
-    const photo =
-      this.inspection.photos.find(
-        p =>
-          p.id === id
+    const inspection =
+      this.requireInspection();
+
+
+    const index =
+      inspection.photos.findIndex(
+        photo =>
+          photo.id === photoId
       );
 
 
-    if (!photo) {
+    if (index === -1) {
+
+      console.error(
+        'Falcon: photo slot was not found:',
+        photoId
+      );
 
       return;
     }
 
 
-    photo.imageUrl =
-      imageUrl;
-
-    photo.uploaded =
-      true;
-
-    photo.uploadedAt =
-      new Date();
+    const uploadedAt =
+      new Date().toISOString();
 
 
-    this.inspection.status =
-      'in-progress';
+    /*
+     * =======================================================
+     * UPDATE LIVE PRIMARY PHOTO
+     * =======================================================
+     *
+     * The actual image remains in the live Angular state.
+     */
+    inspection.photos[index] = {
+      ...inspection.photos[index],
+
+      imageUrl,
+
+      uploaded:
+        true,
+
+      uploadedAt,
+    };
+
+
+    /*
+     * =======================================================
+     * UPDATE COMPATIBILITY COLLECTION
+     * =======================================================
+     */
+    const accidentIndex =
+      inspection.accidentPhotos.findIndex(
+        photo =>
+          photo.id === photoId
+      );
+
+
+    if (accidentIndex !== -1) {
+
+      inspection.accidentPhotos[accidentIndex] = {
+        ...inspection.accidentPhotos[accidentIndex],
+
+        imageUrl,
+
+        uploaded:
+          true,
+
+        uploadedAt,
+      };
+    }
+
+
+    /*
+     * =======================================================
+     * UPDATE STATUS
+     * =======================================================
+     */
+    if (
+      inspection.status ===
+      'draft'
+    ) {
+
+      inspection.status =
+        'in-progress';
+    }
+
+
+    /*
+     * =======================================================
+     * UPDATE LIVE STATE FIRST
+     * =======================================================
+     */
+    this.inspectionSubject.next(
+      inspection
+    );
+
+
+    /*
+     * =======================================================
+     * SAVE ONLY LIGHTWEIGHT METADATA
+     * =======================================================
+     *
+     * IMPORTANT:
+     *
+     * saveInspection() deliberately removes imageUrl before
+     * writing to localStorage.
+     *
+     * This prevents large camera images from freezing the
+     * browser or exceeding localStorage quota.
+     */
+    this.saveInspection(
+      inspection
+    );
   }
 
 
-  /*
-   * =========================================================
-   * ACCIDENT PHOTO
-   * =========================================================
-   */
+  // =========================================================
+  // ACCIDENT PHOTO COMPATIBILITY
+  // =========================================================
 
   updateAccidentPhoto(
-    id: string,
+    photoId: string,
     imageUrl: string
   ): void {
 
-    const photo =
-      this.inspection
-        .accidentPhotos
-        .find(
-          p =>
-            p.id === id
-        );
+    const inspection =
+      this.requireInspection();
 
 
-    if (!photo) {
+    const index =
+      inspection.accidentPhotos.findIndex(
+        photo =>
+          photo.id === photoId
+      );
+
+
+    if (index === -1) {
+
+      console.error(
+        'Falcon: accident photo slot was not found:',
+        photoId
+      );
 
       return;
     }
 
 
-    photo.imageUrl =
-      imageUrl;
-
-    photo.uploaded =
-      true;
-
-    photo.uploadedAt =
-      new Date();
+    const uploadedAt =
+      new Date().toISOString();
 
 
-    this.inspection.status =
-      'in-progress';
+    inspection.accidentPhotos[index] = {
+      ...inspection.accidentPhotos[index],
+
+      imageUrl,
+
+      uploaded:
+        true,
+
+      uploadedAt,
+    };
+
+
+    /*
+     * Keep primary collection synchronized.
+     */
+    const primaryIndex =
+      inspection.photos.findIndex(
+        photo =>
+          photo.id === photoId
+      );
+
+
+    if (primaryIndex !== -1) {
+
+      inspection.photos[primaryIndex] = {
+        ...inspection.photos[primaryIndex],
+
+        imageUrl,
+
+        uploaded:
+          true,
+
+        uploadedAt,
+      };
+    }
+
+
+    if (
+      inspection.status ===
+      'draft'
+    ) {
+
+      inspection.status =
+        'in-progress';
+    }
+
+
+    this.inspectionSubject.next(
+      inspection
+    );
+
+
+    this.saveInspection(
+      inspection
+    );
   }
 
 
-  /*
-   * =========================================================
-   * PHOTO COUNTS
-   * =========================================================
-   */
+  // =========================================================
+  // COMPLETED PHOTO COUNT
+  // =========================================================
 
-  getCompletedPhotos():
-    number {
+  getCompletedPhotos(): number {
 
-    return this.inspection
-      .photos
-      .filter(
-        p =>
-          p.uploaded
-      )
-      .length;
+    const inspection =
+      this.requireInspection();
+
+
+    return inspection.photos.filter(
+      photo =>
+        photo.uploaded &&
+        !!photo.imageUrl
+    ).length;
   }
 
 
-  getTotalPhotos():
-    number {
+  // =========================================================
+  // TOTAL PHOTO COUNT
+  // =========================================================
 
-    return this.inspection
-      .photos
-      .length;
+  getTotalPhotos(): number {
+
+    return 7;
   }
 
 
-  getCompletedAccidentPhotos():
-    number {
+  // =========================================================
+  // PROGRESS
+  // =========================================================
 
-    return this.inspection
-      .accidentPhotos
-      .filter(
-        p =>
-          p.uploaded
-      )
-      .length;
-  }
+  getProgress(): number {
 
-
-  getTotalAccidentPhotos():
-    number {
-
-    return this.inspection
-      .accidentPhotos
-      .length;
-  }
-
-
-  /*
-   * =========================================================
-   * PROGRESS
-   * =========================================================
-   */
-
-  getProgress():
-    number {
-
-    const vehicleCompleted =
-      this.getCompletedPhotos();
-
-
-    const vehicleTotal =
+    const total =
       this.getTotalPhotos();
 
 
-    if (
-      this.inspection
-        .inspectionType ===
-      'accident'
-    ) {
-
-      const accidentCompleted =
-        this.getCompletedAccidentPhotos();
-
-
-      const accidentTotal =
-        this.getTotalAccidentPhotos();
-
-
-      const completed =
-        vehicleCompleted +
-        accidentCompleted;
-
-
-      const total =
-        vehicleTotal +
-        accidentTotal;
-
-
-      if (
-        total === 0
-      ) {
-
-        return 0;
-      }
-
-
-      return Math.round(
-        (
-          completed /
-          total
-        ) * 100
-      );
-    }
-
-
-    if (
-      vehicleTotal === 0
-    ) {
-
+    if (total === 0) {
       return 0;
     }
 
 
     return Math.round(
       (
-        vehicleCompleted /
-        vehicleTotal
+        this.getCompletedPhotos() /
+        total
       ) * 100
     );
   }
 
 
-  /*
-   * =========================================================
-   * SET TYPE
-   * =========================================================
-   *
-   * Changing type means starting a completely
-   * new inspection.
-   */
+  // =========================================================
+  // ALL PHOTOS COMPLETE
+  // =========================================================
 
-  setInspectionType(
-    type: InspectionType
-  ): void {
+  areAllPhotosComplete(): boolean {
 
-    this.startNewInspection(
-      type
+    const inspection =
+      this.requireInspection();
+
+
+    return (
+      inspection.photos.length === 7 &&
+      inspection.photos.every(
+        photo =>
+          photo.uploaded &&
+          !!photo.imageUrl
+      )
     );
   }
 
 
-  /*
-   * =========================================================
-   * STATUS
-   * =========================================================
-   */
+  // =========================================================
+  // STATUS
+  // =========================================================
 
   setStatus(
     status: InspectionStatus
   ): void {
 
-    this.inspection.status =
+    const inspection =
+      this.requireInspection();
+
+
+    inspection.status =
       status;
 
 
     if (
-      status === 'submitted'
+      status ===
+      'submitted'
     ) {
 
-      this.inspection.submittedAt =
-        new Date();
+      inspection.submittedAt =
+        new Date().toISOString();
     }
+
+
+    this.setInspection(
+      inspection
+    );
+  }
+
+
+  // =========================================================
+  // EXACTLY 7 PHOTO CHECKLIST
+  // =========================================================
+
+  private createSevenPhotoChecklist(
+    type:
+      InspectionType = 'pre-cover'
+  ):
+    InspectionPhoto[] {
+
+    if (
+      type === 'accident'
+    ) {
+
+      return [
+
+        {
+          id:
+            'front',
+
+          title:
+            'Front of Vehicle',
+
+          description:
+            'Capture a complete front view showing the vehicle and any visible accident damage.',
+
+          imageUrl:
+            null,
+
+          uploaded:
+            false,
+        },
+
+        {
+          id:
+            'rear',
+
+          title:
+            'Rear of Vehicle',
+
+          description:
+            'Capture a complete rear view showing the vehicle and any visible accident damage.',
+
+          imageUrl:
+            null,
+
+          uploaded:
+            false,
+        },
+
+        {
+          id:
+            'left',
+
+          title:
+            'Left Side',
+
+          description:
+            'Capture the complete left side and any visible impact damage.',
+
+          imageUrl:
+            null,
+
+          uploaded:
+            false,
+        },
+
+        {
+          id:
+            'right',
+
+          title:
+            'Right Side',
+
+          description:
+            'Capture the complete right side and any visible impact damage.',
+
+          imageUrl:
+            null,
+
+          uploaded:
+            false,
+        },
+
+        {
+          id:
+            'damage-close',
+
+          title:
+            'Damage Close-up',
+
+          description:
+            'Capture a clear close-up of the main damaged or impacted area.',
+
+          imageUrl:
+            null,
+
+          uploaded:
+            false,
+        },
+
+        {
+          id:
+            'damage-wide',
+
+          title:
+            'Damage Wider View',
+
+          description:
+            'Capture a wider view showing the full extent and location of the damage.',
+
+          imageUrl:
+            null,
+
+          uploaded:
+            false,
+        },
+
+        {
+          id:
+            'accident-scene',
+
+          title:
+            'Accident Scene',
+
+          description:
+            'Capture the relevant accident scene or surrounding area where appropriate.',
+
+          imageUrl:
+            null,
+
+          uploaded:
+            false,
+        },
+
+      ];
+    }
+
+
+    // =======================================================
+    // PRE-COVER
+    // =======================================================
+
+    return [
+
+      {
+        id:
+          'front',
+
+        title:
+          'Front of Vehicle',
+
+        description:
+          'Capture a complete, clear front view of the vehicle.',
+
+        imageUrl:
+          null,
+
+        uploaded:
+          false,
+      },
+
+      {
+        id:
+          'rear',
+
+        title:
+          'Rear of Vehicle',
+
+        description:
+          'Capture a complete, clear rear view of the vehicle.',
+
+        imageUrl:
+          null,
+
+        uploaded:
+          false,
+      },
+
+      {
+        id:
+          'left',
+
+        title:
+          'Left Side',
+
+        description:
+          'Capture the complete left side of the vehicle.',
+
+        imageUrl:
+          null,
+
+        uploaded:
+          false,
+      },
+
+      {
+        id:
+          'right',
+
+        title:
+          'Right Side',
+
+        description:
+          'Capture the complete right side of the vehicle.',
+
+        imageUrl:
+          null,
+
+        uploaded:
+          false,
+      },
+
+      {
+        id:
+          'odometer',
+
+        title:
+          'Odometer Reading',
+
+        description:
+          'Capture a clear photo showing the current odometer reading.',
+
+        imageUrl:
+          null,
+
+        uploaded:
+          false,
+      },
+
+      {
+        id:
+          'windscreen',
+
+        title:
+          'Windscreen',
+
+        description:
+          'Capture a clear photo of the windscreen, including any visible chips or cracks.',
+
+        imageUrl:
+          null,
+
+        uploaded:
+          false,
+      },
+
+      {
+        id:
+          'vehicle-interior',
+
+        title:
+          'Vehicle Interior',
+
+        description:
+          'Capture a clear photograph of the vehicle interior and dashboard area.',
+
+        imageUrl:
+          null,
+
+        uploaded:
+          false,
+      },
+
+    ];
+  }
+
+
+  // =========================================================
+  // STATE
+  // =========================================================
+
+  private setInspection(
+    inspection:
+      Inspection
+  ): void {
+
+    /*
+     * Update Angular state immediately.
+     */
+    this.inspectionSubject.next(
+      inspection
+    );
+
+
+    /*
+     * Persist only metadata.
+     */
+    this.saveInspection(
+      inspection
+    );
+  }
+
+
+  // =========================================================
+  // LOCAL STORAGE
+  // =========================================================
+
+  private saveInspection(
+    inspection:
+      Inspection
+  ): void {
+
+    try {
+
+      /*
+       * =====================================================
+       * VERY IMPORTANT
+       * =====================================================
+       *
+       * Never put the actual image/base64 data into
+       * localStorage.
+       *
+       * Camera images can easily be several megabytes.
+       *
+       * We only persist:
+       *
+       * - photo ID
+       * - title
+       * - description
+       * - uploaded state
+       * - uploadedAt
+       *
+       * The real image remains in the live inspection object
+       * and is therefore still available to Review/Submit
+       * during the current customer session.
+       */
+      const storageInspection:
+        Inspection = {
+
+        ...inspection,
+
+        photos:
+          inspection.photos.map(
+            photo => ({
+
+              id:
+                photo.id,
+
+              title:
+                photo.title,
+
+              description:
+                photo.description,
+
+              imageUrl:
+                null,
+
+              uploaded:
+                photo.uploaded,
+
+              uploadedAt:
+                photo.uploadedAt,
+            })
+          ),
+
+        accidentPhotos:
+          inspection.accidentPhotos.map(
+            photo => ({
+
+              id:
+                photo.id,
+
+              title:
+                photo.title,
+
+              description:
+                photo.description,
+
+              imageUrl:
+                null,
+
+              uploaded:
+                photo.uploaded,
+
+              uploadedAt:
+                photo.uploadedAt,
+            })
+          ),
+      };
+
+
+      localStorage.setItem(
+        this.storageKey,
+        JSON.stringify(
+          storageInspection
+        )
+      );
+
+
+    } catch (error) {
+
+      /*
+       * LocalStorage failure must never break the
+       * customer inspection workflow.
+       */
+      console.warn(
+        'Falcon: unable to persist inspection metadata to localStorage.',
+        error
+      );
+    }
+  }
+
+
+  // =========================================================
+  // LOAD INSPECTION
+  // =========================================================
+
+  private loadInspection():
+    Inspection | null {
+
+    try {
+
+      const stored =
+        localStorage.getItem(
+          this.storageKey
+        );
+
+
+      if (!stored) {
+        return null;
+      }
+
+
+      const inspection =
+        JSON.parse(
+          stored
+        ) as Inspection;
+
+
+      // ------------------------------------------------------
+      // Compatibility
+      // ------------------------------------------------------
+
+      if (
+        !inspection.inspectionType &&
+        inspection.type
+      ) {
+
+        inspection.inspectionType =
+          inspection.type;
+      }
+
+
+      if (
+        !inspection.type &&
+        inspection.inspectionType
+      ) {
+
+        inspection.type =
+          inspection.inspectionType;
+      }
+
+
+      if (
+        !inspection.customer
+      ) {
+
+        inspection.customer = {};
+      }
+
+
+      if (
+        !inspection.vehicle
+      ) {
+
+        inspection.vehicle = {};
+      }
+
+
+      const type =
+        inspection.inspectionType ??
+        'pre-cover';
+
+
+      // ------------------------------------------------------
+      // NORMALIZE PHOTOS
+      // ------------------------------------------------------
+
+      const oldPhotos =
+        Array.isArray(
+          inspection.photos
+        )
+          ? inspection.photos
+          : [];
+
+
+      const oldAccidentPhotos =
+        Array.isArray(
+          inspection.accidentPhotos
+        )
+          ? inspection.accidentPhotos
+          : [];
+
+
+      const sevenPhotos =
+        this.createSevenPhotoChecklist(
+          type
+        );
+
+
+      /*
+       * Restore metadata only.
+       *
+       * Images are intentionally not restored because they
+       * are no longer stored in localStorage.
+       */
+      sevenPhotos.forEach(
+        photo => {
+
+          const existing =
+            oldPhotos.find(
+              oldPhoto =>
+                oldPhoto.id === photo.id
+            )
+            ??
+            oldAccidentPhotos.find(
+              oldPhoto =>
+                oldPhoto.id === photo.id
+            );
+
+
+          if (existing) {
+
+            photo.imageUrl =
+              null;
+
+            photo.uploaded =
+              !!existing.uploaded;
+
+            photo.uploadedAt =
+              existing.uploadedAt;
+          }
+        }
+      );
+
+
+      inspection.photos =
+        sevenPhotos;
+
+
+      inspection.accidentPhotos =
+        sevenPhotos.map(
+          photo => ({
+            ...photo,
+            imageUrl:
+              null,
+          })
+        );
+
+
+      // ------------------------------------------------------
+      // VEHICLE COMPATIBILITY
+      // ------------------------------------------------------
+
+      if (
+        inspection.vehicle.mileage !== undefined &&
+        typeof inspection.vehicle.mileage !== 'number'
+      ) {
+
+        const mileage =
+          Number(
+            inspection.vehicle.mileage
+          );
+
+
+        inspection.vehicle.mileage =
+          Number.isFinite(mileage)
+            ? mileage
+            : 0;
+      }
+
+
+      if (
+        inspection.vehicle.year !== undefined
+      ) {
+
+        inspection.vehicle.year =
+          String(
+            inspection.vehicle.year
+          );
+      }
+
+
+      /*
+       * Normalize storage.
+       */
+      this.saveInspection(
+        inspection
+      );
+
+
+      return inspection;
+
+    } catch (error) {
+
+      console.error(
+        'Failed to load Falcon inspection:',
+        error
+      );
+
+
+      return null;
+    }
+  }
+
+
+  // =========================================================
+  // CLEAR INSPECTION
+  // =========================================================
+
+  clearInspection(): void {
+
+    this.inspectionSubject.next(
+      null
+    );
+
+
+    try {
+
+      localStorage.removeItem(
+        this.storageKey
+      );
+
+    } catch (error) {
+
+      console.error(
+        'Failed to clear Falcon inspection:',
+        error
+      );
+    }
+  }
+
+
+  // =========================================================
+  // HELPERS
+  // =========================================================
+
+  private requireInspection():
+    Inspection {
+
+    const inspection =
+      this.inspectionSubject.value;
+
+
+    if (!inspection) {
+
+      throw new Error(
+        'No active Falcon inspection exists.'
+      );
+    }
+
+
+    return inspection;
+  }
+
+
+  private generateLocalReference():
+    string {
+
+    return (
+      'LOCAL-' +
+      Math.random()
+        .toString(36)
+        .substring(2, 14)
+        .toUpperCase()
+    );
   }
 }

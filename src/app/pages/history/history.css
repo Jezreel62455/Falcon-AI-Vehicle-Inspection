@@ -1,480 +1,480 @@
-/* =========================================================
-   FALCON AI — INSPECTION HISTORY
-   Presentation only
-========================================================= */
+/* ==========================================================
+   FALCON
+   INSPECTION HISTORY
+   ========================================================== */
 
 :host {
   display: block;
   width: 100%;
+  min-height: 100vh;
+  background: #f4f7fb;
 }
 
-.history-page {
-  width: 100%;
-  max-width: 1440px;
-  margin: 0 auto;
-  padding: 36px 40px 60px;
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
 
-/* =========================================================
-   PAGE HEADER
-========================================================= */
+/* ==========================================================
+   PAGE
+   ========================================================== */
+
+.history-page {
+  width: 100%;
+  min-height: 100vh;
+  background: #f4f7fb;
+  color: #0f172a;
+}
+
+
+/* ==========================================================
+   HEADER
+   ========================================================== */
 
 .history-header {
+  width: 100%;
+  background: #ffffff;
+  border-bottom: 1px solid #e8edf3;
+}
+
+
+.history-header-content {
+  width: min(1180px, calc(100% - 48px));
+  min-height: 150px;
+  margin: 0 auto;
+
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 32px;
-
-  margin-bottom: 32px;
 }
 
-.history-header > div {
-  min-width: 0;
-}
 
-.page-eyebrow {
-  display: inline-block;
-
+.history-eyebrow {
   margin-bottom: 8px;
 
+  color: #64748b;
+
   font-size: 11px;
-  line-height: 1;
   font-weight: 800;
   letter-spacing: 0.14em;
-  text-transform: uppercase;
-
-  color: #64748b;
+  line-height: 1.4;
 }
+
 
 .history-header h1 {
   margin: 0;
 
-  font-size: 32px;
-  line-height: 1.15;
+  color: #0f172a;
+
+  font-size: 30px;
   font-weight: 800;
   letter-spacing: -0.025em;
-
-  color: #0f172a;
+  line-height: 1.15;
 }
 
-.subtitle {
-  margin: 10px 0 0;
 
-  max-width: 650px;
+.history-header p {
+  margin: 9px 0 0;
+
+  color: #64748b;
 
   font-size: 14px;
   line-height: 1.6;
-
-  color: #64748b;
 }
 
 
-/* =========================================================
+/* ==========================================================
    NEW INSPECTION BUTTON
-========================================================= */
+   ========================================================== */
 
 .new-inspection-button {
-  flex-shrink: 0;
-
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 9px;
 
-  min-height: 44px;
+  min-height: 42px;
   padding: 0 18px;
 
-  border: 0;
-  border-radius: 10px;
+  border: 1px solid #0f172a;
+  border-radius: 8px;
 
   background: #0f172a;
   color: #ffffff;
 
   font-family: inherit;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 750;
+
+  white-space: nowrap;
 
   cursor: pointer;
 
   transition:
     background 0.18s ease,
+    border-color 0.18s ease,
     transform 0.18s ease,
     box-shadow 0.18s ease;
 }
 
+
 .new-inspection-button:hover {
   background: #1e293b;
+  border-color: #1e293b;
 
   transform: translateY(-1px);
 
   box-shadow:
-    0 7px 18px rgba(15, 23, 42, 0.15);
+    0 6px 14px rgba(15, 23, 42, 0.12);
 }
+
 
 .new-inspection-button:active {
   transform: translateY(0);
 }
 
-.new-inspection-button span {
-  font-size: 20px;
-  line-height: 1;
+
+.button-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 18px;
+  height: 18px;
+
+  font-size: 19px;
   font-weight: 400;
+  line-height: 1;
 }
 
 
-/* =========================================================
+/* ==========================================================
+   CONTENT
+   ========================================================== */
+
+.history-content {
+  width: min(1180px, calc(100% - 48px));
+
+  margin: 0 auto;
+  padding: 32px 0 48px;
+}
+
+
+/* ==========================================================
    INSPECTION LIST
-========================================================= */
+   ========================================================== */
 
 .inspection-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
+
+  width: 100%;
 }
 
 
-/* =========================================================
+/* ==========================================================
    INSPECTION CARD
-========================================================= */
+   ========================================================== */
 
 .inspection-card {
   width: 100%;
-  box-sizing: border-box;
 
   padding: 24px;
 
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
-
   background: #ffffff;
 
-  box-shadow:
-    0 1px 2px rgba(15, 23, 42, 0.03);
-
-  transition:
-    border-color 0.18s ease,
-    box-shadow 0.18s ease,
-    transform 0.18s ease;
-}
-
-.inspection-card:hover {
-  border-color: #cbd5e1;
+  border: 1px solid #e3e9f0;
+  border-radius: 12px;
 
   box-shadow:
-    0 8px 24px rgba(15, 23, 42, 0.07);
+    0 2px 8px rgba(15, 23, 42, 0.035);
 
-  transform: translateY(-1px);
+  overflow: hidden;
 }
 
 
-/* =========================================================
+/* ==========================================================
    CARD HEADER
-========================================================= */
+   ========================================================== */
 
 .inspection-card-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 24px;
+  gap: 20px;
 
-  margin-bottom: 20px;
+  width: 100%;
+
+  padding-bottom: 18px;
+
+  border-bottom: 1px solid #eef2f7;
 }
 
-.inspection-card-header > div {
+
+.inspection-customer {
   min-width: 0;
 }
 
-.card-eyebrow {
-  display: block;
 
-  margin-bottom: 5px;
-
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-
-  color: #94a3b8;
-}
-
-.inspection-card h2 {
+.inspection-customer h2 {
   margin: 0;
-
-  font-size: 18px;
-  line-height: 1.3;
-  font-weight: 750;
 
   color: #0f172a;
 
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  line-height: 1.35;
+
   overflow-wrap: anywhere;
 }
 
-.inspection-id {
-  margin: 6px 0 0;
 
-  font-family:
-    ui-monospace,
-    SFMono-Regular,
-    Menlo,
-    Monaco,
-    Consolas,
-    monospace;
+.inspection-reference {
+  display: block;
 
+  margin-top: 6px;
+
+  color: #64748b;
+
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 11px;
-  line-height: 1.4;
-
-  color: #94a3b8;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 
   overflow-wrap: anywhere;
 }
 
 
-/* =========================================================
+/* ==========================================================
    STATUS
-========================================================= */
+   ========================================================== */
 
-.status {
-  flex-shrink: 0;
+.inspection-status {
+  flex: 0 0 auto;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  min-width: 78px;
   min-height: 28px;
-
   padding: 0 11px;
 
   border-radius: 999px;
 
-  font-size: 10px;
-  line-height: 1;
+  font-size: 11px;
   font-weight: 800;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
+  letter-spacing: 0.01em;
+
+  white-space: nowrap;
 }
 
 
-/* Pending */
-
-.status.pending {
-  background: #fff7ed;
-  color: #c2410c;
-}
-
-
-/* Submitted */
-
-.status.submitted {
-  background: #ecfdf5;
+.status-completed {
+  background: #ecfdf3;
   color: #047857;
 }
 
 
-/* Completed */
-
-.status.completed {
+.status-submitted {
   background: #eff6ff;
   color: #1d4ed8;
 }
 
 
-/* Review */
-
-.status.review,
-.status.under-review {
-  background: #fefce8;
-  color: #a16207;
+.status-in-progress {
+  background: #fff7ed;
+  color: #c2410c;
 }
 
 
-/* Draft */
+.status-processing {
+  background: #f5f3ff;
+  color: #6d28d9;
+}
 
-.status.draft {
+
+.status-failed {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+
+.status-pending {
   background: #f1f5f9;
   color: #475569;
 }
 
 
-/* In progress */
-
-.status.in-progress {
-  background: #eef2ff;
-  color: #4338ca;
-}
-
-
-/* =========================================================
+/* ==========================================================
    SUMMARY
-========================================================= */
+   ========================================================== */
 
 .inspection-summary {
   display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 
-  grid-template-columns:
-    minmax(0, 1.4fr)
-    minmax(0, 1fr)
-    minmax(0, 1fr);
+  width: 100%;
 
-  margin-bottom: 20px;
+  margin-top: 20px;
 
-  border: 1px solid #eef2f7;
-  border-radius: 10px;
+  border: 1px solid #edf1f5;
+  border-radius: 9px;
 
   overflow: hidden;
-
-  background: #f8fafc;
 }
+
 
 .summary-item {
   min-width: 0;
 
   padding: 14px 16px;
 
-  border-right: 1px solid #e2e8f0;
+  background: #fafbfc;
 }
 
-.summary-item:last-child {
-  border-right: 0;
+
+.summary-item + .summary-item {
+  border-left: 1px solid #edf1f5;
 }
 
-.summary-item span {
+
+.summary-label {
   display: block;
 
   margin-bottom: 5px;
 
-  font-size: 10px;
-  line-height: 1.2;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-
   color: #94a3b8;
+
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-.summary-item strong {
+
+.summary-value {
   display: block;
+
+  color: #334155;
 
   font-size: 13px;
-  line-height: 1.4;
   font-weight: 650;
+  line-height: 1.45;
+
+  overflow-wrap: anywhere;
+}
+
+
+/* ==========================================================
+   INFORMATION SECTIONS
+   ========================================================== */
+
+.inspection-section {
+  width: 100%;
+
+  margin-top: 22px;
+}
+
+
+.section-title {
+  margin-bottom: 12px;
 
   color: #334155;
 
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-
-/* =========================================================
-   VEHICLE SECTION
-========================================================= */
-
-.vehicle-section {
-  padding-top: 19px;
-
-  border-top: 1px solid #eef2f7;
-}
-
-.section-heading {
-  margin-bottom: 14px;
-}
-
-.section-heading h3 {
-  margin: 0;
-
   font-size: 12px;
-  line-height: 1.3;
   font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-
-  color: #475569;
+  letter-spacing: 0.02em;
 }
 
 
-/* =========================================================
-   VEHICLE GRID
-========================================================= */
-
-.vehicle-grid {
+.inspection-grid {
   display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 
-  grid-template-columns:
-    repeat(6, minmax(0, 1fr));
+  width: 100%;
 
-  gap: 16px;
+  border: 1px solid #edf1f5;
+  border-radius: 9px;
+
+  overflow: hidden;
 }
 
-.detail-item {
+
+.inspection-field {
   min-width: 0;
+
+  min-height: 70px;
+  padding: 13px 15px;
+
+  background: #ffffff;
 }
 
-.detail-item > span {
+
+.inspection-field:nth-child(n + 4) {
+  border-top: 1px solid #edf1f5;
+}
+
+
+.inspection-field:not(:nth-child(3n + 1)) {
+  border-left: 1px solid #edf1f5;
+}
+
+
+.field-label {
   display: block;
 
   margin-bottom: 5px;
 
-  font-size: 10px;
-  line-height: 1.2;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-
   color: #94a3b8;
+
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
 }
 
-.detail-item > strong {
-  display: block;
 
-  font-size: 12px;
-  line-height: 1.4;
-  font-weight: 600;
+.field-value {
+  display: block;
 
   color: #334155;
 
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.45;
+
+  overflow-wrap: anywhere;
 }
 
 
-/* =========================================================
-   INSPECTION INFORMATION
-========================================================= */
+/* ==========================================================
+   ACTIONS
+   ========================================================== */
 
-.inspection-information {
-  display: grid;
+.inspection-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
 
-  grid-template-columns:
-    repeat(3, minmax(0, 1fr));
+  width: 100%;
 
-  gap: 18px;
-
-  margin-top: 20px;
+  margin-top: 22px;
   padding-top: 18px;
 
   border-top: 1px solid #eef2f7;
 }
 
 
-/* =========================================================
-   ACTIONS
-========================================================= */
-
-.inspection-actions {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-
-  margin-top: 20px;
-  padding-top: 16px;
-
-  border-top: 1px solid #eef2f7;
-}
+/* ==========================================================
+   VIEW DETAILS
+   ========================================================== */
 
 .view-details-button {
   display: inline-flex;
@@ -482,8 +482,8 @@
   justify-content: center;
   gap: 8px;
 
-  min-height: 36px;
-  padding: 0;
+  min-height: 38px;
+  padding: 0 4px;
 
   border: 0;
   background: transparent;
@@ -497,86 +497,117 @@
   cursor: pointer;
 }
 
-.view-details-button span {
-  font-size: 17px;
-  line-height: 1;
 
-  transition:
-    transform 0.18s ease;
+.view-details-button:hover {
+  color: #334155;
 }
 
-.view-details-button:hover span {
+
+.view-arrow {
+  display: inline-flex;
+
+  font-size: 16px;
+  line-height: 1;
+
+  transition: transform 0.18s ease;
+}
+
+
+.view-details-button:hover .view-arrow {
   transform: translateX(4px);
 }
 
 
-/* =========================================================
-   STATE CARDS
-========================================================= */
+/* ==========================================================
+   DELETE
+   ========================================================== */
 
-.state-card {
+.delete-inspection-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 38px;
+  min-width: 78px;
+
+  padding: 0 14px;
+
+  border: 1px solid #fecaca;
+  border-radius: 7px;
+
+  background: #ffffff;
+  color: #b91c1c;
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 750;
+
+  cursor: pointer;
+
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease;
+}
+
+
+.delete-inspection-button:hover:not(:disabled) {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #991b1b;
+}
+
+
+.delete-inspection-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+
+/* ==========================================================
+   LOADING
+   ========================================================== */
+
+.history-loading {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 
-  min-height: 300px;
+  min-height: 280px;
 
   padding: 40px;
 
-  box-sizing: border-box;
-
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
-
   background: #ffffff;
 
-  text-align: center;
-
-  box-shadow:
-    0 1px 2px rgba(15, 23, 42, 0.03);
+  border: 1px solid #e3e9f0;
+  border-radius: 12px;
 }
 
-.state-card h2,
-.state-card h3 {
-  margin: 14px 0 7px;
-
-  font-size: 18px;
-  line-height: 1.3;
-  font-weight: 750;
-
-  color: #0f172a;
-}
-
-.state-card p {
-  margin: 0;
-
-  max-width: 450px;
-
-  font-size: 13px;
-  line-height: 1.6;
-
-  color: #64748b;
-}
-
-
-/* =========================================================
-   LOADING
-========================================================= */
 
 .loading-spinner {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
 
-  margin-bottom: 4px;
+  margin-bottom: 14px;
 
   border: 3px solid #e2e8f0;
   border-top-color: #0f172a;
-
   border-radius: 50%;
 
-  animation: history-spin 0.75s linear infinite;
+  animation: history-spin 0.8s linear infinite;
 }
+
+
+.history-loading p {
+  margin: 0;
+
+  color: #64748b;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
 
 @keyframes history-spin {
   to {
@@ -585,190 +616,280 @@
 }
 
 
-/* =========================================================
+/* ==========================================================
    ERROR
-========================================================= */
+   ========================================================== */
 
-.error-state {
-  border-color: #fecaca;
+.history-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+
+  width: 100%;
+
+  padding: 18px 20px;
+
   background: #fffafa;
+
+  border: 1px solid #fecaca;
+  border-radius: 10px;
 }
 
-.error-state h3 {
-  color: #991b1b;
-}
 
-.error-state p {
+.error-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex: 0 0 auto;
+
+  width: 28px;
+  height: 28px;
+
+  border-radius: 50%;
+
+  background: #fee2e2;
   color: #b91c1c;
+
+  font-size: 14px;
+  font-weight: 900;
 }
 
-.retry-button {
-  margin-top: 20px;
 
-  min-height: 40px;
-  padding: 0 16px;
+.history-error h3 {
+  margin: 2px 0 5px;
 
-  border: 0;
-  border-radius: 9px;
+  color: #991b1b;
 
-  background: #0f172a;
-  color: #ffffff;
+  font-size: 14px;
+  font-weight: 800;
+}
 
-  font-family: inherit;
+
+.history-error p {
+  margin: 0;
+
+  color: #7f1d1d;
+
   font-size: 12px;
-  font-weight: 700;
-
-  cursor: pointer;
+  line-height: 1.5;
 }
 
 
-/* =========================================================
-   EMPTY STATE
-========================================================= */
+/* ==========================================================
+   EMPTY
+   ========================================================== */
+
+.history-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 340px;
+
+  padding: 40px;
+
+  text-align: center;
+
+  background: #ffffff;
+
+  border: 1px solid #e3e9f0;
+  border-radius: 12px;
+}
+
 
 .empty-icon {
   display: flex;
   align-items: center;
   justify-content: center;
 
-  width: 52px;
-  height: 52px;
+  width: 48px;
+  height: 48px;
 
-  border-radius: 12px;
+  margin-bottom: 16px;
+
+  border-radius: 50%;
 
   background: #f1f5f9;
+  color: #475569;
 
-  font-size: 24px;
+  font-size: 20px;
+  font-weight: 800;
 }
 
 
-/* =========================================================
-   TABLET
-========================================================= */
+.history-empty h2 {
+  margin: 0;
+
+  color: #0f172a;
+
+  font-size: 18px;
+  font-weight: 800;
+}
+
+
+.history-empty p {
+  max-width: 420px;
+
+  margin: 8px 0 20px;
+
+  color: #64748b;
+
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
 
 @media (max-width: 1100px) {
 
-  .history-page {
-    padding: 30px 26px 48px;
+  .history-header-content,
+  .history-content {
+    width: min(100% - 40px, 1000px);
   }
 
-  .vehicle-grid {
-    grid-template-columns:
-      repeat(3, minmax(0, 1fr));
+  .inspection-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .inspection-summary {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
+  .inspection-field:nth-child(n + 4) {
+    border-top: 1px solid #edf1f5;
   }
 
-  .summary-item:nth-child(2) {
-    border-right: 0;
+  .inspection-field:not(:nth-child(3n + 1)) {
+    border-left: 0;
   }
 
-  .summary-item:nth-child(-n + 2) {
-    border-bottom: 1px solid #e2e8f0;
+  .inspection-field:not(:nth-child(2n + 1)) {
+    border-left: 1px solid #edf1f5;
   }
 
-  .summary-item:last-child {
-    border-right: 0;
-  }
 }
 
 
-/* =========================================================
-   MOBILE
-========================================================= */
-
 @media (max-width: 720px) {
 
-  .history-page {
-    padding: 22px 16px 40px;
-  }
-
-  .history-header {
+  .history-header-content {
     flex-direction: column;
     align-items: stretch;
+    justify-content: center;
 
     gap: 20px;
-    margin-bottom: 26px;
+
+    padding: 24px 0;
   }
 
+
   .history-header h1 {
-    font-size: 27px;
+    font-size: 26px;
   }
+
 
   .new-inspection-button {
     width: 100%;
   }
 
+
+  .history-content {
+    width: calc(100% - 28px);
+
+    padding-top: 20px;
+  }
+
+
   .inspection-card {
     padding: 18px;
   }
 
+
   .inspection-card-header {
     flex-direction: column;
-    gap: 13px;
+    align-items: flex-start;
   }
 
-  .status {
+
+  .inspection-status {
     align-self: flex-start;
   }
+
 
   .inspection-summary {
     grid-template-columns: 1fr;
   }
 
-  .summary-item {
-    border-right: 0;
-    border-bottom: 1px solid #e2e8f0;
+
+  .summary-item + .summary-item {
+    border-left: 0;
+    border-top: 1px solid #edf1f5;
   }
 
-  .summary-item:last-child {
-    border-bottom: 0;
-  }
 
-  .vehicle-grid {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
-  }
-
-  .inspection-information {
+  .inspection-grid {
     grid-template-columns: 1fr;
-    gap: 14px;
   }
+
+
+  .inspection-field {
+    min-height: auto;
+  }
+
+
+  .inspection-field:nth-child(n + 2) {
+    border-top: 1px solid #edf1f5;
+  }
+
+
+  .inspection-field:not(:nth-child(3n + 1)),
+  .inspection-field:not(:nth-child(2n + 1)) {
+    border-left: 0;
+  }
+
 
   .inspection-actions {
     justify-content: stretch;
   }
 
-  .view-details-button {
-    width: 100%;
-    justify-content: space-between;
+
+  .view-details-button,
+  .delete-inspection-button {
+    flex: 1;
   }
+
 }
 
 
-/* =========================================================
-   SMALL MOBILE
-========================================================= */
-
 @media (max-width: 420px) {
 
-  .history-page {
-    padding-left: 12px;
-    padding-right: 12px;
+  .history-header-content,
+  .history-content {
+    width: calc(100% - 20px);
   }
 
-  .vehicle-grid {
-    grid-template-columns: 1fr;
+
+  .history-header h1 {
+    font-size: 23px;
   }
 
-  .inspection-card h2 {
-    font-size: 16px;
-  }
 
   .inspection-card {
-    padding: 16px;
+    padding: 15px;
+    border-radius: 10px;
   }
+
+
+  .inspection-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+
+  .view-details-button,
+  .delete-inspection-button {
+    width: 100%;
+  }
+
 }
